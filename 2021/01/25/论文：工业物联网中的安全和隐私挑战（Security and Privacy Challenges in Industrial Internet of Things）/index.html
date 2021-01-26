@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>（论文翻译）工业物联网中的安全和隐私挑战（Security and Privacy Challenges in Industrial Internet of Things） | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="工业物联网系统的发展趋势（第2节）一种新兴趋势是将更复杂的电子设备集成到生产系统中，将它们互连，并集成到常规业务IT系统中。由此产生的工业物联网是工业价值链的新层次组织和管理的基础，并可以实现高度灵活和节省资源的生产，并以批量生产为代价增强了产品的个性化。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="（论文翻译）工业物联网中的安全和隐私挑战（Security and Privacy Challenges in Industrial Internet of Things）">
+<meta property="og:url" content="http://example.com/2021/01/25/%E8%AE%BA%E6%96%87%EF%BC%9A%E5%B7%A5%E4%B8%9A%E7%89%A9%E8%81%94%E7%BD%91%E4%B8%AD%E7%9A%84%E5%AE%89%E5%85%A8%E5%92%8C%E9%9A%90%E7%A7%81%E6%8C%91%E6%88%98%EF%BC%88Security%20and%20Privacy%20Challenges%20in%20Industrial%20Internet%20of%20Things%EF%BC%89/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="工业物联网系统的发展趋势（第2节）一种新兴趋势是将更复杂的电子设备集成到生产系统中，将它们互连，并集成到常规业务IT系统中。由此产生的工业物联网是工业价值链的新层次组织和管理的基础，并可以实现高度灵活和节省资源的生产，并以批量生产为代价增强了产品的个性化。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/006y8mN6ly1g8954zzz2cj30w10gkag1.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/006y8mN6ly1g8955qviynj30hx0fowhb.jpg">
+<meta property="article:published_time" content="2021-01-25T14:28:05.579Z">
+<meta property="article:modified_time" content="2020-05-05T03:16:51.224Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="论文">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/006y8mN6ly1g8954zzz2cj30w10gkag1.jpg">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-论文：工业物联网中的安全和隐私挑战（Security and Privacy Challenges in Industrial Internet of Things）" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/01/25/%E8%AE%BA%E6%96%87%EF%BC%9A%E5%B7%A5%E4%B8%9A%E7%89%A9%E8%81%94%E7%BD%91%E4%B8%AD%E7%9A%84%E5%AE%89%E5%85%A8%E5%92%8C%E9%9A%90%E7%A7%81%E6%8C%91%E6%88%98%EF%BC%88Security%20and%20Privacy%20Challenges%20in%20Industrial%20Internet%20of%20Things%EF%BC%89/" class="article-date">
+  <time class="dt-published" datetime="2021-01-25T14:28:05.579Z" itemprop="datePublished">2021-01-25</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E5%B7%A5%E6%8E%A7/">工控</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      （论文翻译）工业物联网中的安全和隐私挑战（Security and Privacy Challenges in Industrial Internet of Things）
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="工业物联网系统的发展趋势（第2节）"><a href="#工业物联网系统的发展趋势（第2节）" class="headerlink" title="工业物联网系统的发展趋势（第2节）"></a>工业物联网系统的发展趋势（第2节）</h2><h3 id="一种新兴趋势是将更复杂的电子设备集成到生产系统中，将它们互连，并集成到常规业务IT系统中。由此产生的工业物联网是工业价值链的新层次组织和管理的基础，并可以实现高度灵活和节省资源的生产，并以批量生产为代价增强了产品的个性化。"><a href="#一种新兴趋势是将更复杂的电子设备集成到生产系统中，将它们互连，并集成到常规业务IT系统中。由此产生的工业物联网是工业价值链的新层次组织和管理的基础，并可以实现高度灵活和节省资源的生产，并以批量生产为代价增强了产品的个性化。" class="headerlink" title="一种新兴趋势是将更复杂的电子设备集成到生产系统中，将它们互连，并集成到常规业务IT系统中。由此产生的工业物联网是工业价值链的新层次组织和管理的基础，并可以实现高度灵活和节省资源的生产，并以批量生产为代价增强了产品的个性化。"></a>一种新兴趋势是将更复杂的电子设备集成到生产系统中，将它们互连，并集成到常规业务IT系统中。由此产生的工业物联网是工业价值链的新层次组织和管理的基础，并可以实现高度灵活和节省资源的生产，并以批量生产为代价增强了产品的个性化。</h3><a id="more"></a>
+
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g8954zzz2cj30w10gkag1.jpg" alt="image-20191024114308344"></p>
+<h3 id="工业物联网的基础是信息物理系统（CPS）"><a href="#工业物联网的基础是信息物理系统（CPS）" class="headerlink" title="工业物联网的基础是信息物理系统（CPS）"></a>工业物联网的基础是信息物理系统（CPS）</h3><ul>
+<li>这是监视和控制物理过程的计算平台</li>
+<li> CPS可以实时监测状态，进行结构健康监测，远程诊断和远程控制生产系统。</li>
+</ul>
+<h3 id="工业物联网带来了许多新的挑战涉及不同方面，包括安全性，隐私，标准化，法律和社会方面。"><a href="#工业物联网带来了许多新的挑战涉及不同方面，包括安全性，隐私，标准化，法律和社会方面。" class="headerlink" title="工业物联网带来了许多新的挑战涉及不同方面，包括安全性，隐私，标准化，法律和社会方面。"></a>工业物联网带来了许多新的挑战涉及不同方面，包括安全性，隐私，标准化，法律和社会方面。</h3><h2 id="指出相关的安全性和隐私风险和挑战（第3节）"><a href="#指出相关的安全性和隐私风险和挑战（第3节）" class="headerlink" title="指出相关的安全性和隐私风险和挑战（第3节）"></a>指出相关的安全性和隐私风险和挑战（第3节）</h2><p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g8955qviynj30hx0fowhb.jpg" alt="image-20191024114351297"></p>
+<h3 id="对工业物联网系统的攻击"><a href="#对工业物联网系统的攻击" class="headerlink" title="对工业物联网系统的攻击"></a>对工业物联网系统的攻击</h3><ul>
+<li><p>Slammer蠕虫</p>
+<ul>
+<li>2003年</li>
+<li>感染了美国一家核电厂的两个关键监控系统</li>
+<li>同年，计算机病毒感染了美国主要运输网络的信号和调度控制系统，导致旅客和货运列车完全停驶</li>
+</ul>
+</li>
+<li><p>在随后的几年中，文献报道了许多影响工业控制系统和关键基础设施的安全事件[31、7、22、40]</p>
+</li>
+<li><p>Stuxnet [70，22，40]却显示出一种新趋势，即针对性强的攻击和强大的对手（例如民族国家）的代价</p>
+</li>
+</ul>
+<h3 id="工业攻击面"><a href="#工业攻击面" class="headerlink" title="工业攻击面"></a>工业攻击面</h3><ul>
+<li><p>智能工厂由几个网络物理生产系统（CPPS）组成</p>
+<ul>
+<li><p>电子设备</p>
+<ul>
+<li>电子由软件（例如嵌入式操作系统和应用程序）驱动，并通过各种网络连接（例如以太网或WiFi）与人类和其他CPPS交互</li>
+</ul>
+</li>
+<li><p>监控器</p>
+<ul>
+<li>这些监控器通过传感器和执行器控制物理过程</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>攻击面存在于所有这些抽象层上</p>
+<ul>
+<li>电子会遭受物理攻击，包括侵入性硬件攻击，边信道攻击和逆向工程攻击[55]。</li>
+<li>恶意代码（例如特洛伊木马，病毒和运行时攻击）可能会破坏软件</li>
+<li>通信协议易受协议攻击，包括中间人攻击和拒绝服务攻击[28]</li>
+<li>即使是操作CPPS的人也容易遭受网络攻击，例如网络钓鱼和社会工程。</li>
+</ul>
+</li>
+</ul>
+<h3 id="安全目标和要求"><a href="#安全目标和要求" class="headerlink" title="安全目标和要求"></a>安全目标和要求</h3><ul>
+<li><p>工业生产系统的最重要目标是可用性，它应该防止任何不必要的生产延迟，从而导致生产力损失和收入损失。</p>
+</li>
+<li><p>另一个基本目标是防止任何系统可能导致人身伤害或人身伤害的故障。</p>
+<ul>
+<li>为了实现这一目标，必须保持工业物联网系统的完整性。这包括防止破坏活动，这可能会导致产品质量意外损失和资源使用增加。</li>
+</ul>
+</li>
+<li><p>工业物联网的目标之一是实现智能知道自己的历史并可以控制自己的生产过程的产品。</p>
+</li>
+<li><p>物联网生产系统的强大连接性和智能产品则需要新的机制来防止工业间谍活动以及客户和员工的隐私。</p>
+</li>
+</ul>
+<h2 id="讨论针对工业物联网系统的整体安全框架的潜在解决方案（第4节）"><a href="#讨论针对工业物联网系统的整体安全框架的潜在解决方案（第4节）" class="headerlink" title="讨论针对工业物联网系统的整体安全框架的潜在解决方案（第4节）"></a>讨论针对工业物联网系统的整体安全框架的潜在解决方案（第4节）</h2><h3 id="现有的信息安全概念适应网络物理生产系统（CPPS）并不容易"><a href="#现有的信息安全概念适应网络物理生产系统（CPPS）并不容易" class="headerlink" title="现有的信息安全概念适应网络物理生产系统（CPPS）并不容易"></a>现有的信息安全概念适应网络物理生产系统（CPPS）并不容易</h3><ul>
+<li><p>完整性和机密性是传统企业IT系统的主要保护目标，因此，防范网络攻击通常是安全性和可用性之间的权衡</p>
+</li>
+<li><p>如果发生网络攻击，通常会暂时禁用受影响的IT系统，然后在攻击后将其恢复。但是，这种方法不能应用于以可用性为基本要求的CPPS。</p>
+</li>
+<li><p>其他差异是由于CPPS严格的实时要求特性所致-</p>
+<ul>
+<li>它们受约束的计算，内存和能源，以及工业生产系统的使用寿命长。</li>
+</ul>
+</li>
+</ul>
+<h3 id="CPS的安全体系结构"><a href="#CPS的安全体系结构" class="headerlink" title="CPS的安全体系结构"></a>CPS的安全体系结构</h3><ul>
+<li><p>嵌入式物联网系统的安全体系结构方面有大量文献</p>
+<ul>
+<li><p>高端是Intel和ARM体系结构</p>
+<ul>
+<li>基于软件的隔离和虚拟化[35]</li>
+<li>基于安全硬件的可信计算（例如，可信平台模块[67]）</li>
+<li>和提供安全执行的处理器架构（例如ARM TrustZone [72]，AEGIS [64]，OASIS [46]和Intel Software Guard Extensions（SGX）[36、20]）</li>
+</ul>
+</li>
+<li><p>低端嵌入式系统通常是为特定任务而设计的，并且针对低功耗和最低成本进行了优化</p>
+<ul>
+<li><p>它们必须提供多种功能并满足严格的实时要求</p>
+</li>
+<li><p>这些设备的安全解决方案通常基于硬件强制将安全关键代码和数据与同一平台上的其他软件隔离</p>
+</li>
+<li><p>示例是SMART [13]，SPM [63]，SANCUS [45]和TrustLite [25]。</p>
+<ul>
+<li> SMART用只读存储器保护一个特定的嵌入式应用程序（任务）的完整性，这不允许在部署后更改代码。</li>
+<li>SPM通过仅对任务本身授予对任务数据区域的访问权限，从而提供了硬件强制的任务隔离。但是，这些任务具有固定的内存布局，不能被中断。此外，SPM的任务测量是在硬件中执行的，即，它是不间断的，同时取决于所测量任务的内存大小，这违反了实时性要求</li>
+<li>SANCUS通过一种机制扩展了SPM，以生成和管理任务的加密机密，但继承了SPM的局限性。</li>
+<li>TrustLite概括了SPM [63]和SMART [13]的概念，并支持中断任务。但是，TrustLite要求在启动时加载所有软件组件并配置其隔离。与SMART，SPM和SANCUS相比，TyTAN [6]在运行时提供了多个任务的动态加载和卸载，具有发送者和接收者身份验证的安全进程间通信（IPC）以及实时调度。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="CPS的完整性验证"><a href="#CPS的完整性验证" class="headerlink" title="CPS的完整性验证"></a>CPS的完整性验证</h3><ul>
+<li>认证是验证系统软件配置完整性的关键机制，它可以检测出意料之外的恶意软件修改。</li>
+<li>下一代物联网系统将由设备组成群，即嵌入式设备的大型自组织异构网络。验证这些系统的正确和安全运行需要有效的群验证机制，以集体验证所有设备的软件完整性，从而检测出意外和恶意的软件修改。</li>
+</ul>
+<h3 id="安全的物联网设备管理"><a href="#安全的物联网设备管理" class="headerlink" title="安全的物联网设备管理"></a>安全的物联网设备管理</h3><ul>
+<li>本地数据管理和本地分布式分析预计将改善本地服务的延迟，因为只有极少的信息将在本地和低延迟网络之外交换</li>
+<li>出于同样的原因，本地分析和数据管理将改善用户数据的隐私性。这些功能将最大限度地利用物联网系统中可用的资源，并为开发人员提供创建创新服务的基础。</li>
+</ul>
+<h2 id="本文介绍了工业物联网系统，相关的安全和隐私挑战，以及针对工业物联网系统整体安全框架的可能解决方案的展望"><a href="#本文介绍了工业物联网系统，相关的安全和隐私挑战，以及针对工业物联网系统整体安全框架的可能解决方案的展望" class="headerlink" title="本文介绍了工业物联网系统，相关的安全和隐私挑战，以及针对工业物联网系统整体安全框架的可能解决方案的展望"></a>本文介绍了工业物联网系统，相关的安全和隐私挑战，以及针对工业物联网系统整体安全框架的可能解决方案的展望</h2>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2021/01/25/%E8%AE%BA%E6%96%87%EF%BC%9A%E5%B7%A5%E4%B8%9A%E7%89%A9%E8%81%94%E7%BD%91%E4%B8%AD%E7%9A%84%E5%AE%89%E5%85%A8%E5%92%8C%E9%9A%90%E7%A7%81%E6%8C%91%E6%88%98%EF%BC%88Security%20and%20Privacy%20Challenges%20in%20Industrial%20Internet%20of%20Things%EF%BC%89/" data-id="ckkco519h00290gyr4sln914w" data-title="（论文翻译）工业物联网中的安全和隐私挑战（Security and Privacy Challenges in Industrial Internet of Things）" class="article-share-link">Share</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BA%E6%96%87/" rel="tag">论文</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2021/01/25/%E6%8E%A7%E5%88%B6%E5%99%A8%E5%9B%BA%E4%BB%B6%E9%80%86%E5%90%91%E5%88%86%E6%9E%90%E5%AE%9E%E8%B7%B5/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          控制器固件逆向分析实践（以施耐德NOE 771为例）
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2021/01/25/%E8%AE%BA%E6%96%87%EF%BC%9A%E7%89%A9%E8%81%94%E7%BD%91%E8%B0%83%E6%9F%A5/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">（论文翻译）物联网调查：体系结构，支持技术，安全性和隐私性以及应用程序</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BA%8C%E8%BF%9B%E5%88%B6/">二进制</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%85%B6%E4%BB%96/">其他</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B7%A5%E6%8E%A7/">工控</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%9D%82%E9%A1%B9/">杂项</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AFL/" rel="tag">AFL</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/BugID/" rel="tag">BugID</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/" rel="tag">Docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Fuzzing/" rel="tag">Fuzzing</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MacbookPro/" rel="tag">MacbookPro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Modbus/" rel="tag">Modbus</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Sql/" rel="tag">Sql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/clusterfuzz/" rel="tag">clusterfuzz</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fuzz/" rel="tag">fuzz</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/libFuzzer/" rel="tag">libFuzzer</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitMQ/" rel="tag">rabbitMQ</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%B8%AA%E4%BA%BA%E6%80%BB%E7%BB%93/" rel="tag">个人总结</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8A%A0%E5%A3%B3%E8%84%B1%E5%A3%B3/" rel="tag">加壳脱壳</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8F%8D%E8%B0%83%E8%AF%95/" rel="tag">反调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%9B%BA%E4%BB%B6%E9%80%86%E5%90%91/" rel="tag">固件逆向</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B0%8F%E8%84%9A%E6%9C%AC/" rel="tag">小脚本</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B7%A5%E6%8E%A7%E5%8D%8F%E8%AE%AE/" rel="tag">工控协议</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/" rel="tag">漏洞分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" rel="tag">漏洞复现</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/" rel="tag">漏洞挖掘</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%97%85%E6%AF%92%E5%88%86%E6%9E%90/" rel="tag">病毒分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BB%83%E5%AD%97/" rel="tag">练字</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%8A%B1%E6%8C%87%E4%BB%A4/" rel="tag">花指令</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%BA%E6%96%87/" rel="tag">论文</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" rel="tag">论文阅读</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" rel="tag">读书笔记</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/AFL/" style="font-size: 10px;">AFL</a> <a href="/tags/BugID/" style="font-size: 10px;">BugID</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Fuzzing/" style="font-size: 10px;">Fuzzing</a> <a href="/tags/MacbookPro/" style="font-size: 10px;">MacbookPro</a> <a href="/tags/Modbus/" style="font-size: 10px;">Modbus</a> <a href="/tags/Sql/" style="font-size: 10px;">Sql</a> <a href="/tags/clusterfuzz/" style="font-size: 10px;">clusterfuzz</a> <a href="/tags/fuzz/" style="font-size: 15px;">fuzz</a> <a href="/tags/libFuzzer/" style="font-size: 10px;">libFuzzer</a> <a href="/tags/rabbitMQ/" style="font-size: 10px;">rabbitMQ</a> <a href="/tags/%E4%B8%AA%E4%BA%BA%E6%80%BB%E7%BB%93/" style="font-size: 20px;">个人总结</a> <a href="/tags/%E5%8A%A0%E5%A3%B3%E8%84%B1%E5%A3%B3/" style="font-size: 10px;">加壳脱壳</a> <a href="/tags/%E5%8F%8D%E8%B0%83%E8%AF%95/" style="font-size: 10px;">反调试</a> <a href="/tags/%E5%9B%BA%E4%BB%B6%E9%80%86%E5%90%91/" style="font-size: 10px;">固件逆向</a> <a href="/tags/%E5%B0%8F%E8%84%9A%E6%9C%AC/" style="font-size: 10px;">小脚本</a> <a href="/tags/%E5%B7%A5%E6%8E%A7%E5%8D%8F%E8%AE%AE/" style="font-size: 10px;">工控协议</a> <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/" style="font-size: 11.67px;">漏洞分析</a> <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" style="font-size: 18.33px;">漏洞复现</a> <a href="/tags/%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/" style="font-size: 13.33px;">漏洞挖掘</a> <a href="/tags/%E7%97%85%E6%AF%92%E5%88%86%E6%9E%90/" style="font-size: 10px;">病毒分析</a> <a href="/tags/%E7%BB%83%E5%AD%97/" style="font-size: 10px;">练字</a> <a href="/tags/%E8%8A%B1%E6%8C%87%E4%BB%A4/" style="font-size: 10px;">花指令</a> <a href="/tags/%E8%AE%BA%E6%96%87/" style="font-size: 11.67px;">论文</a> <a href="/tags/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" style="font-size: 10px;">论文阅读</a> <a href="/tags/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" style="font-size: 16.67px;">读书笔记</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">January 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2021/01/25/%EF%BC%88%E5%B7%A5%E6%8E%A7%E5%90%91%EF%BC%89%E7%BB%84%E6%80%81%E7%8E%8B%E8%BD%AF%E4%BB%B6%E6%BC%8F%E6%B4%9E%E6%B5%8B%E8%AF%95%E9%AA%8C%E8%AF%81%E4%B8%8E%E5%88%A9%E7%94%A8/">（工控向）组态王软件漏洞测试验证与利用</a>
+          </li>
+        
+          <li>
+            <a href="/2021/01/25/%E3%80%8A%E9%BB%91%E5%AE%A2%E5%A4%A7%E6%9B%9D%E5%85%89-%E5%B7%A5%E6%8E%A7%E5%AE%89%E5%85%A8%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/">（读书笔记）工业控制系统安全概述</a>
+          </li>
+        
+          <li>
+            <a href="/2021/01/25/%E5%A0%86%E7%9A%84%E7%9F%A5%E8%AF%86%E4%B8%8E%E5%88%A9%E7%94%A8/">堆的知识与利用（0day2）</a>
+          </li>
+        
+          <li>
+            <a href="/2021/01/25/%E5%8F%8D%E8%B0%83%E8%AF%95/">反调试初步学习总结与简单实战</a>
+          </li>
+        
+          <li>
+            <a href="/2021/01/25/%E5%B7%A5%E6%8E%A7%E7%B3%BB%E7%BB%9F%E5%A8%81%E8%83%81%E5%BB%BA%E6%A8%A1/">（读书笔记）通过威胁建模获取具有可操作性的工控系统威胁情报</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2021 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.4.1.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

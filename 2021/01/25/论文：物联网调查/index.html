@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>（论文翻译）物联网调查：体系结构，支持技术，安全性和隐私性以及应用程序 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="原文：A Survey on Internet of Things: Architecture, Enabling Technologies, Security and Privacy, and Applications  第一部分简介 物联网（IOT）的两个功能  物联网是网络或互联网的扩展[10]，这意味着在物联网中，各种网络应共存，并且这些网络之间的互操作性对于信息传递和支持应用程序至关重要">
+<meta property="og:type" content="article">
+<meta property="og:title" content="（论文翻译）物联网调查：体系结构，支持技术，安全性和隐私性以及应用程序">
+<meta property="og:url" content="http://example.com/2021/01/25/%E8%AE%BA%E6%96%87%EF%BC%9A%E7%89%A9%E8%81%94%E7%BD%91%E8%B0%83%E6%9F%A5/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="原文：A Survey on Internet of Things: Architecture, Enabling Technologies, Security and Privacy, and Applications  第一部分简介 物联网（IOT）的两个功能  物联网是网络或互联网的扩展[10]，这意味着在物联网中，各种网络应共存，并且这些网络之间的互操作性对于信息传递和支持应用程序至关重要">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/006y8mN6ly1g893d5qi6hj30hr09u0vf.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/006y8mN6ly1g893egitkvj30h409q40h.jpg">
+<meta property="article:published_time" content="2021-01-25T14:28:04.926Z">
+<meta property="article:modified_time" content="2020-05-05T03:16:58.526Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="论文">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/006y8mN6ly1g893d5qi6hj30hr09u0vf.jpg">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-论文：物联网调查" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/01/25/%E8%AE%BA%E6%96%87%EF%BC%9A%E7%89%A9%E8%81%94%E7%BD%91%E8%B0%83%E6%9F%A5/" class="article-date">
+  <time class="dt-published" datetime="2021-01-25T14:28:04.926Z" itemprop="datePublished">2021-01-25</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E5%B7%A5%E6%8E%A7/">工控</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      （论文翻译）物联网调查：体系结构，支持技术，安全性和隐私性以及应用程序
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>原文：A Survey on Internet of Things: Architecture, Enabling Technologies, Security and Privacy, and Applications </p>
+<h3 id="第一部分简介"><a href="#第一部分简介" class="headerlink" title="第一部分简介"></a>第一部分简介</h3><ul>
+<li><p>物联网（IOT）的两个功能</p>
+<ul>
+<li>物联网是网络或互联网的扩展[10]，这意味着在物联网中，各种网络应共存，并且这些网络之间的互操作性对于信息传递和支持应用程序至关重要[88]，[7]。互连是物联网中的关键架构问题[132]</li>
+<li>物联网中连接的事物不再局限于设备或对象，还可以是信息，人类行为等。</li>
+</ul>
+</li>
+<li><p>我们将物联网视为多层体系结构，分为感知层，网络层，服务层和应用程序层。</p>
+<a id="more"></a>
+
+</li>
+</ul>
+<h3 id="第二部分介绍了CPS和IoT之间的关系"><a href="#第二部分介绍了CPS和IoT之间的关系" class="headerlink" title="第二部分介绍了CPS和IoT之间的关系"></a>第二部分介绍了CPS和IoT之间的关系</h3><p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g893d5qi6hj30hr09u0vf.jpg"></p>
+<ul>
+<li><p>CPS被称为系统通过集成现代计算和通信技术，可以有效地集成网络和物理组件[131]，[5]，旨在改变人，网络和物理世界之间的交互方式。 CPS强调网络和物理组件之间的相互作用，其目标是通过利用网络组件来使对物理组件的监视和控制安全，高效和智能化[2</p>
+</li>
+<li><p>“网络c”是指使用现代感应技术，通讯技术来有效地监视和控制物理组件，</p>
+<ul>
+<li>而“物理p”是指现实世界中的物理组件，</li>
+<li>“系统s”则反映了复杂性和多样性。</li>
+<li>CPS是物理组件，传感器，执行器，通信网络和控制中心的集成，其中部署传感器以测量和监视物理组件的状态，部署执行器以确保理想的操作物理组件上的通信，以及通信网络用于在传感器，执行器和控制中心之间传递测量数据和反馈意见。控制中心用于分析测量数据并将反馈命令发送给执行器，以确保系统在所需状态下运行</li>
+</ul>
+</li>
+<li><p>cps和iot的相同点</p>
+<ul>
+<li>根据CPS的概述，我们知道CPS和IoT旨在实现网络世界与物理世界之间的互动[100]。特别是，CPS和IoT可以通过智能传感器设备测量物理组件的状态信息，而无需人工输入。同时，在CPS和IoT中，可以通过有线或无线通信网络传输和共享测量的状态信息。在分析测量的状态信息之后，CPS和IoT都可以为应用程序提供安全，高效和智能的服务。 CPS应用程序和IoT应用程序的现有工作已扩展到类似领域（智能电网，智能交通，智能城市等）</li>
+</ul>
+</li>
+<li><p>CPS和基于IoT的区别</p>
+<ul>
+<li>CPS的本质是“系统”。CPS的主要目标是测量物理设备的状态信息，并确保在物理设备上的安全，高效和智能操作。在CPS中，存在传感器/执行器层，通信层和应用程序（控制）层。传感器/执行器层用于收集实时数据并执行命令，通信层用于将数据传递到上层，命令传递到下层，而应用程序（控制）层用于分析数据并做出决策。图1说明了CPS中的三层。从该图可以看出，CPS是垂直架构</li>
+<li>物联网是连接大量设备，并通过在网络空间中使用现代技术来监视和控制设备。因此，物联网的关键是“互连”。物联网的主要目标是互连各种网络，以便可以跨异构网络进行数据收集，资源共享，分析和管理。这样，可以提供可靠，高效和安全的服务。因此，物联网是一种水平架构，应集成所有CPS应用程序的通信层以实现互连，如图1所示</li>
+<li>总而言之，CPS和物联网之间的基本区别是也就是说，CPS被视为“系统”，而物联网被视为“互联网”。 CPS和IoT的共同要求是实时，可靠和安全的数据传输。对CPS和IoT的不同要求如下：对于CPS，有效，可靠，准确，实时的控制是主要目标，而对于IoT，资源共享和管理，数据共享和管理，不同网络之间的接口，大规模数据和大数据的收集和存储，数据挖掘，数据聚合和信息提取以及高质量的网络服务质量（QoS）是重要的服务</li>
+</ul>
+</li>
+</ul>
+<h3 id="第三部分介绍物联网的架构"><a href="#第三部分介绍物联网的架构" class="headerlink" title="第三部分介绍物联网的架构"></a>第三部分介绍物联网的架构</h3><ul>
+<li><p>1.三层架构</p>
+<ul>
+<li><p>应用层</p>
+<ul>
+<li>应用层，也称为业务层，被实现为物联网架构的顶层[7]。应用层接收从网络层发送的数据，并使用该数据提供所需的服务或操作。例如，应用层可以提供存储服务以将接收到的数据备份到数据库中，或者提供分析服务以评估接收到的数据以预测物理设备的未来状态。该层中存在许多应用程序，每个应用程序都有不同的要求。示例包括智能电网，智能交通，智能城市等。[133]，[125]</li>
+</ul>
+</li>
+<li><p>网络层</p>
+<ul>
+<li>网络层，也称为传输层，被实现为物联网架构的中间层[68]。网络层用于接收感知层提供的已处理信息，并确定将数据和信息通过集成网络传输到IoT中心，设备和应用程序的路由。网络层是IoT体系结构中最重要的层，因为各种设备（集线器，交换器，网关，云计算执行等）和各种通信技术（蓝牙，WiFi，长期演进（LTE）等）被集成在这一层。网络层应通过异构网络之间的接口或网关，并使用各种通信技术和协议，向不同事物或应用程序传输数据，或从不同事物或应用程序传输数据</li>
+</ul>
+</li>
+<li><p>感知层</p>
+<ul>
+<li>感知层，也称为传感器层，被实现为物联网架构的底层[11]。感知层通过智能设备（RFID，传感器，执行器等）与物理设备和组件进行交互。其主要目标是将事物连接到IoT网络，并通过部署的智能设备测量，收集和处理与这些事物相关的状态信息，并将处理后的信息通过层接口传输到上层</li>
+</ul>
+</li>
+<li><p>三层架构是物联网的基础，并已在许多系统中设计和实现</p>
+</li>
+</ul>
+</li>
+<li><p>2.基于SoA的体系结构</p>
+<ul>
+<li><p>感知层</p>
+<ul>
+<li>感知层作为体系结构的底层执行，并用于测量，收集和提取与物理设备关联的数据[52]</li>
+</ul>
+</li>
+<li><p>网络层</p>
+<ul>
+<li>网络层用于确定路由，并通过集成的异构网络提供数据传输支持[10]，[47]。</li>
+</ul>
+</li>
+<li><p>服务层</p>
+<ul>
+<li>服务层位于网络层和应用程序层之间，提供支持应用程序层的服务[10]。服务层包括服务发现，服务组合，服务管理和服务接口。在这里，服务发现用于发现所需的服务请求，服务组合用于与连接的对象进行交互，并有效地划分或集成服务以满足服务请求，服务管理用于管理和确定满足以下条件的信任机制服务请求和服务接口用于支持所有提供的服务之间的交互。</li>
+</ul>
+</li>
+<li><p>应用层</p>
+<ul>
+<li>应用层用于支持用户的服务请求。应用程序层可以支持许多应用程序，包括智能电网，智能交通，智能城市等</li>
+</ul>
+</li>
+<li><p>一般来说，SoA是基于组件的模型，可以设计为通过接口和协议[10]，[87]，[136]连接应用程序的不同功能单元（也称为服务）。 SoA可以专注于设计协调服务的工作流程，并实现软件和硬件组件的重用，从而提高SoA用于设计IoT架构的可行性[10]，[137]。因此，SoA可以轻松集成到IoT架构中，其中可以提取传统三层架构中网络层和应用层提供的数据服务，并形成一个新层，即服务层（也称为接口）层或中间件层）。因此，在基于SoA的IoT架构中，存在四个层并彼此交互[123]，这些层是感知层，网络层，服务层和应用程序层。</p>
+</li>
+<li><p>在现有的一些研究中，服务层被分为两个子层，即服务组合子层和服务管理子层。另外，业务层是从应用程序层中提取的，并充当应用程序层的上层，以提供复杂的服务请求。</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="第四部分中，我们介绍了物联网（IoT）的使能技术和挑战"><a href="#第四部分中，我们介绍了物联网（IoT）的使能技术和挑战" class="headerlink" title="第四部分中，我们介绍了物联网（IoT）的使能技术和挑战"></a>第四部分中，我们介绍了物联网（IoT）的使能技术和挑战</h3><ul>
+<li><p>感知层</p>
+<ul>
+<li><p>RFID</p>
+<ul>
+<li><p>通常，RFID作为一种非接触式通信技术，用于识别和跟踪没有接触的物体。它支持通过短距离[8]，[163]的无线电信号进行数据交换。基于RFID的系统包括RFID标签，RFID阅读器和天线[62]。</p>
+</li>
+<li><p>系统</p>
+<ul>
+<li><p>RFID标签</p>
+<ul>
+<li>RFID标签可以是连接到天线的微芯片。每个RFID标签都贴在一个物体上，并具有唯一的标识号</li>
+</ul>
+</li>
+<li><p>RFID阅读器</p>
+<ul>
+<li>RFID阅读器可以通过适当的信号查询附着的RFID标签来识别物体并获得相应的信息[64</li>
+</ul>
+</li>
+<li><p>天线</p>
+<ul>
+<li>天线用于在RFID标签和RFID阅读器之间传输信号</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>RFID具有以下优点</p>
+<ul>
+<li><p>快速扫描，耐用性，可重复使用性，大容量存储，非接触式读取，安全性，小尺寸，低成本等</p>
+<ul>
+<li>由于这些好处，RFID在物联网的感知层中可用于识别和跟踪对象以及交换信息</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>RFID传感器网络（RSN）</p>
+<ul>
+<li>RFID系统和传感器网络的结合。在RSN中，传感器网络可以与RFID系统协作以识别和跟踪对象的状态[139]。在RSN中，实现了基于小型RFID的传感设备和RFID读取器，其中RFID读取器充当接收器节点以生成数据并为网络操作提供电源。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>无线传感器网络（WSN）</p>
+<ul>
+<li>WSN可以监视和跟踪设备的状态，并通过多个状态将状态数据传输到控制中心或接收器节点</li>
+<li>因此，无线传感器网络可以被视为现实世界和网络世界之间的进一步桥梁[131]</li>
+<li>WSN具有许多优点，包括可伸缩性，动态重新配置，可靠性，小尺寸，低成本和低能耗。</li>
+</ul>
+</li>
+<li><p>Other：</p>
+<ul>
+<li>条形码，也称为一维代码。将信息存储在多条黑线和白间距中。这些线和间距具有不同的宽度，以线性或一维方向组织，并按特殊的编码规则排列[49]。条形码中包含的信息可以由机器读取，该机器使用红外光束扫描条形码[94</li>
+<li>二维代码通过使用在平面上布置的黑白像素，其中黑色像素代表二进制“ 1”，白色像素代表二进制“ 0” [49]。通过特殊的编码规则，黑白像素可以存储大量信息。与条形码相比，二维码具有信息量高，可靠性高，鲁棒性强等优点</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>网络层</p>
+<ul>
+<li><p>IEEE 802.15.4</p>
+<ul>
+<li>目标是专注于低速率无线个人区域网（LR-WPAN），以低能耗，低速率传输和低成本[4]提供个人区域中所有事物的低速率连</li>
+<li> IEEE 802.15.4是许多无线通信技术和协议的基础，例如Zigbee [63]，WirelessHART [59]等</li>
+</ul>
+</li>
+<li><p>6LoWPAN</p>
+<ul>
+<li><p>低功耗无线个人局域网（LoWPAN）由大量低功耗无线通信连接的设备组成</p>
+<ul>
+<li>与其他类型的网络相比，LoWPAN具有许多优势（小数据包大小，低功耗，低带宽等）[124</li>
+</ul>
+</li>
+<li><p>作为一项增强功能，通过组合IPv6和LoWPAN设计了6LoWPAN协议</p>
+</li>
+<li><p>由于6LoWPAN的低成本和低能耗，因此它适用于包含大量低成本设备的物联网。 </p>
+</li>
+<li><p>6LoWPAN具有许多优点，包括与传统体系结构的良好连接性和兼容性，低能耗，即席自组织等</p>
+</li>
+</ul>
+</li>
+<li><p>Zigbee</p>
+<ul>
+<li>Zigbee是一种无线网络技术，用于低能耗的短期通信</li>
+<li>在Zigbee协议中，包括五个层：物理层，MAC层，传输层，网络层和应用程序层[124]</li>
+<li>Zigbee网络的优势包括低能耗，低成本，低数据速率，低复杂性，可靠性和安全性</li>
+<li>Zigbee网络可以支持多种拓扑，包括星形，树形和网状拓扑[13]</li>
+</ul>
+</li>
+<li><p>Z-Wave</p>
+<ul>
+<li>Z-wave是一种短期无线通信技术，具有成本低，能耗低和可靠性高的优点[100</li>
+<li> Z-wave的主要目的是在控制单元和一个或多个终端设备之间提供可靠的传输，并且Z-wave适用于带宽较低的网络。</li>
+<li>Z-wave网络支持动态路由技术，每个从站在其内存中存储一​​个路由列表，该列表由控制器更新[41]。</li>
+</ul>
+</li>
+<li><p>Message Queue Telemetry Transport (MQTT)</p>
+<ul>
+<li>消息队列遥测传输（MQTT）是一种消息传递协议，用于在远程传感器上收集测量数据并将其传输到服务器</li>
+<li>MQTT是一种简单而轻便的协议，并支持低带宽和高延迟的网络。</li>
+<li>MQTT可以在各种平台中实现以将IoT中的事物连接到Internet</li>
+<li>因此MQTT可以用作传感器/执行器和服务器之间的消息传递协议，从而使MQTT在IoT中发挥重要作用</li>
+</ul>
+</li>
+<li><p>Constrained Application Protocol (CoAP)</p>
+<ul>
+<li>约束应用协议（CoAP）是基于REST（表示状态传输）体系结构的消息协议</li>
+<li>由于IoT中的大多数设备都受到资源的限制（例如，小存储和低计算能力）。由于其复杂性，HTTP无法在物联网中使用。为了解决该问题，提出了CoAP修改一些HTTP功能以满足物联网的要求。</li>
+<li>一般来说，CoAP是6LoWPAN协议栈中的应用层协议，旨在使资源受限的设备能够实现RESTful交互</li>
+<li>CoAP支持组通信和推送通知，但不支持广播。资源观察，逐块资源传输，资源发现，与HTTP交互以及安全性都是CoAP提供的重要功能</li>
+</ul>
+</li>
+<li><p>Extensible Messaging and Presence Protocol (XMPP)</p>
+<ul>
+<li><p>可扩展消息和状态协议（XMPP）是基于XML流协议的即时消息协议</p>
+</li>
+<li><p>XMPP继承了XML协议的功能，因此XMPP具有出色的可伸缩性，寻址和安全性，可用于多方聊天，语音和视频流以及远程呈现</p>
+</li>
+<li><p>在XMPP中，包括以下三个角色：客户端，服务器和网关，并且在这三个角色的两方之间支持双向通信。</p>
+<ul>
+<li>服务器可以实现链接管理和消息路由的功能</li>
+<li>网关用于支持异构系统之间的稳定通信</li>
+<li>客户端可以基于TCP / IP协议连接到服务器并基于XML流传输上下文协议</li>
+</ul>
+</li>
+<li><p>因此，XMPP可以在物联网中使用，以支持与基于XML的文本消息进行对象到对象的通信</p>
+</li>
+</ul>
+</li>
+<li><p>Data Distribution Service (DDS)</p>
+<ul>
+<li>数据分发服务（DDS）是一种发布/订阅协议，用于支持高性能的设备到设备通信[7</li>
+<li>它是一个以数据为中心的协议，其中可以支持多播以实现高质量的服务和高可靠性</li>
+<li>无需代理的发布/订阅架构使DDS适用于实时受限的IoT和设备到设备通信</li>
+<li>此外，DDS可以实现出色的可伸缩性。</li>
+</ul>
+</li>
+<li><p>Advanced Message Queuing Protocol (AMQP)</p>
+<ul>
+<li>先进的消息队列协议（AMQP）是一种开放标准的消息队列协议，用于在应用程序层[7]，[40]中提供消息服务（队列，路由，安全性和可靠性等）</li>
+<li>AMQP专注于面向消息的环境，可以视为面向消息的中间件协议</li>
+<li>使用AMQP，即使这些客户端和中间件是由不同的编程语言生成的，客户端也可以与消息中间件实现稳定的通信</li>
+<li>此外，AMQP实现了各种消息交换体系结构，包括存储和转发，发布和订阅，消息分发，消息队列，基于上下文的路由以及点对点路由</li>
+</ul>
+</li>
+<li><p>Others</p>
+<ul>
+<li>多播DNS（mDNS）可以支持IoT应用程序中的名称解析[7]，[55]。客户端可以使用DNS服务发现（DNS-SD）通过mDNS [7]，[30]在特殊网络中发现所需的服务</li>
+<li>Routing protocol for Low Power and Lossy networks is低功耗有损网络的路由协议是与链路无关的路由协议，可以将其部署在资源受限的节点上，以确定低功耗和有损链路上的路由</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>服务层</p>
+<ul>
+<li><p>接口技术</p>
+<ul>
+<li>必须在服务层中设计接口技术，以确保在设备和应用程序之间进行有效而安全的信息交换</li>
+<li>此外，该接口应有效管理互连的设备，包括设备连接，设备断开连接，设备通信和设备操作[137</li>
+<li>需要一个InterFace Profile（IFP）可以被认为是一种服务标准，可以用来促进各种设备或应用程序提供的服务之间的交互</li>
+<li>尽管已经为物联网开发了许多接口技术，但以低成本实现更有效，安全和可扩展的接口技术仍然是支持物联网的未来研究面临的巨大挑战</li>
+</ul>
+</li>
+<li><p>服务管理技术</p>
+<ul>
+<li><p>服务管理可以有效地主动发现设备和应用程序，并安排高效，可靠的服务以满足要求。</p>
+</li>
+<li><p>服务可以被认为是一种行为，包括数据的收集，交换和存储，或这些行为的关联，以实现特殊的目标</p>
+</li>
+<li><p>服务可以在物联网中分为两类：主要服务和辅助服务</p>
+<ul>
+<li>基本服务，也称为基本服务，可以在设备或应用程序中公开主要功能。</li>
+<li>辅助服务可以基于主要服务或其他辅助服务来实现辅助功能</li>
+</ul>
+</li>
+<li><p>隐藏服务的实现细节并使这些服务可以在异构设备和应用程序中兼容实现，因此SoA已用于集成服务。</p>
+<ul>
+<li>部署基于SoA的服务，应首先开发服务组合平台</li>
+<li>然后抽象设备的功能和通信能力</li>
+<li>最后，应提供一套通用的服务</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>中间件技术</p>
+<ul>
+<li><p>中间件是一种软件或服务程序，可以提供介于物联网技术和应用程序之间的抽象</p>
+</li>
+<li><p>在中间件中，隐藏了不同技术的细节，并且提供了标准接口，使开发人员可以专注于应用程序的开发，而无需考虑应用程序与基础架构之间的兼容性</p>
+</li>
+<li><p>因此，通过使用中间件，具有不同接口的设备和应用程序可以交换信息并彼此共享资源</p>
+</li>
+<li><p>中间件具有以下优点</p>
+<ul>
+<li>（i）中间件可以支持各种应用程序；</li>
+<li>（ii）中间件可以在各种操作系统和平台上运行；</li>
+<li>（iii）中间件可以支持异构网络，设备和应用程序之间的分布式计算和服务交互；</li>
+<li>（iv）中间件可以支持标准</li>
+<li>（v）中间件可以提供标准接口，提供可移植性和标准协议以实现互操作性，并使中间件在标准化中发挥重要作用[25]。</li>
+<li>中间件还可以为应用程序提供稳定的高级接口。通过稳定的接口，应用程序可以在硬件和操作系统上独立运行。此功能使中间件适用于IoT，因为已集成了大量异构设备和网络，并且这些设备和网络将经常更改或更新。</li>
+</ul>
+</li>
+<li><p>中间件的许多研究工作已经完成开发，可以分为五类</p>
+<ul>
+<li><p>（i）面向消息的中间件</p>
+<ul>
+<li>面向消息的中间件可以在各种平台和通信协议（例如AMQP，DDS，MQTT和XMPP）之间提供可靠的信息交换</li>
+</ul>
+</li>
+<li><p>（ii）基于语义Web的中间件</p>
+<ul>
+<li>基于语义的Web中间件可以提供各种传感器网络之间的交互作用和互操作性。此类示例包括基于SoA的中间件[119]，基于任务计算的中间件[43]等</li>
+</ul>
+</li>
+<li><p>（iii）基于位置的服务和监视中间件</p>
+<ul>
+<li>基于位置的服务和监视中间件将设备的位置和其他信息集成在一起，以提供集成的价值服务[110]。</li>
+</ul>
+</li>
+<li><p>（iv）通信中间件</p>
+<ul>
+<li>通信中间件可以在异构设备和应用程序之间提供可靠的通信。在通信中间件中，基于RFID的中间件（Fosstrak [2]等），基于传感器网络的中间件（TinyREST [82]等）以及监控和数据采集（SCADA）是典型的示例。</li>
+</ul>
+</li>
+<li><p>（v）普适性中间件</p>
+<ul>
+<li>普适中间件是为普适计算环境设计的，并在多个异构平台上提供服务[93]。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>将中间件集成到物联网中，以下挑战需要解决的问题</p>
+<ul>
+<li>（i）互操作性挑战是在通信和信息交换中连接异构设备</li>
+<li>（ii）可扩展性挑战要在具有以下条件的小规模环境或大规模环境中有效地进行：可能涉及大量对象</li>
+<li>（iii）抽象提供挑战是在各个级别提供抽象</li>
+<li>（iv）自发交互挑战是为自发事件提供可靠的服务</li>
+<li>（v）固定基础结构挑战是在不提供自定义事件的情况下提供可靠的服务</li>
+<li>（vi）多重性挑战是支持设备间的同时通信，并从大量服务中选择或安排最适合设备的服务。</li>
+</ul>
+</li>
+<li><p>物联网中间件应实现信任，安全和隐私</p>
+</li>
+</ul>
+</li>
+<li><p>资源管理和共享技术</p>
+<ul>
+<li><p>各种杂项neous网络已集成，可为物联网中的所有应用程序（智能交通，智能电网等）提供数据传输。</p>
+</li>
+<li><p>为了降低成本，某些应用程序可以共享部分网络资源以提高其利用率。在这种情况下，确保各种应用程序请求的信息按时交付是物联网面临的挑战。</p>
+</li>
+<li><p>现有的资源共享机制主要集中在频谱共享上，频谱共享用于有效地协调同一频率下的多个网络，以最大程度地利用网络资源</p>
+<ul>
+<li>频谱共享可以分为三个维度，包括时间，频率和空间。</li>
+</ul>
+</li>
+<li><p>虽然大多数现有方案都是针对机器对机器或设备对设备通信而开发的，但物联网却专注于物对物网络</p>
+<ul>
+<li>其中“物”不仅指设备或机器，还指人行为和其他对象</li>
+<li>因此，跨异构网络设计一种适用于物联网环境的有效资源共享方案是未来发展的重大挑战。</li>
+</ul>
+</li>
+<li><p>物联网中的原始数据由智能设备收集（RFID，传感器等），以及大多数这些智能设备受资源限制，无法从环境中获取能量。在资源管理中应考虑节能方案</p>
+<ul>
+<li>包括通过从分布式能源中收集能量来延长传感器寿命的方案[21]</li>
+<li>通过占空比方案来降低传感器能量的方案[98]</li>
+<li>基于能量的路由协议以平衡能量消耗并延长传感器网络的寿命[152]，[151]等</li>
+<li>尽管这些努力可以在节能和管理上很好地发挥作用，但适用于IoT的方案由异构网络组成的网络基础设施对于未来的研究也是一个悬而未决的挑战。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="第五节中介绍了物联网的安全和隐私问题"><a href="#第五节中介绍了物联网的安全和隐私问题" class="headerlink" title="第五节中介绍了物联网的安全和隐私问题"></a>第五节中介绍了物联网的安全和隐私问题</h3><ul>
+<li><p>物联网的安全性</p>
+<ul>
+<li><p>机密性</p>
+<ul>
+<li>机密性可以确保数据仅在整个过程中对授权用户可用，并且不能被未授权用户窃听或干扰。</li>
+<li>在物联网中，机密性是重要的安全原则，因为大量测量设备（RFID，传感器等）可以集成在物联网中。</li>
+<li>因此，至关重要的是确保测量设备收集的数据不会向其相邻设备泄露安全信息。</li>
+<li>为实现高度机密性，应开发和使用增强的技术，包括安全密钥管理机制和其他技术[22]</li>
+</ul>
+</li>
+<li><p>完整性</p>
+<ul>
+<li>完整性可以确保在通信网络中的数据传递过程中，数据不会被有意或无意的干扰所篡改，最终为授权用户提供准确的数据。</li>
+<li>完整性对于物联网非常重要，因为如果物联网应用程序接收到伪造数据或篡改数据，则可以估计错误的运行状态并做出错误的反馈命令，这可能会进一步破坏物联网应用程序的运行。</li>
+<li>为了实现可接受的完整性，应开发并应用增强的安全数据完整性机制（错误的数据过滤方案等）[144]。</li>
+</ul>
+</li>
+<li><p>可用性</p>
+<ul>
+<li>可用性可以确保数据和只要需要数据和设备，设备就可用于授权用户和服务。</li>
+<li>在物联网中，通常以实时方式请求服务，并且如果无法及时交付所请求的数据，则无法计划和提供服务。因此，可用性也是重要的安全原则。</li>
+<li>对可用性的最严重威胁之一是拒绝服务（DoS）攻击，应研究并应用增强技术（安全，高效的路由协议等）以确保IoT的可用性[83]。</li>
+</ul>
+</li>
+<li><p>身份验证</p>
+<ul>
+<li>身份验证可以确保无法将未经授权的设备或应用程序连接到IoT，并且身份验证可以确保网络中传递的数据是合法的，并且请求数据的设备或应用程序也是合法的。</li>
+<li>在物联网中，很难识别和验证每个数据和对象，因为物联网包含大量不同的对象。</li>
+<li>因此，设计有效的机制来处理对象或事物的身份验证在物联网中至关重要[32]。</li>
+</ul>
+</li>
+<li><p>隐私</p>
+<ul>
+<li>隐私可以确保数据只能由相应的用户控制，并且没有其他用户可以访问或处理数据。</li>
+<li>不同于旨在对数据进行加密而不会被未授权用户窃听和干预的机密性，隐私可确保用户只能基于接收到的数据进行某些特定控制，而不能从接收到的数据中推断出其他有价值的信息</li>
+<li>由于大量设备，服务和人们在IoT中共享同一通信网络，因此隐私被视为重要的安全原则之一。</li>
+</ul>
+</li>
+<li><p>信任</p>
+<ul>
+<li><p>信任可以确保上述安全性不同对象，不同物联网层和不同应用程序之间的交互过程中要实现的隐私和隐私目标。</p>
+</li>
+<li><p>物联网的信任目标</p>
+<ul>
+<li>每个物联网层之间的信任</li>
+<li>设备之间的信任</li>
+<li>设备和应用程序之间的信任</li>
+</ul>
+</li>
+<li><p>有了信任，就可以实施安全性和隐私权。信任管理系统应设计为在物联网中实现这些信任目标。</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>物联网架构各层中的安全挑战</p>
+<ul>
+<li><p>感知层</p>
+<ul>
+<li><p>1.节点捕获攻击</p>
+<ul>
+<li>在节点捕获攻击中，攻击者可以通过物理上替换整个节点或篡改节点或设备的硬件来捕获和控制IoT中的节点或设备[163]</li>
+<li>如果节点受到节点捕获攻击的威胁，则重要信息（组通信密钥，单选密钥，匹配密钥等）可能会暴露给对手</li>
+<li>攻击者还可以将与捕获的节点关联的重要信息复制到恶意节点，然后将恶意节点伪造为授权节点以连接到IoT网络或系统。将该攻击称为节点复制攻击。</li>
+<li>节点捕获攻击可能会对网络造成严重影响。为了防御节点捕获攻击，需要研究有效的方案来监视和检测恶意节点[15]。</li>
+</ul>
+</li>
+<li><p>2.恶意代码注入攻击</p>
+<ul>
+<li>除通过恶意攻击捕获节点外，攻击者可以通过将恶意代码注入节点或设备的内存中来控制物联网中的节点或设备，这被称为恶意代码注入攻击[143]。</li>
+<li>注入的恶意代码不仅可以执行特定功能，而且还可以授予对手进入IoT系统的权限，甚至可以完全控制IoT系统。</li>
+<li>为了抵御恶意代码注入攻击，需要设计有效的代码身份验证方案并将其集成到IoT [143]，[115]。</li>
+</ul>
+</li>
+<li><p>3.错误的数据注入攻击</p>
+<ul>
+<li>使用捕获的节点攻击者可以注入虚假数据来代替由捕获的节点或设备测得的正常数据，并将虚假数据传输到物联网应用程序[144]。</li>
+<li>物联网应用收到虚假数据后，会返回错误的反馈命令或提供错误的服务，进一步影响物联网应用和网络的有效性。</li>
+<li>为了抵御这种恶意攻击，需要设计可以在IoT应用程序接收数据之前有效检测并删除错误数据的技术（错误数据过滤方案等）[72]，[71]。 </li>
+</ul>
+</li>
+<li><p>4.重播攻击（或新鲜度攻击）</p>
+<ul>
+<li>在物联网中，攻击者可以使用恶意节点或设备将合法标识信息传输到目标主机，该合法标识信息已由目标主机接收，以便使恶意节点或设备获得物联网的信任[90]，[163]。</li>
+<li>重播攻击通常在身份验证过程中发起，以破坏证书的有效性。</li>
+<li>为了减轻重放攻击，应在物联网中设计和开发技术（安全时间戳方案等）</li>
+</ul>
+</li>
+<li><p>5.密码分析攻击和侧信道攻击</p>
+<ul>
+<li>密码分析攻击可以使用获得的密文或明文来推断加密算法中使用的加密密钥[158]。</li>
+<li>但是，密码分析攻击的效率很低。为了提高效率，对手可以引入新的攻击，即边路攻击。</li>
+<li>在物联网[138]中调查的边信道攻击中，对手可以在物联网的加密设备上部署一些技术以获得加密密钥，该密钥在物联网中用于加密数据和解密数据。</li>
+<li>定时攻击是一种典型的旁信道攻击，在这种攻击中，对手可以通过分析执行加密算法所需的时间信息来获取加密密钥。</li>
+<li>为了减轻侧信道攻击，需要在物联网中开发有效且安全的加密算法和密钥管理方案[22]。</li>
+</ul>
+</li>
+<li><p>6.窃听和干扰</p>
+<ul>
+<li>因为大多数物联网中的犯罪分子将通过无线网络进行通信，其脆弱性在于无线链接中传递的信息可能会被未经授权的用户窃听[164]，[42]</li>
+<li>为了处理窃听，需要安全的加密算法和密钥管理方案。</li>
+<li>对手还可以发送噪声数据或信号，以干扰无线链路中传递的信息。</li>
+<li>为了确保数据的准确性和及时性，需要有效的安全噪声过滤方案来过滤噪声数据并恢复原始数据[91]。</li>
+</ul>
+</li>
+<li><p>7.睡眠剥夺攻击</p>
+<ul>
+<li>在物联网中，大多数设备或节点具有低功耗能力。为了延长设备和节点的生命周期，对设备或节点进行编程以遵循睡眠例程以减少功耗</li>
+<li>但是，睡眠剥夺攻击可能会破坏已编程的睡眠例程，并使设备或节点一直处于唤醒状态，直到它们被关闭。</li>
+<li>为了延长这些设备和节点的生命周期，能量收集方案可以是一种可能的解决方案，其中设备和节点可以从外部环境（太阳能等[21]）中收集能量。</li>
+<li>此外，还需要在物联网中研究其他技术，例如缓解占空比剥夺攻击的安全占空比机制。 </li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>网络层</p>
+<ul>
+<li><p>1.拒绝服务（DoS）攻击</p>
+<ul>
+<li>DoS攻击可以通过攻击网络协议或用大量流量轰炸IoT网络来总结IoT中的所有可用资源，从而使IoT系统的服务不可用[84]。</li>
+<li>DoS攻击被认为是最常见的攻击之一，代表了一种攻击类别，可能导致IoT系统的服务不可用。</li>
+<li>攻击可以通过包括死亡Ping，TearDrop，UDP泛洪，SYN泛洪，陆地攻击等在内的攻击方案来产生</li>
+<li>为了防御DoS攻击，首先需要仔细研究攻击方案，然后再研究有效的防御方案以减轻威胁需要开发攻击来保护物联网系统[83]。</li>
+</ul>
+</li>
+<li><p>2.欺骗攻击</p>
+<ul>
+<li><p>欺骗攻击的目的是使对手获得对物联网系统的完全访问权，并将恶意数据发送到系统中[8]。</p>
+</li>
+<li><p>在物联网中，欺骗攻击的示例包括IP欺骗[92]，RFID欺骗[89]等。</p>
+<ul>
+<li>在IP欺骗攻击中，攻击者可以欺骗并记录IoT中其他授权设备的有效IP地址，然后访问物联网系统使用获取的有效IP地址发送恶意数据，使恶意数据看起来有效。</li>
+<li>在RFID欺骗攻击中，对手可以欺骗并记录有效RFID标签的信息，然后将具有此有效标签ID的恶意数据发送到IoT系统。</li>
+</ul>
+</li>
+<li><p>安全的信任管理，标识和身份验证可能是防御欺骗攻击的可能解决方案[32]，[28]。</p>
+</li>
+</ul>
+</li>
+<li><p>3.槽洞攻击（Sinkhole Attacks）</p>
+<ul>
+<li>在槽洞攻击中，设备或节点要求具有强大的功能，计算和通信功能，因此，由于其吸引力，更多相邻的设备或节点将在数据路由过程中选择受损的设备或节点作为转发节点[118]</li>
+<li>通过这样做，受感染的设备或节点可以增加在IoT系统中传输数据之前获得的数据量。</li>
+<li>请注意，漏洞攻击不仅可以破坏所传递数据的机密性，而且可以成为发起其他攻击（DoS攻击等）的基本步骤。</li>
+<li>为了槽洞攻击，需要研究和应用诸如安全多个路由协议之类的技术[57]</li>
+</ul>
+</li>
+<li><p>4.虫洞攻击（Wormhole Attacks）</p>
+<ul>
+<li><p>可以发起虫洞攻击物联网中的两个协作恶意设备或节点，其中位于不同位置的两个恶意设备可以与专用链路交换路由信息，以实现它们之间的虚假一跳传输，即使它们彼此之间的距离很远[67] 。</p>
+</li>
+<li><p>在蠕虫攻击中，由于减少了转发跳数，因此将通过这两个恶意设备或节点传递更多数据。通过访问更多传递的数据，虫洞攻击可导致与污水坑攻击类似的破坏。</p>
+</li>
+<li><p>为了抵御虫洞攻击，有一些可能的防御技术。</p>
+<ul>
+<li>一种技术是修改路由协议以增强路由选择过程中的安全性[26]，</li>
+<li>而其他技术则涉及部署安全硬件（GPS，定向天线等）。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>5.中间人攻击</p>
+<ul>
+<li>在中间人攻击中，由对手控制的恶意设备可以虚拟地定位在物联网中的两个通信设备之间[97]。通过窃取两个正常设备的标识信息，恶意设备可以成为存储和转发在这两个正常设备之间通信的所有数据的中间设备，而两个正常设备无法检测到恶意设备的存在，并且而是相信他们直接相互交流。</li>
+<li>遭受中间攻击的人可能侵犯机密性，完整性和隐私性通过监视，窃听，篡改和控制两个普通设备之间的通信来控制物联网中受限制的数据。</li>
+<li>与需要物理篡改设备硬件的恶意节点捕获攻击不同，可以仅依靠物联网网络中使用的通信协议来发动中间攻击。</li>
+<li>安全的通信协议和密钥管理方案可以确保正常设备的标识和密钥信息不泄露给对手，可以作为一种有效的防御技术来防御攻击[83]，[22]。</li>
+</ul>
+</li>
+<li><p>6.路由信息攻击</p>
+<ul>
+<li>路由信息攻击着重于物联网系统中的路由协议，其中路由信息可以由对手操纵和发送，以在网络数据传输中创建路由环路，从而导致源路径的扩展和端到端的增加物联网网络的最终延迟[8]</li>
+<li>为了防御路由信息攻击，可以使用安全的路由协议和信任管理来在IoT中的设备之间建立安全链接，并确保标识信息和IP地址不泄漏给对手。</li>
+</ul>
+</li>
+<li><p>7.Sybil（女巫）攻击</p>
+<ul>
+<li>在sybil攻击中，是一种恶意设备，即sybil设备，可以声明多个合法身份并在IoT系统中模拟它们[8]，[96]，[159]。</li>
+<li>由于sybil设备具有多个合法身份，因此sybil设备发送的虚假数据很容易被其良性相邻设备接受。</li>
+<li>同样，选择sybil设备作为转发节点的路由可能会考虑确定了几个不同的相交路径，但实际上，仅确定了一条路径，所有传输的数据都需要通过sybil设备，在其中可以使用干扰和DoS。</li>
+<li>为了抵御sybil攻击，需要为物联网系统开发安全的识别和认证机制[32]。</li>
+</ul>
+</li>
+<li><p>8.未经授权的访问</p>
+<ul>
+<li>RFID是物联网中一项重要的使能技术。但是，由于大量基于RFID的设备已集成在IoT中，并且大多数RFID标签缺乏适当的身份验证机制，因此，RFID标签可以被访问，并且标签中存储的信息可以通过以下方式获取，修改和删除。</li>
+<li>因此，物联网中基于RFID的设备的授权访问和认证机制是需要进一步开发的挑战[56]。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>应用层</p>
+<ul>
+<li><p>1.网络钓鱼攻击</p>
+<ul>
+<li>在网络钓鱼攻击中，攻击者可以通过受感染的电子邮件和网络钓鱼网站欺骗用户的身份验证凭据，从而获得用户的机密数据，例如标识和密码，[8]，[54]。</li>
+<li>安全的授权访问，识别和身份验证可以缓解网络钓鱼攻击[8]。</li>
+<li>尽管如此，最有效的方法是让用户自己在上网时始终保持警惕。</li>
+</ul>
+</li>
+<li><p>2.恶意病毒/蠕虫</p>
+<ul>
+<li>恶意病毒/蠕虫是物联网应用的另一个挑战[8]，[128]，[155]。攻击者可以使用恶意的自我传播攻击（蠕虫，特洛伊木马等）感染IoT应用程序，然后获取或篡改机密数据。</li>
+<li>需要部署可靠的防火墙，病毒检测和其他防御机制来对抗物联网应用程序中的恶意病毒/蠕虫攻击[111]。</li>
+</ul>
+</li>
+<li><p>3.恶意脚本</p>
+<ul>
+<li>恶意脚本代表为损害物联网的系统功能而添加到软件中，在软件中进行修改以及从软件中删除的脚本[8]。</li>
+<li>由于所有物联网应用程序都已连接到Internet，因此在通过Internet请求服务时，对手可以轻松地欺骗客户运行恶意脚本（Java攻击小程序，active-x脚本等）。</li>
+<li>恶意脚本可能造成机密数据的泄漏，甚至导致整个系统关闭。为了防御恶意脚本，需要在IoT系统中部署有效的脚本检测技术，包括蜜罐技术，静态代码检测和动态动作检测。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>隐私问题</p>
+<ul>
+<li><p>所有收集和使用的海量数据物联网应经历以下三个步骤</p>
+<ul>
+<li>（i）数据收集</li>
+<li>（ii）数据聚合[130]</li>
+<li>（iii）数据挖掘与分析[126]，[166]。</li>
+</ul>
+</li>
+<li><p>这些步骤中数据的隐私问题也在IoT中引起了。作为物联网的新挑战，隐私可能导致财产损失，甚至危及人类安全[145]，[107]。</p>
+</li>
+<li><p>根据不同的数据处理步骤，隐私保护机制可以分为三类：</p>
+<ul>
+<li><p>（i）数据收集中的隐私保护[65]，</p>
+</li>
+<li><p>（ii）数据聚合中的隐私保护</p>
+<ul>
+<li><p>很难通过传统的加密机制来实现隐私保护</p>
+</li>
+<li><p>（i）基于匿名的隐私保护[105]</p>
+<ul>
+<li>在基于匿名的隐私保护中，在数据聚合过程中使用了几种相关的匿名技术（K匿名，L分集，T紧密度等）来保护标识信息的隐私[106]</li>
+<li>另外，流量分析技术可能会影响匿名通信系统[149]，[76]，</li>
+</ul>
+</li>
+<li><p>（ii）基于加密的隐私保护[39]</p>
+<ul>
+<li>在基于加密的隐私保护中，数种加密技术（同态加密，承诺机制，秘密共享，零知识证明等）被用于数据聚合中，以确保不会被对手窃听数据[39]。</li>
+<li>但是，现有的加密技术只能在数据传输中实现机密性，而在隐私保护方面可能无法很好地发挥作用。</li>
+</ul>
+</li>
+<li><p>（iii）基于干扰的隐私保护</p>
+<ul>
+<li>在基于扰动的隐私保护中，基于扰动的技术（数据定制，数据共享，随机噪声注入等）被用于数据聚合中以扰动原始数据，从而实现了隐私保护[48]</li>
+<li>但是，数据的实用性可能会阻碍该技术在物联网中的应用</li>
+<li>基于干扰的隐私保护方案是物联网中非常流行的技术。但是，大多数基于扰动的隐私保护通过减少数据的实用性来实现出色的性能。效用较低时，数据可能无法或可能仅部分支持IoT应用程序请求的服务</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>（iii）数据挖掘和分析中的隐私保护[135]，[20]</p>
+</li>
+</ul>
+</li>
+<li><p>IoT当前在隐私保护方面所做的大部分努力都集中在数据聚合中的数据隐私上</p>
+</li>
+<li><p>具有巨大数据实用性的隐私保护方案的设计仍然是物联网中数据隐私保护方面的巨大挑战，需要进一步研究</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="第六节中介绍了物联网和雾-边缘计算的集成"><a href="#第六节中介绍了物联网和雾-边缘计算的集成" class="headerlink" title="第六节中介绍了物联网和雾/边缘计算的集成"></a>第六节中介绍了物联网和雾/边缘计算的集成</h3><p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g893egitkvj30h409q40h.jpg" alt="截屏2019-10-24上午10.42.40"></p>
+<ul>
+<li><p>A.概述</p>
+<ul>
+<li><p>事物产生的信息需要大数据收集和处理所有产生和收集的信息，并将其转化为有用的信息。</p>
+</li>
+<li><p>大数据需要物联网的支持，因为物联网支持的大量传感和激励数据（智能网格，智能交通等）面临挑战。</p>
+</li>
+<li><p>此外，物联网应用中收集的数据通常是非结构化数据，需要进一步分析以提取有用的信息。</p>
+</li>
+<li><p>在物联网中，连续的数据流将影响各种组织中的数据存储容量。将需要其他数据中心来处理从物联网应用程序收集的数据负载。</p>
+<ul>
+<li><p>一种可能的解决方案是通过利用平台即服务（PaaS）将数据移动到云中</p>
+</li>
+<li><p>当组织选择技术用于在执行大数据处理和分析时，需要考虑物联网数据的性质</p>
+</li>
+<li><p>Hadoop和Hive可用于处理大数据。但是，对于IoT应用程序收集的数据，NoSQL文档数据库（Apache CouchDB等）可能是合适的[33]。</p>
+<ul>
+<li>这是因为NoSQL文档数据库可以提供高吞吐量和低延迟</li>
+<li>Apache Kafka是一种用于中间消息代理的物联网工具，可用于实时流处理。大数据的安全性也将受到物联网的影响</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>B.基于雾/边缘计算的物联网云</p>
+<ul>
+<li><p>在许多IoT / CPS应用程序中，需要有效地存储，处理和分析来自跨越大地理区域的大量事物和对象的数据。为了弥补这一差距，雾/边缘计算能够将云计算扩展到更接近其支持的事物</p>
+</li>
+<li><p>雾/边缘计算可以在网络边缘为设备（节点）提供计算和存储服务，而不是在云中心进行所有计算。</p>
+</li>
+<li><p>雾/边缘计算节点可以是具有以下功能的任何网络设备：具有存储，计算和网络连接（路由器，交换机，视频监控摄像机，服务器等）的功能</p>
+<ul>
+<li>这些设备可以部署在具有网络连接的任何位置，并从IoT收集数据与物联网应用程序关联的设备。</li>
+<li>可以根据性能要求将不同类型的IoT数据定向到适当的位置进行进一步分析。</li>
+<li>可以在最接近生成数据的IoT设备的雾/边缘计算节点上处理需要立即处理的高优先级数据。</li>
+<li>不对延迟敏感的低优先级数据可以定向到某些聚合节点，以进行进一步的处理和分析。</li>
+</ul>
+</li>
+<li><p>将雾/边缘计算与物联网集成存在一些挑战</p>
+<ul>
+<li><p>一个可能的挑战是如何有效地管理雾/边缘计算基础架构并将可用资源分配给物联网设备。</p>
+<ul>
+<li>每次都可以通过IoT设备请求大量服务，并且每个雾/边缘服务节点仅具有有限的计算和存储能力。</li>
+<li>在这种情况下，应该对所有雾/边缘节点进行最佳管理，并为物联网设备（或群集中的一组物联网设备）分配有效的服务</li>
+</ul>
+</li>
+<li><p>另一个挑战是如何有效地管理雾/边缘计算资源</p>
+<ul>
+<li>尽管先前的挑战着重于雾/边缘节点与物联网服务之间的接口，但这一挑战着重于雾/边缘节点之间的资源管理。</li>
+</ul>
+</li>
+<li><p>基于雾/边缘计算的物联网中资源分配的挑战</p>
+<ul>
+<li>终端设备和雾/边缘节点之间的资源分配</li>
+<li>雾/边缘节点之间的资源分配</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="第七节-应用-如何在实际应用中实现基于雾-边缘计算的物联网"><a href="#第七节-应用-如何在实际应用中实现基于雾-边缘计算的物联网" class="headerlink" title="第七节 应用  如何在实际应用中实现基于雾/边缘计算的物联网"></a>第七节 应用  如何在实际应用中实现基于雾/边缘计算的物联网</h3><ul>
+<li><p>A.智能电网</p>
+<ul>
+<li>在智能电网中，引入了分布式能源发生器以提高分布式能源的利用率</li>
+<li>引入了电动汽车以提高能量存储能力并减少了CO2的排放</li>
+<li>引入了智能电表和双向通信网络以实现客户与公用事业提供商之间的互动这一目标</li>
+<li>借助雾/边缘计算基础架构，可以存储和处理从智能电表收集的大量数据，从而可以支持智能电网的有效运行。</li>
+<li>利用交互信息，公用事业提供商可以优化电网的能源分配，客户可以优化其能源消耗，从而提高资源利用率并降低成本</li>
+<li>有效的安全机制需要为智能电网开发可在数据收集和传输过程中保持数据隐私性和完整性的工具</li>
+</ul>
+</li>
+<li><p>B.智慧交通</p>
+<ul>
+<li>能交通信息系统（ITS）是另一种典型的基于IoT-CPS的应用，其中集成了智能交通管理，控制系统，通信网络和计算技术，以使交通系统可靠，高效和安全[74]。</li>
+<li>通过对基于雾/边缘计算的IoT基础架构中的车辆网络和雾/边缘计算节点发起恶意攻击，并通过通信与其他车辆共享误导的交通状况数据，对手可能会侵入系统并控制车辆中的ECU在受损车辆[141]，[12]中部署的接口。</li>
+</ul>
+</li>
+<li><p>C.智慧城市</p>
+<ul>
+<li>它旨在通过引入信息和通信技术（ICT）解决方案来管理公共事务[156]。</li>
+<li>智慧城市可以更有效地利用公共资源，从而改善了为用户提供的服务质量，并降低了公共管理者的运营成本[156]，[53]</li>
+<li>物联网/ CPS应用程序，旨在实现城市中公共资源的最佳利用</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2021/01/25/%E8%AE%BA%E6%96%87%EF%BC%9A%E7%89%A9%E8%81%94%E7%BD%91%E8%B0%83%E6%9F%A5/" data-id="ckkco51ca004b0gyr1ibw0ju4" data-title="（论文翻译）物联网调查：体系结构，支持技术，安全性和隐私性以及应用程序" class="article-share-link">Share</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BA%E6%96%87/" rel="tag">论文</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2021/01/25/%E8%AE%BA%E6%96%87%EF%BC%9A%E5%B7%A5%E4%B8%9A%E7%89%A9%E8%81%94%E7%BD%91%E4%B8%AD%E7%9A%84%E5%AE%89%E5%85%A8%E5%92%8C%E9%9A%90%E7%A7%81%E6%8C%91%E6%88%98%EF%BC%88Security%20and%20Privacy%20Challenges%20in%20Industrial%20Internet%20of%20Things%EF%BC%89/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          （论文翻译）工业物联网中的安全和隐私挑战（Security and Privacy Challenges in Industrial Internet of Things）
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2021/01/25/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9D/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">永恒之蓝（待完善）</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BA%8C%E8%BF%9B%E5%88%B6/">二进制</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%85%B6%E4%BB%96/">其他</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B7%A5%E6%8E%A7/">工控</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%9D%82%E9%A1%B9/">杂项</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AFL/" rel="tag">AFL</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/BugID/" rel="tag">BugID</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/" rel="tag">Docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Fuzzing/" rel="tag">Fuzzing</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MacbookPro/" rel="tag">MacbookPro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Modbus/" rel="tag">Modbus</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Sql/" rel="tag">Sql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/clusterfuzz/" rel="tag">clusterfuzz</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fuzz/" rel="tag">fuzz</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/libFuzzer/" rel="tag">libFuzzer</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitMQ/" rel="tag">rabbitMQ</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%B8%AA%E4%BA%BA%E6%80%BB%E7%BB%93/" rel="tag">个人总结</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8A%A0%E5%A3%B3%E8%84%B1%E5%A3%B3/" rel="tag">加壳脱壳</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8F%8D%E8%B0%83%E8%AF%95/" rel="tag">反调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%9B%BA%E4%BB%B6%E9%80%86%E5%90%91/" rel="tag">固件逆向</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B0%8F%E8%84%9A%E6%9C%AC/" rel="tag">小脚本</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B7%A5%E6%8E%A7%E5%8D%8F%E8%AE%AE/" rel="tag">工控协议</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/" rel="tag">漏洞分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" rel="tag">漏洞复现</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/" rel="tag">漏洞挖掘</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%97%85%E6%AF%92%E5%88%86%E6%9E%90/" rel="tag">病毒分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BB%83%E5%AD%97/" rel="tag">练字</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%8A%B1%E6%8C%87%E4%BB%A4/" rel="tag">花指令</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%BA%E6%96%87/" rel="tag">论文</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" rel="tag">论文阅读</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" rel="tag">读书笔记</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/AFL/" style="font-size: 10px;">AFL</a> <a href="/tags/BugID/" style="font-size: 10px;">BugID</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Fuzzing/" style="font-size: 10px;">Fuzzing</a> <a href="/tags/MacbookPro/" style="font-size: 10px;">MacbookPro</a> <a href="/tags/Modbus/" style="font-size: 10px;">Modbus</a> <a href="/tags/Sql/" style="font-size: 10px;">Sql</a> <a href="/tags/clusterfuzz/" style="font-size: 10px;">clusterfuzz</a> <a href="/tags/fuzz/" style="font-size: 15px;">fuzz</a> <a href="/tags/libFuzzer/" style="font-size: 10px;">libFuzzer</a> <a href="/tags/rabbitMQ/" style="font-size: 10px;">rabbitMQ</a> <a href="/tags/%E4%B8%AA%E4%BA%BA%E6%80%BB%E7%BB%93/" style="font-size: 20px;">个人总结</a> <a href="/tags/%E5%8A%A0%E5%A3%B3%E8%84%B1%E5%A3%B3/" style="font-size: 10px;">加壳脱壳</a> <a href="/tags/%E5%8F%8D%E8%B0%83%E8%AF%95/" style="font-size: 10px;">反调试</a> <a href="/tags/%E5%9B%BA%E4%BB%B6%E9%80%86%E5%90%91/" style="font-size: 10px;">固件逆向</a> <a href="/tags/%E5%B0%8F%E8%84%9A%E6%9C%AC/" style="font-size: 10px;">小脚本</a> <a href="/tags/%E5%B7%A5%E6%8E%A7%E5%8D%8F%E8%AE%AE/" style="font-size: 10px;">工控协议</a> <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/" style="font-size: 11.67px;">漏洞分析</a> <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" style="font-size: 18.33px;">漏洞复现</a> <a href="/tags/%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/" style="font-size: 13.33px;">漏洞挖掘</a> <a href="/tags/%E7%97%85%E6%AF%92%E5%88%86%E6%9E%90/" style="font-size: 10px;">病毒分析</a> <a href="/tags/%E7%BB%83%E5%AD%97/" style="font-size: 10px;">练字</a> <a href="/tags/%E8%8A%B1%E6%8C%87%E4%BB%A4/" style="font-size: 10px;">花指令</a> <a href="/tags/%E8%AE%BA%E6%96%87/" style="font-size: 11.67px;">论文</a> <a href="/tags/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" style="font-size: 10px;">论文阅读</a> <a href="/tags/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" style="font-size: 16.67px;">读书笔记</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">January 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2021/01/25/%EF%BC%88%E5%B7%A5%E6%8E%A7%E5%90%91%EF%BC%89%E7%BB%84%E6%80%81%E7%8E%8B%E8%BD%AF%E4%BB%B6%E6%BC%8F%E6%B4%9E%E6%B5%8B%E8%AF%95%E9%AA%8C%E8%AF%81%E4%B8%8E%E5%88%A9%E7%94%A8/">（工控向）组态王软件漏洞测试验证与利用</a>
+          </li>
+        
+          <li>
+            <a href="/2021/01/25/%E3%80%8A%E9%BB%91%E5%AE%A2%E5%A4%A7%E6%9B%9D%E5%85%89-%E5%B7%A5%E6%8E%A7%E5%AE%89%E5%85%A8%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/">（读书笔记）工业控制系统安全概述</a>
+          </li>
+        
+          <li>
+            <a href="/2021/01/25/%E5%A0%86%E7%9A%84%E7%9F%A5%E8%AF%86%E4%B8%8E%E5%88%A9%E7%94%A8/">堆的知识与利用（0day2）</a>
+          </li>
+        
+          <li>
+            <a href="/2021/01/25/%E5%8F%8D%E8%B0%83%E8%AF%95/">反调试初步学习总结与简单实战</a>
+          </li>
+        
+          <li>
+            <a href="/2021/01/25/%E5%B7%A5%E6%8E%A7%E7%B3%BB%E7%BB%9F%E5%A8%81%E8%83%81%E5%BB%BA%E6%A8%A1/">（读书笔记）通过威胁建模获取具有可操作性的工控系统威胁情报</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2021 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.4.1.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

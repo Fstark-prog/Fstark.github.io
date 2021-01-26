@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>常见二进制逆向工具总结 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="逆向分析工具预处理工具 脱壳工具  目前有很多加壳工具，当然有盾，自然就有矛。软件脱壳有手动脱和自动脱壳之分，其中手动是用TRW2000、TR、SOFTICE等调试工具对付，对脱壳者有一定水平要求，涉及到很多汇编语言和软件调试方面的知识。自动就是用专门的脱壳工具来脱，最常用某种压缩软件都有编写的反压缩工具对应，有些压缩工具自身能解压，如UPX。有些不提供这功能，如：ASPACK，需要UNASPAC">
+<meta property="og:type" content="article">
+<meta property="og:title" content="常见二进制逆向工具总结">
+<meta property="og:url" content="http://example.com/2019/10/26/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="逆向分析工具预处理工具 脱壳工具  目前有很多加壳工具，当然有盾，自然就有矛。软件脱壳有手动脱和自动脱壳之分，其中手动是用TRW2000、TR、SOFTICE等调试工具对付，对脱壳者有一定水平要求，涉及到很多汇编语言和软件调试方面的知识。自动就是用专门的脱壳工具来脱，最常用某种压缩软件都有编写的反压缩工具对应，有些压缩工具自身能解压，如UPX。有些不提供这功能，如：ASPACK，需要UNASPAC">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1oei4qj30os0jon2g.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1qqmtaj31880ootl6.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1vweapj313c0u0e3g.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1q9kqqj316k0i811c.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1oxsudj31440u0nf3.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1r73yoj30xw0rsamc.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1pfijpj31bb0u0ww1.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1sdvzkj319s0oo7m2.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1x9j97j312o0b0di0.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1ks0pbj316o0pw4df.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1lob7ej31970u0ttw.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1ifwfqj31040dkabs.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1js0c0j311c0r8122.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1tllq8j31a40n44eo.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1iricjj30yk0p8wlc.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1ja0r4j316g0ok116.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1n3np4j30s008kjry.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1l5gh1j30zc0q010i.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1k9otyj30kg0kg40z.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1uiersj30xs0q0qal.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1m1vzcj313w0b4wh2.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1v12wnj307q0420wv.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1mjo1kj30q007kaaw.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1verthj31a40bctbe.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1wbitfj30q00643zl.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1niii7j30uc0h87d9.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1wt1lzj315o0icn4q.jpg">
+<meta property="article:published_time" content="2019-10-26T12:12:57.000Z">
+<meta property="article:modified_time" content="2020-06-06T12:22:14.914Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="个人总结">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1oei4qj30os0jon2g.jpg">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-漏洞分析工具" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2019/10/26/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7/" class="article-date">
+  <time class="dt-published" datetime="2019-10-26T12:12:57.000Z" itemprop="datePublished">2019-10-26</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E4%BA%8C%E8%BF%9B%E5%88%B6/">二进制</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      常见二进制逆向工具总结
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="逆向分析工具"><a href="#逆向分析工具" class="headerlink" title="逆向分析工具"></a>逆向分析工具</h2><h3 id="预处理工具"><a href="#预处理工具" class="headerlink" title="预处理工具"></a>预处理工具</h3><ol>
+<li>脱壳工具</li>
+</ol>
+<p>目前有很多加壳工具，当然有盾，自然就有矛。软件脱壳有手动脱和自动脱壳之分，其中手动是用TRW2000、TR、SOFTICE等调试工具对付，对脱壳者有一定水平要求，涉及到很多汇编语言和软件调试方面的知识。自动就是用专门的脱壳工具来脱，最常用某种压缩软件都有编写的反压缩工具对应，有些压缩工具自身能解压，如UPX。有些不提供这功能，如：ASPACK，需要UNASPACK来脱壳。更一般的需要专门的脱壳工具来解决，使用比较多的是PROCDUMP，可解决目前各种主流压缩软件的压缩文件。</p>
+<a id="more"></a>
+
+<p>也就是说脱壳工具一般分为专用的和通用的脱壳机,通用脱壳机是根据外壳的类型或模拟执行进行脱壳,通用脱壳机能脱的壳较多,但是效果不好,专用脱壳机只能针对某一个壳(甚至是某一个壳的具体版本)进行脱壳,虽然它只能脱单一的一种壳,但是由于它的针对性特别强,因此脱壳的效果较好。下面介绍两种通用的脱壳工具：</p>
+<p>a. linxerUnpacker</p>
+<p>linxerUnpacker是一个通用型自脱工具，由linxer编写发布。它完全基于虚拟机，将壳特征和编译器特征保存在PEid_Sign.txt里面，可以自动脱几十种主流的壳。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1oei4qj30os0jon2g.jpg" alt="img"> </p>
+<p>b. FFI万能脱壳</p>
+<p>本工具是一款辅助进行病毒分析的工具，它包括各种文件格式识别功能，使用超级巡警的格式识别引擎，集查壳、虚拟机脱壳、PE文件编辑、PE文件重建、导入表抓取(内置虚拟机解密某些加密导入表)、进程内存查看/DUMP、附加数据处理、文件地址转换、PEID插件支持、MD5计算以及快捷的第三方工具利用等功能，适合病毒分析中对一些病毒木马样本进行系统处理。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1qqmtaj31880ootl6.jpg" alt="img"> </p>
+<ol start="2">
+<li>定位地址工具</li>
+</ol>
+<p>a.Dependency Walker</p>
+<p>Dependency Walker是一个免费的实用程序，在Windows 95、98，Me，NT，2000，XP，2003，Vista，7和8上运行,可扫描任何32位或64位Windows模块（exe，dll，ocx，sys等），并构建所有从属模块的层次树状图。对于找到的每个模块的地址有巨大的帮助，它列出了该模块导出的所有功能，以及其他模块实际上正在调用的功能。另一个视图显示最少的必需文件集，以及有关每个文件的详细信息，包括文件的完整路径，基地址，版本号，计算机类型，调试信息等。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1vweapj313c0u0e3g.jpg" alt="img"> </p>
+<p>b.LoadPE</p>
+<p>LordPE是一款功能强大的PE文件分析、修改工具，可以查看PE格式文件格式，并修改相关信息。</p>
+<p>LordPE可以解析PE文件结构，对PE文件头部结构内容进行查看分析。可以解析各字段特征值的含义，并对特征值进行操作更改。也可以解析PE文件导入导出表结构，分析PE文件的导入函数及导出函数信息。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1q9kqqj316k0i811c.jpg" alt="img"> </p>
+<p>c.Stud_PE</p>
+<p> StudPE是一个功能强大的PE文件格式编辑工具,它可以解析PE文件格式,可以进行文件格式的比较,可以进行壳的识别等。它还提供了支持插件的功能，内置十六进制编辑器，可对资源进行修改。拥有可视化资源查看器，可修改、替换、导出文件；添加函数、修改区段、查看程序进程等等；</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1oxsudj31440u0nf3.jpg" alt="img"> </p>
+<ol start="3">
+<li>地址计算工具</li>
+</ol>
+<p>a. 逆向工程计算器（Reversers Calculator ）</p>
+<p>Reversers Calculator 是一个 32 位十六进制基础逆向计算工具，支持十六进制逻辑和数学运算，支持将十六进制和二进制转换为十进制（有/无符号）和八进制结果，并可将字符串转换为十六进制值。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1r73yoj30xw0rsamc.jpg" alt="img"> </p>
+<h3 id="动态分析工具"><a href="#动态分析工具" class="headerlink" title="动态分析工具"></a>动态分析工具</h3><p>a. Windbg</p>
+<p>WinDbg是在windows平台下，强大的用户态和内核态调试工具。它能够通过dmp文件轻松的定位到问题根源，可用于分析蓝屏、程序崩溃（IE崩溃）原因，是我们日常工作中必不可少的一个有力工具，学会使用它，将有效提升我们的问题解决效率和准确率。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1pfijpj31bb0u0ww1.jpg" alt="img"> </p>
+<p>c. OllyDbg</p>
+<p>OllyDbg（简称OD）是有Oleh Yuschuuk（<a target="_blank" rel="noopener" href="http://www.ollydbg.de)编写的一款具有可视化界面的用户模式调试器,可以在当前各种windows版本上运行,但nt的系统架构更能发挥ollydbg强大功能.ollydbg结合了动态调试和静态分析,具有gui界面,易上手,并且对异常的跟踪处理相当灵活,这些使得ollydbg成为调试ring/">www.ollydbg.de）编写的一款具有可视化界面的用户模式调试器，可以在当前各种Windows版本上运行，但NT的系统架构更能发挥OllyDbg强大功能。OllyDbg结合了动态调试和静态分析，具有GUI界面，易上手，并且对异常的跟踪处理相当灵活，这些使得OllyDbg成为调试Ring</a> 3级程序的首选工作。它的反汇编引擎很强大，可识别数千个被C和Windows频繁使用的函数，并能将其参数注释出。它会自动分析函数过程、循环语句、代码中的字符串等。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1sdvzkj319s0oo7m2.jpg" alt="img"> </p>
+<p>d. Immunity Debugger</p>
+<p>Immunity Debugger软件专门用于加速漏洞利用程序的开发，辅助漏洞挖掘以及恶意软件分析。它具备一个完整的图形用户界面，同时还配备了迄今为止最为强的Python安全工具库。它巧妙的将动态调试功能与一个强大的静态分析引擎融合于一体，它还附带了一套高度可定制的纯pythont图形算法，可用于帮助我们绘制出直观的函数体控制流以及函数中的各个基本块。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1x9j97j312o0b0di0.jpg" alt="img"> </p>
+<h3 id="静态分析工具"><a href="#静态分析工具" class="headerlink" title="静态分析工具"></a>静态分析工具</h3><p>a.IDA</p>
+<p>IDA Pro（简称IDA）是DataRescue公司出品的一款可编程的交互式反汇编工具和调试器，它的最主要的特性是交互和多处理器。操作者可以通过对IDA的交互来指导IDA更好地反汇编，IDA并非自动解决程序中的问题，但它会按用户的指令找到可疑之处，用户的工作是通知IDA怎样去做。比如人工指定编译器类型，对变量名、结构定义、数组等定义等。这样的交互能力在反汇编大型软件时显得尤为重要。多处理器特点是指IDA支持常见处理器平台上的软件产品，IDA支持的文件类型非常丰富，除了常见的PE格式，还支持Windows,DOS,UNIX,Mac,Java,.NET等平台的文件格式。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1ks0pbj316o0pw4df.jpg" alt="img"> </p>
+<p>b.Hopper Disassembler</p>
+<p>Hopper Disassembler是一款适用于Mac与Linux操作系统的软件，它可以帮助你二进制反汇编，反编译和调试32/64位的应用程序。完成集成到OS X环境中，能够进行控制流程图、可脚本化调用、可扩展、调试器、解码器等等功能。<img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1lob7ej31970u0ttw.jpg" alt="img"></p>
+<h2 id="漏洞挖掘工具"><a href="#漏洞挖掘工具" class="headerlink" title="漏洞挖掘工具"></a>漏洞挖掘工具</h2><h3 id="模糊测试类挖掘工具"><a href="#模糊测试类挖掘工具" class="headerlink" title="模糊测试类挖掘工具"></a>模糊测试类挖掘工具</h3><p>a.Peach</p>
+<p>Peach 是一款用 Python 写的开源的 Smart Fuzz 工具， 它支持两种文件 Fuzz 方法:基于生长(Generation Based)和基于变异(Mutation Based)。基于生长的 Fuzz 方法产生随机或启发性数据 来填充给定的数据模型，从而生成畸形文件。而基于变异的 Fuzz 方法在一个给定的样本文件 基础上进行修改从而产生畸形文件。 </p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1ifwfqj31040dkabs.jpg" alt="img"> </p>
+<p>b.Sully</p>
+<p>Sulley是一个模糊测试引擎和模糊测试框架，由多个可扩展的组件组成。Sulley（IMHO）所具有的能力超过了以前所发布的大多数模糊测试技术，包括商业工具和那些在公开领域中可用的工具。该框架的目标是不仅要简化数据的表示，而且还要简化数据的传输以及对目标的监视。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1js0c0j311c0r8122.jpg" alt="img"> </p>
+<p>c.AFL</p>
+<p>AFL（American Fuzzy Lop）是由安全研究员Michał Zalewski（<a target="_blank" rel="noopener" href="https://twitter.com/lcamtuf">@lcamtuf</a>）开发的一款基于覆盖引导（Coverage-guided）的模糊测试工具，它通过记录输入样本的代码覆盖率，从而调整输入样本以提高覆盖率，增加发现漏洞的概率。</p>
+<p>与其他仪器化的模糊测试器相比，afl的设计更加实用：它具有适度的性能开销，使用各种高效的模糊测试策略和工作量最小化的技巧，基本上不需要配置，并且可以无缝处理复杂的实际用例等优点。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1tllq8j31a40n44eo.jpg" alt="img"> </p>
+<p>d.AFL-Go</p>
+<p>AFLGo是<a target="_blank" rel="noopener" href="https://lcamtuf.coredump.cx/afl/">American Fuzzy Lop（AFL）</a>的扩展。给定一组目标位置（例如folder/file.c:582），AFLGo会生成专门用于执行这些目标位置的目标的输入。与AFL不同，AFLGo的大部分时间预算都花在了到达特定目标位置上，而又不会浪费资源来强调无关的程序组件。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1iricjj30yk0p8wlc.jpg" alt="img"> </p>
+<p>e.Simple Fuzzer</p>
+<p>Simple Fuzzer工具具备全面的模糊测试功能，但使用非常简单。该工具提供一种非常简洁的脚本语言。该语言提供文本模糊字符串和序列模糊字符串两种形式。同时，该语言支持脚本包含等功能，来构建复杂的测试用例。通过该语言，用户来构建测试所用的配置文件。然后，通过Simple Fuzzer加载该文件，就可以对目标实施各种模糊测试。Simple Fuzzer已经集成在了Kali Linux之中，使用起来十分的方便。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1ja0r4j316g0ok116.jpg" alt="img"> </p>
+<h3 id="符号执行类挖掘工具"><a href="#符号执行类挖掘工具" class="headerlink" title="符号执行类挖掘工具"></a>符号执行类挖掘工具</h3><p>a. Klee</p>
+<p>KLEE是一款开源的自动软件测试工具，英国帝国理工的Cristian Cadar则是符号执行引擎KLEE的作者。它基于LLVM编译底层基础，能够自动生成测试样例检测软件缺陷。与其它工具不同的地方在于，KLEE能对c程序生成字节码.bc文件，并自动生成各类缺陷，不需要再自己编写。因而使用KLEE进行软件测试是比较轻松的方式。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1n3np4j30s008kjry.jpg" alt="img"> </p>
+<p>b. Mayhem</p>
+<p>MAYHEM，这是一个用于自动查找二进制（即可执行文件）程序中的可利用错误的系统，它是由CMU的David Brumley团队在2012年提出的。MAYHEM会针对所报告的每个错误产生有效的控制劫持漏洞利用，从而确保每个错误报告都是可操作的并且对安全性至关重要。通过使用二进制代码，MAYHEM甚至可以使那些没有源代码访问权限的人也可以检查该软件的安全性。</p>
+<p>David Brumley后担任ForAllSecure的首席执行官（CEO），Mayhem也借助该公司实现了商业化。</p>
+<pre><code>![img](https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1nyys2j30s008kmy0.jpg)</code></pre>
+<p>c. Driller</p>
+<p>Driller在afl的基础上开发的crash模糊测试工具。Driller在AFL的基础上加入了动态符号执行引擎，当模糊测试发生stuck时，使用动态符号执行去突破这些限制，生成满足fuzz需求的新输入，使得fuzz能够继续执行。</p>
+<p>总体上说，Driller结合了AFL的高效、低消耗、快速的优点和动态符号执行探索能力强的优点，又避免了AFL较难突破特殊的边界和动态符号执行路径爆炸的问题。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1l5gh1j30zc0q010i.jpg" alt="img"> </p>
+<p>d. Clang</p>
+<p>Clang是一个由Apple主导编写，基于LLVM的C/C++/Objective-C编译器。它是一个开源工具，其源代码发布于BSD协议之下。本质上，Clang不仅是一个静态分析工具，还是这些语言的一个轻量级编译器。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1k9otyj30kg0kg40z.jpg" alt="img"> </p>
+<h2 id="漏洞分析工具"><a href="#漏洞分析工具" class="headerlink" title="漏洞分析工具"></a>漏洞分析工具</h2><p>a. BAP</p>
+<p>卡内基梅隆大学二进制分析平台（CMU BAP）是一个反向工程和程序分析平台，可以使用二进制代码，并且不需要源代码。 BAP支持多种体系结构：ARM，x86，x86-64，PowerPC和MIPS。 BAP分解二进制代码并将其拆分为类似RISC的BAP指令语言（BIL）。程序分析是使用BIL表示形式执行的，并且与体系结构无关，从某种意义上说，它对于所有支持的体系结构都将同样有效。其包含大量的库，插件和前端。库提供了代码重构，插件有助于扩展，前端作为入口点。该框架用OCaml编写，也可以绑定C，Python和Rust语言。该项目得到了美国国防部，西门子公司和韩国政府的各种资助。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1uiersj30xs0q0qal.jpg" alt="img"> </p>
+<p>b. BitBlaze</p>
+<p>BitBlaze是一个统一的二进制分析平台, 结合了动态分析和静态分析, 并且具有可扩展性。BitBlaze主要包含3个组件, 分别是Vine、TEMU和Rudder。Vine是静态分析组件, 其将底层指令翻译成简单且规范的中间语言, 并且在中间语言的基础上为一些常见的静态分析提供了实用工具, 如绘制程序依赖关系图、数据流图及程序控制流图等; TEMU是动态分析组件, 其提供了整个系统的动态分析, 并且实现了语义提取和用户定义动态污点分析; Rudder是结合动静态分析的具体执行和符号执行组件, 其使用Vine和TMEU提供的功能在二进制层面上实现了混合具体执行和符号执行, 并且提供了路径选择和约束求解的功能。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1m1vzcj313w0b4wh2.jpg" alt="img"> </p>
+<p>c. Intel PIN</p>
+<p>Pin是Intel公司开发的动态二进制插桩框架，可以用于创建基于动态程序分析工具，支持IA-32和x86-64指令集架构，支持windows和linux。</p>
+<p>其本身提供的API可以让我们观察一个进程的状态，比如：内存、寄存器和控制流。Pin还提供了一些更改程序行为的机制，比如：允许重写程序的寄存器和内存。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1v12wnj307q0420wv.jpg" alt="img"> </p>
+<p>d. Triton</p>
+<p>Triton是一个使用C++编写功能强大的动态二进制分析（Dynamic Binary Analysis）框架。 基于Taint引擎， 提供良好的Python Binding接口。其主要包含四大组件：（1）符号执行引擎（2）污点分析引擎（3）SMT求解器接口（4）AST representation接口。基于这些组件，我们可以构建用于自动化逆向工程或者漏洞研究的工具。 </p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1mjo1kj30q007kaaw.jpg" alt="img"> </p>
+<p>e. BinNavi</p>
+<p>BinNavi是一个二进制代码逆向工程的工具，旨在帮助寻找反汇编代码中漏洞的漏洞研究人员。它能够分析输入数据流在程序中的传播路径，通过将程序的控制流图形化表示，从而帮助分析人员定位其感兴趣的执行路径。</p>
+<p>使用BinNavi，您可以用其强大的内置静态代码分析技术来分析反汇编的x86，ARM，PowerPC和MIPS代码。如果静态分析仍不够，则可以使用内置调试器来实时查看正在分析的程序。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1verthj31a40bctbe.jpg" alt="img"> </p>
+<h2 id="漏洞利用工具"><a href="#漏洞利用工具" class="headerlink" title="漏洞利用工具"></a>漏洞利用工具</h2><p>a. Metasploit</p>
+<p>Metasploit是当前信息安全与渗透测试领域最为流行的术语之一。它颠覆了原有的渗透测试方法。Metasploit框架是一个开源框架，宗旨就在方便渗透测试，它是由Ruby进行开发编写模块化框架，具有很好的扩展性，便于渗透测试人员进行二次开开发、使用定制的工具模板。</p>
+<p>Metasploit可向后端模块提供多种用来控制测试的接口(如控制台、WEB、CLI)。推荐使用控制台接口，通过控制台接口，可以访问和使用所有的Metasploit的插件，例如:Payload、 利用模块、Post模块等。Metasploit还有第三方程序的接口，例如Nmap、SQLmap 等，可以直接在控制台接口里使用，要访问该界面，需要在命令行下输入 msfconsole。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1wbitfj30q00643zl.jpg" alt="img"> </p>
+<p>b. Mona</p>
+<p>Mona是一种非常有用的插件，它由Corelan Team用Python编写开发的一个可以自动构造Rop Chain并且集成了metaasploit计算位移量功能的强大挖洞辅助插件。起初是为Immunity Debugger编写的，现在它也适用于WinDbg调试器。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1niii7j30uc0h87d9.jpg" alt="img">  </p>
+<p>c. Pompem</p>
+<p>Pompem是一个开源的漏洞利用和漏洞发现工具，旨在自动在一些重要的漏洞库中搜索漏洞和利用漏洞。在当前版本中，它将在PacketStorm security, CXSecurity, ZeroDay, Vulners, National Vulnerability Database, WPScan Vulnerability Database这些漏洞库中执行搜索。</p>
+<p> <img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf1wt1lzj315o0icn4q.jpg" alt="img"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2019/10/26/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7/" data-id="ckkco51bh003t0gyrbei00191" data-title="常见二进制逆向工具总结" class="article-share-link">Share</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E4%B8%AA%E4%BA%BA%E6%80%BB%E7%BB%93/" rel="tag">个人总结</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2021/01/25/hello-world/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Hello World
+        
+      </div>
+    </a>
+  
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BA%8C%E8%BF%9B%E5%88%B6/">二进制</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%85%B6%E4%BB%96/">其他</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B7%A5%E6%8E%A7/">工控</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%9D%82%E9%A1%B9/">杂项</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AFL/" rel="tag">AFL</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/BugID/" rel="tag">BugID</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/" rel="tag">Docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Fuzzing/" rel="tag">Fuzzing</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MacbookPro/" rel="tag">MacbookPro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Modbus/" rel="tag">Modbus</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Sql/" rel="tag">Sql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/clusterfuzz/" rel="tag">clusterfuzz</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fuzz/" rel="tag">fuzz</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/libFuzzer/" rel="tag">libFuzzer</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitMQ/" rel="tag">rabbitMQ</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%B8%AA%E4%BA%BA%E6%80%BB%E7%BB%93/" rel="tag">个人总结</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8A%A0%E5%A3%B3%E8%84%B1%E5%A3%B3/" rel="tag">加壳脱壳</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8F%8D%E8%B0%83%E8%AF%95/" rel="tag">反调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%9B%BA%E4%BB%B6%E9%80%86%E5%90%91/" rel="tag">固件逆向</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B0%8F%E8%84%9A%E6%9C%AC/" rel="tag">小脚本</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B7%A5%E6%8E%A7%E5%8D%8F%E8%AE%AE/" rel="tag">工控协议</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/" rel="tag">漏洞分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" rel="tag">漏洞复现</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/" rel="tag">漏洞挖掘</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%97%85%E6%AF%92%E5%88%86%E6%9E%90/" rel="tag">病毒分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BB%83%E5%AD%97/" rel="tag">练字</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%8A%B1%E6%8C%87%E4%BB%A4/" rel="tag">花指令</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%BA%E6%96%87/" rel="tag">论文</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" rel="tag">论文阅读</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" rel="tag">读书笔记</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/AFL/" style="font-size: 10px;">AFL</a> <a href="/tags/BugID/" style="font-size: 10px;">BugID</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Fuzzing/" style="font-size: 10px;">Fuzzing</a> <a href="/tags/MacbookPro/" style="font-size: 10px;">MacbookPro</a> <a href="/tags/Modbus/" style="font-size: 10px;">Modbus</a> <a href="/tags/Sql/" style="font-size: 10px;">Sql</a> <a href="/tags/clusterfuzz/" style="font-size: 10px;">clusterfuzz</a> <a href="/tags/fuzz/" style="font-size: 15px;">fuzz</a> <a href="/tags/libFuzzer/" style="font-size: 10px;">libFuzzer</a> <a href="/tags/rabbitMQ/" style="font-size: 10px;">rabbitMQ</a> <a href="/tags/%E4%B8%AA%E4%BA%BA%E6%80%BB%E7%BB%93/" style="font-size: 20px;">个人总结</a> <a href="/tags/%E5%8A%A0%E5%A3%B3%E8%84%B1%E5%A3%B3/" style="font-size: 10px;">加壳脱壳</a> <a href="/tags/%E5%8F%8D%E8%B0%83%E8%AF%95/" style="font-size: 10px;">反调试</a> <a href="/tags/%E5%9B%BA%E4%BB%B6%E9%80%86%E5%90%91/" style="font-size: 10px;">固件逆向</a> <a href="/tags/%E5%B0%8F%E8%84%9A%E6%9C%AC/" style="font-size: 10px;">小脚本</a> <a href="/tags/%E5%B7%A5%E6%8E%A7%E5%8D%8F%E8%AE%AE/" style="font-size: 10px;">工控协议</a> <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/" style="font-size: 11.67px;">漏洞分析</a> <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" style="font-size: 18.33px;">漏洞复现</a> <a href="/tags/%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/" style="font-size: 13.33px;">漏洞挖掘</a> <a href="/tags/%E7%97%85%E6%AF%92%E5%88%86%E6%9E%90/" style="font-size: 10px;">病毒分析</a> <a href="/tags/%E7%BB%83%E5%AD%97/" style="font-size: 10px;">练字</a> <a href="/tags/%E8%8A%B1%E6%8C%87%E4%BB%A4/" style="font-size: 10px;">花指令</a> <a href="/tags/%E8%AE%BA%E6%96%87/" style="font-size: 11.67px;">论文</a> <a href="/tags/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" style="font-size: 10px;">论文阅读</a> <a href="/tags/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" style="font-size: 16.67px;">读书笔记</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">January 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2021/01/25/%EF%BC%88%E5%B7%A5%E6%8E%A7%E5%90%91%EF%BC%89%E7%BB%84%E6%80%81%E7%8E%8B%E8%BD%AF%E4%BB%B6%E6%BC%8F%E6%B4%9E%E6%B5%8B%E8%AF%95%E9%AA%8C%E8%AF%81%E4%B8%8E%E5%88%A9%E7%94%A8/">（工控向）组态王软件漏洞测试验证与利用</a>
+          </li>
+        
+          <li>
+            <a href="/2021/01/25/%E3%80%8A%E9%BB%91%E5%AE%A2%E5%A4%A7%E6%9B%9D%E5%85%89-%E5%B7%A5%E6%8E%A7%E5%AE%89%E5%85%A8%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/">（读书笔记）工业控制系统安全概述</a>
+          </li>
+        
+          <li>
+            <a href="/2021/01/25/%E5%A0%86%E7%9A%84%E7%9F%A5%E8%AF%86%E4%B8%8E%E5%88%A9%E7%94%A8/">堆的知识与利用（0day2）</a>
+          </li>
+        
+          <li>
+            <a href="/2021/01/25/%E5%8F%8D%E8%B0%83%E8%AF%95/">反调试初步学习总结与简单实战</a>
+          </li>
+        
+          <li>
+            <a href="/2021/01/25/%E5%B7%A5%E6%8E%A7%E7%B3%BB%E7%BB%9F%E5%A8%81%E8%83%81%E5%BB%BA%E6%A8%A1/">（读书笔记）通过威胁建模获取具有可操作性的工控系统威胁情报</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2021 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.4.1.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
