@@ -1,0 +1,430 @@
+<!DOCTYPE html><html lang="en"><head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<link rel="preconnect" href="//www.googletagmanager.com">
+	<link rel="preconnect" href="//zz.bdstatic.com">
+	<link rel="preconnect" href="//sp0.baidu.com">
+	<link rel="preconnect" href="//www.google-analytics.com">
+	<link rel="preconnect" href="//cdn1.lncld.net">
+	<link rel="preconnect" href="//unpkg.com">
+	<link rel="preconnect" href="//app-router.leancloud.cn">
+	<link rel="preconnect" href="//9qpuwspm.api.lncld.net">
+	<link rel="preconnect" href="//gravatar.loli.net">
+
+	<title>Aflnet简单实践 | Hexo</title>
+
+	<meta name="HandheldFriendly" content="True">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+	<meta name="generator" content="hexo">
+	<meta name="author" content="Fstark">
+	<meta name="description" content="">
+
+	
+	<meta name="keywords" content="">
+	
+
+	
+	<link rel="shortcut icon" href="https://i.loli.net/2017/11/26/5a19c0b50432e.png">
+	<link rel="apple-touch-icon" href="https://i.loli.net/2017/11/26/5a19c0b50432e.png">
+	
+
+	
+	<meta name="theme-color" content="#3c484e">
+	<meta name="msapplication-TileColor" content="#3c484e">
+	
+
+	
+
+	
+
+	<meta property="og:site_name" content="Hexo">
+	<meta property="og:type" content="article">
+	<meta property="og:title" content="Aflnet简单实践 | Hexo">
+	<meta property="og:description" content="">
+	<meta property="og:url" content="http://example.com/2021/01/26/aflnet/">
+
+	
+	<meta property="article:published_time" content="2021-01-26T09:01:18+08:00"> 
+	<meta property="article:author" content="Fstark">
+	<meta property="article:published_first" content="Hexo, /2021/01/26/aflnet/">
+	
+
+	
+	
+	
+<link rel="stylesheet" href="/css/allinonecss.min.css">
+
+
+	
+	
+	
+</head>
+
+<body class="post-template">
+	<div class="site-wrapper">
+		
+
+
+
+
+<header class="site-header post-site-header outer">
+    <div class="inner">
+        
+<nav class="site-nav"> 
+    <div class="site-nav-left">
+        <ul class="nav">
+            <li>
+                
+                <a href="/" title="Home">HOME</a>
+                
+            </li>
+            
+            
+            <li>
+                <a href="/about" title="ABOUT">ABOUT</a>
+            </li>
+            
+            
+        </ul> 
+    </div>
+    
+    <div class="search-button-area">
+        <a href="#search" class="search-button">Search ...</a>
+    </div>
+     
+    <div class="site-nav-right">
+        
+        <a href="#search" class="search-button">Search ...</a>
+         
+        
+<div class="social-links">
+    
+    
+    
+    
+    
+    <a class="social-link" title="telegram" href="https://t.me/Fstarkss" target="_blank" rel="noopener">
+        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M679.428571 746.857143l84-396q5.142857-25.142857-6-36t-29.428571-4L234.285714 501.142857q-16.571429 6.285714-22.571428 14.285714t-1.428572 15.142858 18.285715 11.142857l126.285714 39.428571 293.142857-184.571428q12-8 18.285714-3.428572 4 2.857143-2.285714 8.571429l-237.142857 214.285714-9.142857 130.285714q13.142857 0 25.714285-12.571428l61.714286-59.428572 128 94.285715q36.571429 20.571429 46.285714-21.714286z m344.571429-234.857143q0 104-40.571429 198.857143t-109.142857 163.428571-163.428571 109.142857-198.857143 40.571429-198.857143-40.571429-163.428571-109.142857-109.142857-163.428571T0 512t40.571429-198.857143 109.142857-163.428571T313.142857 40.571429 512 0t198.857143 40.571429 163.428571 109.142857 109.142857 163.428571 40.571429 198.857143z"></path></svg>
+    </a>
+    
+    
+    
+</div>
+    </div>
+</nav>
+    </div>
+</header>
+
+
+<div id="site-main" class="site-main outer" role="main">
+    <div class="inner">
+        <header class="post-full-header">
+            <div class="post-full-meta">
+                <time class="post-full-meta-date" datetime="2021-01-26T09:45:33.188Z">
+                    2021-01-26
+                </time>
+                
+                <span class="date-divider">/</span>
+                
+                <a href="/categories/%E4%BA%8C%E8%BF%9B%E5%88%B6/">二进制</a>&nbsp;&nbsp;
+                
+                
+            </div>
+            <h1 class="post-full-title">Aflnet简单实践</h1>
+        </header>
+        <div class="post-full ">
+            
+            <figure class="post-full-image" style="background-image: url(https://i.loli.net/2021/01/26/iaYRrDTF2Hs6gS1.png)">
+            </figure>
+            
+            <div class="post-full-content">
+                <article id="photoswipe" class="markdown-body">
+                    <p> AFLNet已在2020年ICST上被接受发布。</p>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">@inproceedings{AFLNet,</span><br><span class="line">author={Van{-}Thuan Pham and Marcel B{\"o}hme and Abhik Roychoudhury},</span><br><span class="line">title={AFLNet: A Greybox Fuzzer for Network Protocols},</span><br><span class="line">booktitle={Proceedings of the 13rd IEEE International Conference on Software Testing, Verification and Validation : Testing Tools Track},</span><br><span class="line">year={2020},}</span><br></pre></td></tr></tbody></table></figure>
+<a id="more"></a>
+
+<p>AFLNET是一个基于AFL开发的网络协议测试工具，其最大的优点在于有效地利用了服务器的响应信息，以指导下一次的Fuzz。</p>
+<p> 有状态的黑盒模糊检测（SBF）是目前比较受欢迎的fuzz方法，学术界Sulley或BooFuzz，工业界的Peach，特点是利用FSM或者图遍历协议模型，并生成符合语法的消息序列。这种方法虽部分解决了第一个挑战，但是其的效果通常取决与设计的状态模型，这种模型通常需要由有经验的分析者/开发者基于对该协议的知识，以及结合端点之间的网络流量具体设计。设计的模型可能不会百分百符合黑盒内的协议，毕竟网络协议的实现取决于各个开发者，可能存在对协议的误解，或是实现时增加新的特性。此外现有的SBF方法尽管可以生成一些数据去触发一些特殊状态，然而并未将这类数据进行保留以指导未来的fuzz行为，例如，并不会更新现有的状态模型。针对这个问题，AFLNET的解决方案是比较合理的。</p>
+<p> 其流程可以描述如下:程序的输入是数据包文件，程序内部的parser会对数据包进行分析，Parser随协议不同而采用不同设计，目的在于解析出Request请求，这些请求将组合为一个个序列，作为序列数据集。数据集中的序列会通过Mutator变异后发往Server，Server对request返回response，response数据包将被程序捕获，提取其中的状态码，判断该状态码位于FSM的何处，若原本的模型中不存在该状态码，则FSM中会增加一个结点代表该状态。程序中的State Selector将会分析程序当前的FSM模型，从中选出较少遍历/未曾遍历的状态（这是通过一个优先级机制实现的），传递给sequence selector，使之选择出可以触发该状态的request序列。当然，一开始由于缺乏统计信息，State的选取是随机化的。</p>
+<p><img alt="image-20201005165901975" class="post-img b-lazy" data-img="https://i.loli.net/2020/10/05/Zylq4FunIUhm6JR.png" data-index="0" data-src="https://i.loli.net/2020/10/05/Zylq4FunIUhm6JR.png"></p>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p>aflnet官方的教程非常详细，首先下载</p>
+<figure class="highlight shell"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> First, <span class="built_in">clone</span> this AFLNet repository to a folder named aflnet</span></span><br><span class="line">git clone &lt;links to the repository&gt; aflnet</span><br><span class="line"><span class="meta">#</span><span class="bash"> Then move to the <span class="built_in">source</span> code folder</span></span><br><span class="line">cd aflnet</span><br><span class="line">make clean all</span><br><span class="line">cd llvm_mode</span><br><span class="line"><span class="meta">#</span><span class="bash"> The following make <span class="built_in">command</span> may not work <span class="keyword">if</span> llvm-config cannot be found</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> To fix this issue, just <span class="built_in">set</span> the LLVM_CONFIG env. variable to the specific llvm-config version on your machine</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> On Ubuntu 18.04, it could be llvm-config-6.0 <span class="keyword">if</span> you have installed clang using apt-get</span></span><br><span class="line">make</span><br><span class="line"><span class="meta">#</span><span class="bash"> Move to AFLNet<span class="string">'s parent folder</span></span></span><br><span class="line">cd ../..</span><br><span class="line">export AFLNET=$(pwd)/aflnet</span><br><span class="line">export WORKDIR=$(pwd)</span><br></pre></td></tr></tbody></table></figure>
+<p>aflnet的用法和afl非常相似，可以afl –help查看详情</p>
+<ul>
+<li><strong><em>-N netinfo</em></strong>: server information 服务器信息 (e.g., tcp://127.0.0.1/8554)</li>
+<li><strong><em>-P protocol</em></strong>: application protocol to be tested 目标的协议类型 (e.g., RTSP, FTP, DTLS12, DNS)</li>
+<li><strong><em>-D usec</em></strong>: (optional) waiting time (in micro seconds) for the server to complete its initialization 等待时间</li>
+<li><strong><em>-K</em></strong> : (optional) send SIGTERM signal to gracefully terminate the server after consuming all request messages  使用所有请求消息后发送SIGTERM信号以正常终止服务器</li>
+<li><strong><em>-E</em></strong> : (optional) enable state aware mode 启动状态感知模式</li>
+<li><strong><em>-R</em></strong> : (optional) enable region-level mutation operators 启用区域级别的突变运算符</li>
+<li><strong><em>-F</em></strong> : (optional) enable false negative reduction mode </li>
+<li><strong><em>-c script</em></strong> : (optional) name or full path to a script for server cleanup 服务器清理脚本的名称或完整路径</li>
+<li><strong><em>-q algo</em></strong>: (optional) state selection algorithm 状态选择算法(e.g., 1. RANDOM_SELECTION, 2. ROUND_ROBIN, 3. FAVOR)</li>
+<li><strong><em>-s algo</em></strong>: (optional) seed selection algorithm种子选择算法 (e.g., 1. RANDOM_SELECTION, 2. ROUND_ROBIN, 3. FAVOR)</li>
+</ul>
+<p><strong>实例命令：</strong></p>
+<figure class="highlight shell"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">afl-fuzz -d -i in -o out -N &lt;server info&gt; -x &lt;dictionary file&gt; -P &lt;protocol&gt; -D 10000 -q 3 -s 3 -E -K -R &lt;executable binary and its arguments (e.g., port number)&gt;</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="实践–以dnsmasq为例"><a href="#实践–以dnsmasq为例" class="headerlink" title="实践–以dnsmasq为例"></a>实践–以dnsmasq为例</h3><p>首先下载dnsmasq的源码,切换版本到2.73，使用afl-clang-fast进行编译</p>
+<figure class="highlight shell"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> Assuming AFLNet is <span class="keyword">in</span> ~/aflnet</span></span><br><span class="line">export AFLNET=$HOME/aflnet</span><br><span class="line">export WORKDIR=$HOME</span><br><span class="line">export AFL_PATH=$AFLNET</span><br><span class="line">if [[ ! $PATH == *"$AFLNET"* ]]; then export PATH=$AFLNET:$PATH; fi</span><br><span class="line">cd ~</span><br><span class="line"><span class="meta">#</span><span class="bash"> Clone the Dnsmasq repository</span></span><br><span class="line">git clone git://thekelleys.org.uk/dnsmasq.git</span><br><span class="line"><span class="meta">#</span><span class="bash"> Move to the directory</span></span><br><span class="line">cd dnsmasq</span><br><span class="line"><span class="meta">#</span><span class="bash"> Checkout a specific version</span></span><br><span class="line">git checkout v2.73rc6</span><br><span class="line"><span class="meta">#</span><span class="bash"> Compile <span class="built_in">source</span></span></span><br><span class="line">CC=$AFLNET/afl-clang-fast make</span><br><span class="line"><span class="meta">#</span><span class="bash"> Copy configuration file</span></span><br><span class="line">sudo cp $AFLNET/tutorials/dnsmasq/dnsmasq.conf /etc/</span><br><span class="line"><span class="meta">#</span><span class="bash"> Move to the src directory</span></span><br><span class="line">cd src/</span><br></pre></td></tr></tbody></table></figure>
+<p>成功编译Dnsmasq之后，我们可以通过添加地址来解析并<code>dig</code>用于查询主机名来测试服务器：</p>
+<figure class="highlight shell"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> Add an address to resolve</span></span><br><span class="line">echo address=/test.com/5.5.5.5 | sudo tee -a /etc/dnsmasq.conf</span><br><span class="line"><span class="meta">#</span><span class="bash"> Run Dnsmasq and don<span class="string">'t daemonize (the dnsmasq.conf file will specify port 5353)</span></span></span><br><span class="line">./dnsmasq</span><br></pre></td></tr></tbody></table></figure>
+<p>然后我们dig一下目标</p>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">dig @127.0.0.1 -p 5353 test.com</span><br><span class="line"></span><br><span class="line">; &lt;&lt;&gt;&gt; DiG 9.11.3-1ubuntu1.12-Ubuntu &lt;&lt;&gt;&gt; @127.0.0.1 -p 5353 test.com</span><br><span class="line">; (1 server found)</span><br><span class="line">;; global options: +cmd</span><br><span class="line">;; Got answer:</span><br><span class="line">;; -&gt;&gt;HEADER&lt;&lt;- opcode: QUERY, status: NOERROR, id: 40722</span><br><span class="line">;; flags: qr aa rd ra ad; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0</span><br><span class="line"></span><br><span class="line">;; QUESTION SECTION:</span><br><span class="line">;test.com.			IN	A</span><br><span class="line"></span><br><span class="line">;; ANSWER SECTION:</span><br><span class="line">test.com.		0	IN	A	5.5.5.5</span><br><span class="line"></span><br><span class="line">;; Query time: 0 msec</span><br><span class="line">;; SERVER: 127.0.0.1#5353(127.0.0.1)</span><br><span class="line">;; WHEN: Tue May 19 14:19:38 EDT 2020</span><br><span class="line">;; MSG SIZE  rcvd: 42</span><br></pre></td></tr></tbody></table></figure>
+<p>可以开始进行fuzz了</p>
+<figure class="highlight shell"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd $WORKDIR/dnsmasq/src</span><br><span class="line">afl-fuzz -d -i $AFLNET/tutorials/dnsmasq/in-dns -o out-dns -N tcp://127.0.0.1/5353 -P DNS -D 10000 -K -R ./dnsmasq</span><br></pre></td></tr></tbody></table></figure>
+<p>运行一段时间后就会有crash了</p>
+<p><img alt="image-20200929152459965" class="post-img b-lazy" data-img="https://i.loli.net/2020/09/29/uEFhGyWXidzct9C.png" data-index="1" data-src="https://i.loli.net/2020/09/29/uEFhGyWXidzct9C.png"></p>
+<p>当有crash之后我们如何重现漏洞现场，aflnet之中自带了重现工具aflnet-replay，具体用法类似于</p>
+<figure class="highlight shell"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aflnet-replay packet_file protocol port [first_resp_timeout(us) [follow-up_resp_timeout(ms)]]</span><br></pre></td></tr></tbody></table></figure>
+<p>我们可以先gdb 一下dnsmasq然后使用aflnet-replay发送poc</p>
+<p><img alt="image-20201005173801528" class="post-img b-lazy" data-img="https://i.loli.net/2020/10/05/EI3oTXiGKw7QnpR.png" data-index="2" data-src="https://i.loli.net/2020/10/05/EI3oTXiGKw7QnpR.png"></p>
+<p>可以看到目标服务崩溃了，位置断在forward.c:1895上</p>
+<p>相同思路可以应用到其余的网络协议服务之上，比如bind9的named应用程序，但是发现可能会存在crash误报的情况，按理来说aflnet通过识别发送回的状态码进行服务器状态判别应该误差不会太大，还要再读一读论文了解一下原理。</p>
+<p><img alt="image-20201005092715081" class="post-img b-lazy" data-img="https://i.loli.net/2020/10/05/ojEiPm2t537HAJ6.png" data-index="3" data-src="https://i.loli.net/2020/10/05/ojEiPm2t537HAJ6.png"></p>
+<p>aflnet还有很多功能可以进行探索，比如作者在推特上提到的ipsm.dot，可以时时看到fuzz的进程进度。</p>
+<p><img alt="image-20201005175339428" class="post-img b-lazy" data-img="https://i.loli.net/2020/10/05/qRyhgEftc7wJLzr.png" data-index="4" data-src="https://i.loli.net/2020/10/05/qRyhgEftc7wJLzr.png"></p>
+
+                </article>
+                <ul class="tags-postTags">
+                    
+                    <li>
+                        <a href="/tags/fuzz/" rel="tag"># fuzz</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/tags/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" rel="tag"># 论文阅读</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    
+    <nav id="gobottom" class="pagination">
+        
+        <span class="prev-next-post">·</span>
+        
+        <a class="next-post" title="（读书笔记）工业控制系统安全概述" href="/2021/01/25/%E3%80%8A%E9%BB%91%E5%AE%A2%E5%A4%A7%E6%9B%9D%E5%85%89-%E5%B7%A5%E6%8E%A7%E5%AE%89%E5%85%A8%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/">
+            （读书笔记）工业控制系统安全概述 →
+        </a>
+        
+    </nav>
+
+    
+    <div class="inner">
+        <div id="comment"></div>
+    </div>
+    
+</div>
+
+<div class="toc-bar">
+    <div class="toc-btn-bar">
+        <a href="#site-main" class="toc-btn">
+            <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M793.024 710.272a32 32 0 1 0 45.952-44.544l-310.304-320a32 32 0 0 0-46.4 0.48l-297.696 320a32 32 0 0 0 46.848 43.584l274.752-295.328 286.848 295.808z"></path></svg>
+        </a>
+        <div class="toc-btn toc-switch">
+            <svg class="toc-open" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M779.776 480h-387.2a32 32 0 0 0 0 64h387.2a32 32 0 0 0 0-64M779.776 672h-387.2a32 32 0 0 0 0 64h387.2a32 32 0 0 0 0-64M256 288a32 32 0 1 0 0 64 32 32 0 0 0 0-64M392.576 352h387.2a32 32 0 0 0 0-64h-387.2a32 32 0 0 0 0 64M256 480a32 32 0 1 0 0 64 32 32 0 0 0 0-64M256 672a32 32 0 1 0 0 64 32 32 0 0 0 0-64"></path></svg>
+            <svg class="toc-close hide" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M512 960c-247.039484 0-448-200.960516-448-448S264.960516 64 512 64 960 264.960516 960 512 759.039484 960 512 960zM512 128.287273c-211.584464 0-383.712727 172.128262-383.712727 383.712727 0 211.551781 172.128262 383.712727 383.712727 383.712727 211.551781 0 383.712727-172.159226 383.712727-383.712727C895.712727 300.415536 723.551781 128.287273 512 128.287273z"></path><path d="M557.05545 513.376159l138.367639-136.864185c12.576374-12.416396 12.672705-32.671738 0.25631-45.248112s-32.704421-12.672705-45.248112-0.25631l-138.560301 137.024163-136.447897-136.864185c-12.512727-12.512727-32.735385-12.576374-45.248112-0.063647-12.512727 12.480043-12.54369 32.735385-0.063647 45.248112l136.255235 136.671523-137.376804 135.904314c-12.576374 12.447359-12.672705 32.671738-0.25631 45.248112 6.271845 6.335493 14.496116 9.504099 22.751351 9.504099 8.12794 0 16.25588-3.103239 22.496761-9.247789l137.567746-136.064292 138.687596 139.136568c6.240882 6.271845 14.432469 9.407768 22.65674 9.407768 8.191587 0 16.352211-3.135923 22.591372-9.34412 12.512727-12.480043 12.54369-32.704421 0.063647-45.248112L557.05545 513.376159z"></path></svg>
+        </div>
+        <a href="#gobottom" class="toc-btn">
+            <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M231.424 346.208a32 32 0 0 0-46.848 43.584l297.696 320a32 32 0 0 0 46.4 0.48l310.304-320a32 32 0 1 0-45.952-44.544l-286.848 295.808-274.752-295.36z"></path></svg>
+        </a>
+    </div>
+    <div class="toc-main">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E8%A3%85"><span class="toc-text">安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E8%B7%B5%E2%80%93%E4%BB%A5dnsmasq%E4%B8%BA%E4%BE%8B"><span class="toc-text">实践–以dnsmasq为例</span></a></li></ol>
+    </div>
+</div>
+
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+
+	</div>
+	
+
+
+	
+
+
+
+
+<div id="search" class="search-overlay">
+    <div class="search-form">
+        
+        <div class="search-overlay-logo">
+        	<img src="https://i.loli.net/2017/11/26/5a19c0b50432e.png" alt="Hexo">
+        </div>
+        
+        <input id="local-search-input" class="search-input" type="text" name="search" placeholder="Search ...">
+        <a class="search-overlay-close" href="#"></a>
+    </div>
+    <div id="local-search-result"></div>
+</div>
+
+<footer class="site-footer outer">
+	<div class="site-footer-content inner">
+		<div class="copyright">
+			<a href="/" title="Hexo">Hexo © 2021</a>
+			
+				
+			        <span hidden="true" id="/2021/01/26/aflnet/" class="leancloud-visitors" data-flag-title="Aflnet简单实践">
+			            <span>阅读量 </span>
+			            <span class="leancloud-visitors-count">0</span>
+			        </span>
+	    		
+    		
+		</div>
+		<nav class="site-footer-nav">
+			
+			<a href="https://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a>
+			<a href="https://github.com/xzhih/hexo-theme-casper" title="Casper" target="_blank" rel="noopener">Casper</a>
+		</nav>
+	</div>
+</footer>
+	
+
+
+<script>
+    if(window.navigator && navigator.serviceWorker) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for(let registration of registrations) {
+                registration.unregister()
+            }
+        })
+    }
+</script>
+
+
+<script id="scriptLoad" src="/js/allinone.min.js" async=""></script>
+
+
+<script>
+    document.getElementById('scriptLoad').addEventListener('load', function () {
+        
+        
+            var bLazy = new Blazy();
+        
+
+        
+        
+
+        
+        
+        
+            searchFunc("/");
+        
+        
+    })
+</script>
+
+
+
+
+<link rel="stylesheet" href="/photoswipe/photoswipe.css">
+
+
+<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
+
+
+<script src="/photoswipe/photoswipe.min.js"></script>
+
+
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+
+
+
+
+
+<script id="valineScript" src="//unpkg.com/valine/dist/Valine.min.js" async=""></script>
+<script>
+    document.getElementById('valineScript').addEventListener("load", function() {
+        new Valine({
+            el: '#comment' ,
+            verify: false,
+            notify: false,
+            appId: '',
+            appKey: '',
+            placeholder: 'Just go go',
+            pageSize: 10,
+            avatar: 'mm',
+            visitor: true
+        })
+    });
+</script>
+
+
+
+
+
+
+
+</body></html>
