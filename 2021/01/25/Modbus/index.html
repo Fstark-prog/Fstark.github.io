@@ -1,142 +1,4 @@
-<!DOCTYPE html><html lang="zh-CN"><head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<link rel="preconnect" href="//www.googletagmanager.com">
-	<link rel="preconnect" href="//zz.bdstatic.com">
-	<link rel="preconnect" href="//sp0.baidu.com">
-	<link rel="preconnect" href="//www.google-analytics.com">
-	<link rel="preconnect" href="//cdn1.lncld.net">
-	<link rel="preconnect" href="//unpkg.com">
-	<link rel="preconnect" href="//app-router.leancloud.cn">
-	<link rel="preconnect" href="//9qpuwspm.api.lncld.net">
-	<link rel="preconnect" href="//gravatar.loli.net">
-
-	<title>工控Modbus学习笔记（在FreeBuf原文上增改） | Fstark</title>
-
-	<meta name="HandheldFriendly" content="True">
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-	<meta name="generator" content="hexo">
-	<meta name="author" content="Fstark">
-	<meta name="description" content="">
-
-	
-	<meta name="keywords" content="">
-	
-
-	
-	<link rel="shortcut icon" href="https://i.loli.net/2017/11/26/5a19c0b50432e.png">
-	<link rel="apple-touch-icon" href="https://i.loli.net/2017/11/26/5a19c0b50432e.png">
-	
-
-	
-	<meta name="theme-color" content="#3c484e">
-	<meta name="msapplication-TileColor" content="#3c484e">
-	
-
-	
-
-	
-
-	<meta property="og:site_name" content="Fstark">
-	<meta property="og:type" content="article">
-	<meta property="og:title" content="工控Modbus学习笔记（在FreeBuf原文上增改） | Fstark">
-	<meta property="og:description" content="">
-	<meta property="og:url" content="http://example.com/2021/01/25/Modbus/">
-
-	
-	<meta property="article:published_time" content="2021-01-25T14:01:15+08:00"> 
-	<meta property="article:author" content="Fstark">
-	<meta property="article:published_first" content="Fstark, /2021/01/25/Modbus/">
-	
-
-	
-	
-	
-<link rel="stylesheet" href="/css/allinonecss.min.css">
-
-
-	
-	
-	
-</head>
-
-<body class="post-template">
-	<div class="site-wrapper">
-		
-
-
-
-
-<header class="site-header post-site-header outer">
-    <div class="inner">
-        
-<nav class="site-nav"> 
-    <div class="site-nav-left">
-        <ul class="nav">
-            <li>
-                
-                <a href="/" title="Home">HOME</a>
-                
-            </li>
-            
-            
-            <li>
-                <a href="/about" title="ABOUT">ABOUT</a>
-            </li>
-            
-            
-        </ul> 
-    </div>
-    
-    <div class="search-button-area">
-        <a href="#search" class="search-button">Search ...</a>
-    </div>
-     
-    <div class="site-nav-right">
-        
-        <a href="#search" class="search-button">Search ...</a>
-         
-        
-<div class="social-links">
-    
-    
-    
-    
-    
-    <a class="social-link" title="telegram" href="https://t.me/Fstarkss" target="_blank" rel="noopener">
-        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M679.428571 746.857143l84-396q5.142857-25.142857-6-36t-29.428571-4L234.285714 501.142857q-16.571429 6.285714-22.571428 14.285714t-1.428572 15.142858 18.285715 11.142857l126.285714 39.428571 293.142857-184.571428q12-8 18.285714-3.428572 4 2.857143-2.285714 8.571429l-237.142857 214.285714-9.142857 130.285714q13.142857 0 25.714285-12.571428l61.714286-59.428572 128 94.285715q36.571429 20.571429 46.285714-21.714286z m344.571429-234.857143q0 104-40.571429 198.857143t-109.142857 163.428571-163.428571 109.142857-198.857143 40.571429-198.857143-40.571429-163.428571-109.142857-109.142857-163.428571T0 512t40.571429-198.857143 109.142857-163.428571T313.142857 40.571429 512 0t198.857143 40.571429 163.428571 109.142857 109.142857 163.428571 40.571429 198.857143z"></path></svg>
-    </a>
-    
-    
-    
-</div>
-    </div>
-</nav>
-    </div>
-</header>
-
-
-<div id="site-main" class="site-main outer" role="main">
-    <div class="inner">
-        <header class="post-full-header">
-            <div class="post-full-meta">
-                <time class="post-full-meta-date" datetime="2021-01-25T14:28:01.159Z">
-                    2021-01-25
-                </time>
-                
-                <span class="date-divider">/</span>
-                
-                <a href="/categories/%E5%B7%A5%E6%8E%A7/">工控</a>&nbsp;&nbsp;
-                
-                
-            </div>
-            <h1 class="post-full-title">工控Modbus学习笔记（在FreeBuf原文上增改）</h1>
-        </header>
-        <div class="post-full no-image">
-            
-            <div class="post-full-content">
-                <article id="photoswipe" class="markdown-body">
-                    <p>自己Modbus的学习笔记，在原文基础上增加了许多更细致的描述与配图，也增加了几个模块的内容，内容丰富了许多。欢迎各位在此基础上继续积累，使其愈加完善。</p>
+<!DOCTYPE html><html class="appearance-auto" lang="zh-CN"><head><meta charset="UTF-8"><title>工控Modbus学习笔记（在FreeBuf原文上增改）</title><meta name="description" content="May the Force be with you"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><link rel="icon" href="/images/favicon.png"><link rel="stylesheet" href="/style/common/bulma.css"><link rel="stylesheet" href="/style/base.css"><link rel="stylesheet" href="/style/common/helper.css"><script src="/js/common.js"></script><link rel="stylesheet" href="/style/post.css"><link rel="stylesheet" href="/style/themes/highlight-theme-light.css"><script src="/js/highlight.pack.js"></script><meta name="generator" content="Hexo 5.3.0"></head><body class="is-flex is-flex-direction-column"><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-space-between is-hidden-mobile"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/">Fstark's blog</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">工控Modbus学习笔记（在FreeBuf原文上增改）</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">点击返回顶部</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></aside></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%AF%E8%AF%AD"><span class="toc-text">术语</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%83%8C%E6%99%AF"><span class="toc-text">背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%8F%E8%AE%AE%E5%8E%9F%E7%90%86"><span class="toc-text">协议原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BC%A0%E8%BE%93%E6%96%B9%E5%BC%8F"><span class="toc-text">传输方式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Modbus%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B"><span class="toc-text">Modbus数据模型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Modbus-RTU%E5%92%8CModbus-ASCII%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB%EF%BC%9F"><span class="toc-text">Modbus RTU和Modbus ASCII有什么区别？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CRC%E4%B8%8ELRC"><span class="toc-text">CRC与LRC</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%A7%E7%9A%84%E6%A0%87%E7%A4%BA%E4%B8%8E%E8%AF%86%E5%88%AB"><span class="toc-text">帧的标示与识别</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MODBUS-TCP%E6%B3%A8%E6%84%8F%E7%82%B9"><span class="toc-text">MODBUS TCP注意点</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BB%E6%9C%BA%E5%92%8C%E4%BB%8E%E6%9C%BA%E3%80%81%E6%9C%8D%E5%8A%A1%E7%AB%AF%E5%92%8C%E5%AE%A2%E6%88%B7%E7%AB%AF"><span class="toc-text">主机和从机、服务端和客户端</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%98%AF%E5%90%A6%E5%8F%AF%E4%BB%A5%E5%A4%9A%E4%B8%BB%E6%9C%BA"><span class="toc-text">是否可以多主机</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#modbus-TCP%E5%8D%8F%E8%AE%AE%E7%AE%80%E8%BF%B0"><span class="toc-text">modbus TCP协议简述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#modbus-tcp-%E5%92%8C-TCP-IP%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="toc-text">modbus tcp 和 TCP IP的关系</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%9F%E8%83%BD%E7%A0%81%E4%BD%9C%E7%94%A8"><span class="toc-text">功能码作用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Modebus%E5%BC%82%E5%B8%B8%E7%A0%81"><span class="toc-text">Modebus异常码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Modbus-%E5%8D%8F%E8%AE%AE%E5%AE%89%E5%85%A8%E6%80%A7%E5%88%86%E6%9E%90"><span class="toc-text">Modbus 协议安全性分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Modbus-%E5%8D%8F%E8%AE%AE%E7%9A%84%E5%9B%BA%E6%9C%89%E9%97%AE%E9%A2%98"><span class="toc-text">Modbus 协议的固有问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0%E4%BA%A7%E7%94%9F%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-text">协议实现产生的问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Modbus%E5%8D%8F%E8%AE%AE%E5%B8%B8%E8%A7%81%E6%94%BB%E5%87%BB%E6%80%BB%E7%BB%93"><span class="toc-text">Modbus协议常见攻击总结</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Modbus%E5%8D%8F%E8%AE%AE%E4%B8%AD%E9%97%B4%E4%BA%BA%E6%94%BB%E5%87%BB"><span class="toc-text">Modbus协议中间人攻击</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Schneider%E7%BB%88%E6%AD%A2cpu%E8%BF%90%E8%A1%8C%E6%94%BB%E5%87%BB"><span class="toc-text">Schneider终止cpu运行攻击</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Schneider%E5%8A%9F%E8%83%BD%E7%A0%8190%E9%89%B4%E5%88%AB%E6%94%BB%E5%87%BB"><span class="toc-text">Schneider功能码90鉴别攻击</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E5%85%A8%E5%BB%BA%E8%AE%AE"><span class="toc-text">安全建议</span></a></li></ol></li></ol></div><div class="column is-9"><header class="my-4"><a href="/tags/%E5%B7%A5%E6%8E%A7%E5%8D%8F%E8%AE%AE"><i class="tag post-item-tag">工控协议</i></a><a href="/tags/Modbus"><i class="tag post-item-tag">Modbus</i></a></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">工控Modbus学习笔记（在FreeBuf原文上增改）</h1><time class="has-text-grey" datetime="2021-01-25T14:28:01.159Z">2021-01-25</time><article class="mt-2 post-content"><p>自己Modbus的学习笔记，在原文基础上增加了许多更细致的描述与配图，也增加了几个模块的内容，内容丰富了许多。欢迎各位在此基础上继续积累，使其愈加完善。</p>
 <a id="more"></a>
 
 <h2 id="术语"><a href="#术语" class="headerlink" title="术语"></a>术语</h2><p>1 word =2 byte;</p>
@@ -154,15 +16,15 @@
 <p>典型地，串口用于ASCII码字符的传输。通信使用3根线完成：（1）地线，（2）发送，（3）接收。由于串口通信是异步的，端口能够在一根线上发送数据同时在另一根线上接收数据。其他线用于握手，但是不是必须的。<strong>串口通信最重要的参数是波特率、数据位、停止位和奇偶校验</strong>。对于两个进行通行的端口，这些参数必须匹配：  </p>
 <blockquote>
 <p>  <strong>a. 波特率</strong>：这是一个衡量通信速度的参数。它表示每秒钟传送的bit的个数。例如300波特表示每秒钟发送300个bit。当我们提到时钟周期时，我们就是指波特率。例如如果协议需要4800波特率，那么时钟是4800Hz。这意味着串口通信在数据线上的采样率为4800Hz。通常电话线的波特率为14400，28800和36600。波特率可以远远大于这些值，但是波特率和距离成反比。高波特率常常用于放置的很近的仪器间的通信，典型的例子就是GPIB设备的通信。<br>  <strong>b. 数据位</strong>：这是衡量通信中实际数据位的参数。当计算机发送一个信息包，实际的数据不会是8位的，标准的值是5、7和8位。如何设置取决于你想传送的信息。比如，标准的ASCII码是0～127（7位）。扩展的ASCII码是0～255（8位）。如果数据使用简单的文本（标准 ASCII码），那么每个数据包使用7位数据。每个包是指一个字节，包括开始/停止位，数据位和奇偶校验位。由于实际数据位取决于通信协议的选取，术语“包”指任何通信的情况。<br>  <strong>c. 停止位</strong>：用于表示单个包的最后一位。典型的值为1，1.5和2位。由于数据是在传输线上定时的，并且每一个设备有其自己的时钟，很可能在通信中两台设备间出现了小小的不同步。因此停止位不仅仅是表示传输的结束，并且提供计算机校正时钟同步的机会。适用于停止位的位数越多，不同时钟同步的容忍程度越大，但是数据传输率同时也越慢。<br>  <strong>d. 奇偶校验位</strong>：在串口通信中一种简单的检错方式。有四种检错方式：偶、奇、高和低。当然没有校验位也是可以的。对于偶和奇校验的情况，串口会设置校验位（数据位后面的一位），用一个值确保传输的数据有偶个或者奇个逻辑高位。例如，如果数据是011，那么对于偶校验，校验位为0，保证逻辑高的位数是偶数个。如果是奇校验，校验位位1，这样就有3个逻辑高位。高位和低位不真正的检查数据，简单置位逻辑高或者逻辑低校验。这样使得接收设备能够知道一个位的状态，有机会判断是否有噪声干扰了通信或者是否传输和接收数据是否不同步。</p>
-<p><img alt="image-20191024205159337" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g89l02e0rnj30n90e2jvs.jpg" data-index="0" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89l02e0rnj30n90e2jvs.jpg"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89l02e0rnj30n90e2jvs.jpg" alt="image-20191024205159337"></p>
 </blockquote>
 <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>早在1971年，Modicon公司首次推出了Modbus协议，ModbusRTU和Modbus ASCII诞生于此。后来施耐德电气（SchneiderElectric）收购了Modicon公司，并在1997年推出了ModbusTCP协议。2004年，中国国家标准委员会正式把Modbus作为了国家标准，开启了Modbus为中国工业通信做贡献的时代。</p>
-<p><img alt="image-20191024205739456" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g89leq1mqdj30o00fjq4x.jpg" data-index="1" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89leq1mqdj30o00fjq4x.jpg"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89leq1mqdj30o00fjq4x.jpg" alt="image-20191024205739456"></p>
 <p>通过此协议，控制器相互之间、控制器经由网络和其它设备之间可以通信。Modbus协议具有标准、开放，可以支持多种电气接口，数据帧格式简单紧凑，数据传输量大、实时性好等特点，在工业控制系统中得到了广泛的应用，已经成为通用工业标准。深入分析Modbus协议实现原理和其安全性对提高工控系统安全性有着重要的现实意义。ModbusRTU和ModbusASCII主要用于串行通信领域，而ModbusTCP则常用于以太网通信。现在，Modbus已经成为工业领域通信协议标准，并且现在是工业电子设备之间相当常用的连接方式。</p>
-<p><a target="_blank" rel="noopener" href="https://image.3001.net/images/20170921/15060057119653.png"><img alt="israbye FreeBuf.COM" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g89irrxfujj30j604n75s.jpg" data-index="2" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89irrxfujj30j604n75s.jpg"></a></p>
-<p><img alt="image-20191024204652957" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g89kuqvhv0j30nb0a7gnm.jpg" data-index="3" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89kuqvhv0j30nb0a7gnm.jpg"></p>
+<p><a target="_blank" rel="noopener" href="https://image.3001.net/images/20170921/15060057119653.png"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89irrxfujj30j604n75s.jpg" alt="israbye FreeBuf.COM"></a></p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89kuqvhv0j30nb0a7gnm.jpg" alt="image-20191024204652957"></p>
 <h2 id="协议原理"><a href="#协议原理" class="headerlink" title="协议原理"></a>协议原理</h2><p>Modbus使用一种简单的MasterandSlave主从协议（客户机/服务器协议）进行通信。客户机作为主站，向服务器发送请求；服务器（从站）接到请求后，对请求进行分析并作出应答。其中使用的通信帧被称为应用数据单元（Application Data Unit，ADU），它包括通信地址段、功能代码段、数据段和校验段，如下图： </p>
-<p><a target="_blank" rel="noopener" href="https://image.3001.net/images/20170921/1506005632357.png"><img alt="israbye FreeBuf.COM" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g89irsxzo4j30j604u0t8.jpg" data-index="4" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89irsxzo4j30j604u0t8.jpg"></a></p>
+<p><a target="_blank" rel="noopener" href="https://image.3001.net/images/20170921/1506005632357.png"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89irsxzo4j30j604u0t8.jpg" alt="israbye FreeBuf.COM"></a></p>
 <p>一般使用上，监控系统(HMI)都为Master，PLC、电表、仪表等都为Slave，HMI系统一直PollingSlave的各种relayandregister最新数值，然后做显示及各种逻辑计算及控制调整等处理。</p>
 <p>其中，功能代码段和数据段组合称为协议数据单元（Protocol Data Unit or Protocol Description Unit)，PDU）。功能代码段占用一个字节，取值范围为1-255，其中128-255为保留值，用于异常消息应答报文。1-127为功能代码编号，其中65-72和100-110为用户自定义编码。</p>
 <p>Modbus协议建立了主设备查询的格式：设备（或广播）地址、功能代码、所有要发送的数据、错误检测域。</p>
@@ -171,7 +33,7 @@
 <p>数据段包含了从设备要执行功能的任何附加信息：从何寄存器开始读、要读的寄存器数量，错误检测域为从设备提供了一种验证消息内容是否正确的方法。</p>
 <p><strong><em>回应</em></strong></p>
 <p>查询消息中的功能代码的回应。数据段包括了从设备收集的数据：像寄存器值或状态。如果有错误发生，功能代码将被修改以用于指出回应消息是错误的，同时数据段包含了描述此错误信息的代码。错误检测域允许主设备确认消息内容是否可用。</p>
-<p><img alt="image-20191024210653222" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g89lfkj27yj310l09r79j.jpg" data-index="5" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89lfkj27yj310l09r79j.jpg"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89lfkj27yj310l09r79j.jpg" alt="image-20191024210653222"></p>
 <h2 id="传输方式"><a href="#传输方式" class="headerlink" title="传输方式"></a>传输方式</h2><p>Modbus 协议是一种应用层报文传输协议，包括ASCII、RTU、TCP三种报文类型，协议本身并没有定义物理层，只是定义了控制器能够认识和使用的消息结构，而不管它们是经过何种网络进行通信的。</p>
 <p>Modbus 协议使用串口传输时可以选择RTU或ASCII模式，并规定了消息、数据结构、命令和应答方式并需要对数据进行校验。ASCII 模式采用LRC校验，RTU模式采用16 位CRC校验。RTU与ASCII不能混用，ASCII可打印字符便于故障检测，而且对用高级语言（如Fortran）编程的主计算机及主PC很适宜。RTU则适用于机器语言编程的计算机和PC主机。 通过以太网传输时使用TCP，这种模式不使用校验，因为TCP协议是一个面向连接的可靠协议。</p>
 <p>​    <strong><em>ASCII与RTU相互转换</em></strong></p>
@@ -222,25 +84,25 @@
 <li><p>​    1个停止位（有校验时），2个Bit（无校验时）</p>
 </li>
 </ul>
-<h2 id="Modbus数据模型"><a href="#Modbus数据模型" class="headerlink" title="Modbus数据模型"></a>Modbus数据模型</h2><p><img alt="image-20191024212243618" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g89lw1t6d9j30yb0bsgr2.jpg" data-index="6" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89lw1t6d9j30yb0bsgr2.jpg"></p>
+<h2 id="Modbus数据模型"><a href="#Modbus数据模型" class="headerlink" title="Modbus数据模型"></a>Modbus数据模型</h2><p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89lw1t6d9j30yb0bsgr2.jpg" alt="image-20191024212243618"></p>
 <h2 id="Modbus-RTU和Modbus-ASCII有什么区别？"><a href="#Modbus-RTU和Modbus-ASCII有什么区别？" class="headerlink" title="Modbus RTU和Modbus ASCII有什么区别？"></a>Modbus RTU<strong>和</strong>Modbus ASCII有什么区别？</h2><p>Modbus是一种应用层协议，它定义了与基础网络无关的数据单元（ADU），可以在以太网（TCP/IP）或串行链路上（RS232、RS485等）进行通信（以太网ADU和串行ADU略有不同）。在串行链路上，Modbus协议有两种传输模式——ASCII模式和RTU模式。其中，ASCII是英文“American Standard Code for Information Interchange”的缩写，中文翻译为“美国国家信息交换标准编码”；RTU是英文“ Remote Terminal Unit”的缩写，中文翻译为“远程终端设备”。</p>
 <p>首先，让我们来看看Modbus的工作原理。</p>
 <p>Modbus采用主从（Master-Salve）通信模式，仅有主设备（Master）能对传输进行初始化，从设备（Slave）根据主设备的请求进行应答。典型的主设备包括现场仪表和显示面板，典型的从设备为可编程逻辑控制器（PLC）。</p>
 <p>在串行链路的主从通信中，Modbus主设备可以连接一个或N（最大为247）个从设备，主从设备之间的通信包括单播模式和广播模式。</p>
-<p><img alt="image-20191024212953487" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g89m3i1roxj30yp04ymy1.jpg" data-index="7" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89m3i1roxj30yp04ymy1.jpg"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89m3i1roxj30yp04ymy1.jpg" alt="image-20191024212953487"></p>
 <p>在广播模式中，Modbus主设备可同时向多个从设备发送请求（设备地址0用于广播模式），从设备对广播请求不进行响应。</p>
 <p>在单播模式中，主设备发送请求至某个特定的从设备（每个Modbus从设备具有唯一地址），请求的消息帧中会包含功能代码和数据，比如功能代码“01”用来读取离散量线圈的状态。从设备接到请求后，进行应答并把消息反馈主设备。</p>
-<p><a target="_blank" rel="noopener" href="https://image.3001.net/images/20170921/1506006245516.png"><img alt="israbye FreeBuf.COM" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g89irrip7gj30av092myt.jpg" data-index="8" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89irrip7gj30av092myt.jpg"></a></p>
+<p><a target="_blank" rel="noopener" href="https://image.3001.net/images/20170921/1506006245516.png"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89irrip7gj30av092myt.jpg" alt="israbye FreeBuf.COM"></a></p>
 <p>在主从设备的通信中，可以使用ASCII模式或者RTU模式。</p>
-<p><img alt="image-20191024213040383" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g89m4b3ybrj30yp0evwkj.jpg" data-index="9" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89m4b3ybrj30yp0evwkj.jpg"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89m4b3ybrj30yp0evwkj.jpg" alt="image-20191024213040383"></p>
 <p>在ASCII（AmericanStandard Code for Information Interchange）传输模式下，消息帧以英文冒号（“：”，ASCII3A Hex）开始，以回车 和换号（CRLF，ASCII 0D and 0A Hex）符号结束，允许的传输的字符集为十六进制的0-9和A-F；网络中的从设备监视传输通路上是否有英文冒号（“：”），如果有的话，就对消息帧进行解码，查看消息中的地址是否与自己的地址相同，如果相同的话，就接收其中的数据；如果不同的话，则不予理会。</p>
-<p><a target="_blank" rel="noopener" href="https://image.3001.net/images/20170921/15060064703424.png"><img alt="israbye FreeBuf.COM" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g89iru5pozj30j603nmxw.jpg" data-index="10" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89iru5pozj30j603nmxw.jpg"></a></p>
+<p><a target="_blank" rel="noopener" href="https://image.3001.net/images/20170921/15060064703424.png"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89iru5pozj30j603nmxw.jpg" alt="israbye FreeBuf.COM"></a></p>
 <p>在ASCII模式下，每个8位的字节被拆分成两个ASCII字符进行发送，比如十六进制数0xAF ,会被分解成ASCII字符“A”和“F”进行发送，发送的字符量比RTU增加一倍。ASCII模式的好处是允许两个字符之间间隔的时间长达1s而不引发通信故障，该模式采用纵向冗余校验（Longitudinal Redundancy Check ，LRC)） 的方法来检验错误，</p>
 <p>当控制器设为在Modbus 网络上以ＲTU 模式通信，消息中的每个8Bit 字节都包含两个4 Bit 的十六进制字符，这种模式没有开始和结束标记。其优点是: 在同样的波特率下，可比传送更多的数据。</p>
 <p>在RTU（RemoteTerminal Unit）模式下，每个字节可以传输两个十六进制字符，比如十六进制数0xAF，直接以十六进制0xAF（二进制：10101111）进行发送，因此它的发送密度比ASCII模式高一倍；RTU模式采用循环冗余校验（CRC），下面是对RTU模式的总结：</p>
 <p>具体格式如图 所示。</p>
-<p><a target="_blank" rel="noopener" href="https://image.3001.net/images/20170921/15060064268162.png"><img alt="israbye FreeBuf.COM" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g89irtpjphj30j603fq3f.jpg" data-index="11" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89irtpjphj30j603fq3f.jpg"></a></p>
-<p><img alt="image-20191024213555654" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g89m9s89wmj30mk037t9w.jpg" data-index="12" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89m9s89wmj30mk037t9w.jpg"></p>
+<p><a target="_blank" rel="noopener" href="https://image.3001.net/images/20170921/15060064268162.png"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89irtpjphj30j603fq3f.jpg" alt="israbye FreeBuf.COM"></a></p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89m9s89wmj30mk037t9w.jpg" alt="image-20191024213555654"></p>
 <h2 id="CRC与LRC"><a href="#CRC与LRC" class="headerlink" title="CRC与LRC"></a>CRC与LRC</h2><p><strong><em>CRC</em></strong></p>
 <p>CRC域是两个字节，包含一16位的二进制值。它由传输设备计算后加入到消息中。接收设备重新计算收到消息的CRC，并与接收到的CRC域中的值比较，如果两个值不同，则有误。</p>
 <p>CRC是先调入值是全“1”的16位寄存器，然后调用过程将消息中连续的8位字节和当前寄存器中的值进行处理。仅每个字符中的8Bit数据对CRC有效，起始位和停止位以及奇偶校验位均无效。</p>
@@ -271,9 +133,9 @@
 <p><strong><em>LRC</em></strong></p>
 <p>LRC错误校验用于ASCII模式。这个错误校验是一个8位二进制数，可作为2个ASCII十六进制字节传送。把十六进制字符转换成二进制，加上无循环进位的二进制字符和二进制补码结果生成LRC错误校验（参见图）。这个LRC在接收设备进行核验，并与被传送的LRC进行比较，冒号（：）、回车符号（CR）、换行字符（LF）和置入的其他任何非ASCII十六进制字符在运算时忽略不计。</p>
 <h2 id="帧的标示与识别"><a href="#帧的标示与识别" class="headerlink" title="帧的标示与识别"></a>帧的标示与识别</h2><p>报文帧的识别</p>
-<p><img alt="image-20191024213737329" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g89mbjn0tsj30vd06pdie.jpg" data-index="13" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89mbjn0tsj30vd06pdie.jpg"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89mbjn0tsj30vd06pdie.jpg" alt="image-20191024213737329"></p>
 <p>字符之间的要求</p>
-<p><img alt="image-20191024213807380" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g89mc2br71j30vd06pdhy.jpg" data-index="14" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89mc2br71j30vd06pdhy.jpg"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89mc2br71j30vd06pdhy.jpg" alt="image-20191024213807380"></p>
 <h2 id="MODBUS-TCP注意点"><a href="#MODBUS-TCP注意点" class="headerlink" title="MODBUS TCP注意点"></a>MODBUS TCP注意点</h2><h3 id="主机和从机、服务端和客户端"><a href="#主机和从机、服务端和客户端" class="headerlink" title="主机和从机、服务端和客户端"></a>主机和从机、服务端和客户端</h3><p>【在modbus协议中】</p>
 <p>主机发送modbus请求，从机根据请求内容向主机返回响应。在modbus协议中，主机总是主动方，从机总是被动方。</p>
 <p>【在网络应用中】</p>
@@ -285,7 +147,7 @@
 <p>a.从机地址变得不再重要，多数情况下忽略。从某种意义上说从机地址被IP地址取代</p>
 <p>b.CRC校验变得不再重要，甚至可以忽略。由于TCP数据包中已经存在校验，为了不重复造轮子，modbus TCP干脆取消了CRC校验。</p>
 <p>TCP 模式是为了让Modbus 数据顺利在以太网上传输产生的，使用TCP502 端口。该协议物理层，数据链路层，网络层，传输层都是基于TCP 协议，只在应用层，将Modbus 协议修改后封装进去; 接收端将该TCP 数据包拆封后，重新获得原始Modbus 帧，然后按照Modbus 协议规范进行解析，并将返回的数据包重新封装进TCP 协议中，返回到发送端。与串行链路传输的数据格式不同，TCP 模式去除了附加地址和校验，增加了报文头，其具体格式如图4所示。</p>
-<p> <a target="_blank" rel="noopener" href="https://image.3001.net/images/20170921/1506006521490.png"><img alt="israbye FreeBuf.COM" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g89irt8wamj30j60avdif.jpg" data-index="15" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89irt8wamj30j60avdif.jpg"></a></p>
+<p> <a target="_blank" rel="noopener" href="https://image.3001.net/images/20170921/1506006521490.png"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89irt8wamj30j60avdif.jpg" alt="israbye FreeBuf.COM"></a></p>
 <p>在modbus TCP中包含一个MBAP头，该头包含以下几个部分</p>
 <table>
 <thead>
@@ -333,16 +195,16 @@
 </blockquote>
 <h3 id="modbus-tcp-和-TCP-IP的关系"><a href="#modbus-tcp-和-TCP-IP的关系" class="headerlink" title="modbus tcp 和 TCP IP的关系"></a>modbus tcp 和 TCP IP的关系</h3><p>modbus TCP可以理解为发生在TCP上的应用层协议，既然是TCP协议那么一个完整的MODBUSTCP报文必然包括TCP首部，IP首部和Ethernet首部。</p>
 <h2 id="功能码作用"><a href="#功能码作用" class="headerlink" title="功能码作用"></a>功能码作用</h2><p>启动Modbus事务处理的客户机创建Modbus应用数据单元。功能码（PDU中的）向服务器指示将执行哪种操作。</p>
-<p><img alt="image-20191024214153200" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g89mfzk77yj30am0lljtr.jpg" data-index="16" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89mfzk77yj30am0lljtr.jpg"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89mfzk77yj30am0lljtr.jpg" alt="image-20191024214153200"></p>
 <p>用一个字节编码Modbus数据单元的功能码域。有效范围是十制制1-255（128-255为异常响应保留）。当从客户机向服务器发送报文时，功能码域通过服务器执行哪种操作。</p>
 <p>从客户机向服务器发送的报文数据域包括附加信息，服务器使用这个信息执行功能码定义的操作。这个域还包括离散项目和寄存器地址、处理项目的数量以及域中的实际数据字节数。</p>
 <p>在某种请求中，数据域可以是不存在的，在此情况下服务器不需要任何附加信息。功能码仅说明操作。</p>
 <p><strong>功能码的类型</strong></p>
 <p>功能码主要分为有效功能码、异常功能码和错误功能码。</p>
 <p>如果在一个正确接收Modbus ADU中，不出现与请求Modbus功能有关的差错，那么服务器至客户机的响应数据会包含请求中的正常功能码。</p>
-<p><img alt="image-20191024211304406" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g89lm0csp6j30un0f7n1r.jpg" data-index="17" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89lm0csp6j30un0f7n1r.jpg"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89lm0csp6j30un0f7n1r.jpg" alt="image-20191024211304406"></p>
 <p>如果出现与请求Modbus功能有关的差错，那么响应数据会包含一个异常码和错误码。</p>
-<p><img alt="image-20191024211459248" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g89lo01xnvj30kl0a5gnk.jpg" data-index="18" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89lo01xnvj30kl0a5gnk.jpg"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89lo01xnvj30kl0a5gnk.jpg" alt="image-20191024211459248"></p>
 <p>例如，客户机能够读一组离散量输出或输入的开/关状态，或者用户能够读/写一组寄存器数据内容。当服务器对客户机响应时，它使用功能码域来指示正常（无差错）响应或出现某种差错（称为异常响应）。对于一个正常响应来说，服务器仅对原始功能码响应，如下图：</p>
 <p>对于异常响应，服务器返回一个与客户机等同的码，设置该原始功能码的最高有效位为逻辑1，并加该异常码后增加错误码，以通知客户机异常原因。如下图：</p>
 <p><strong>有效功能码</strong></p>
@@ -352,10 +214,10 @@
 <p>DO：DigitalOutput（数字输出，线圈输出），一个地址一个数据位，用户可以置位、复位，可以回读状态。以一个 bit表示 On/Off，用来输出控制信号，以激活或停止马达，警铃，灯光…等等。于PLC上被称为Output relay、Output coil等。</p>
 <p>AI：Analog Input（模拟输入，输入寄存器），一个地址16位数据，用户只能读，不能修改，，以16 bits integer表示一个数值，用来记录控制信号的数值输入，例如：温度、流量、料量、速度、转速、文件板开度、液位、重量…等等。于PLC上被称为Input register。</p>
 <p>AO：AnalogOutput（模拟输出，保持寄存器），一个地址16位数据，用户可以写，也可以回读，以16 bits integer表示一个数值，用来输出控制信号的数值，例如：温度、流量、速度、转速、文件板开度、饲料量…等等设定值。于PLC上被称为Output register、Holding register。</p>
-<p><a target="_blank" rel="noopener" href="https://image.3001.net/images/20170921/15060065568486.png"><img alt="israbye FreeBuf.COM" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g89irsc3sqj30j60gsagn.jpg" data-index="19" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89irsc3sqj30j60gsagn.jpg"></a></p>
+<p><a target="_blank" rel="noopener" href="https://image.3001.net/images/20170921/15060065568486.png"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89irsc3sqj30j60gsagn.jpg" alt="israbye FreeBuf.COM"></a></p>
 <p><strong>Modbus功能码与数据类型的对应</strong></p>
-<p><img alt="image-20191024214346782" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g89mhyofizj30xv0evq7s.jpg" data-index="20" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89mhyofizj30xv0evq7s.jpg"></p>
-<h2 id="Modebus异常码"><a href="#Modebus异常码" class="headerlink" title="Modebus异常码"></a>Modebus异常码</h2><p><img alt="image-20191024214535974" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g89mjuatjbj30xv0k8drp.jpg" data-index="21" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89mjuatjbj30xv0k8drp.jpg"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89mhyofizj30xv0evq7s.jpg" alt="image-20191024214346782"></p>
+<h2 id="Modebus异常码"><a href="#Modebus异常码" class="headerlink" title="Modebus异常码"></a>Modebus异常码</h2><p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g89mjuatjbj30xv0k8drp.jpg" alt="image-20191024214535974"></p>
 <h2 id="Modbus-协议安全性分析"><a href="#Modbus-协议安全性分析" class="headerlink" title="Modbus 协议安全性分析"></a>Modbus <strong>协议安全性分析</strong></h2><p>Modbus 协议是典型的工控网协议，研究其安全性对于加强工业控制网络的安全性有重要意义。一般来说，协议安全性问题可以分为两种，一种是协议自身的设计和描述引起的安全问题; 另一种是协议的不正确实现引起的安全问题。Modbus 协议也存在着这两方面的问题。</p>
 <h3 id="Modbus-协议的固有问题"><a href="#Modbus-协议的固有问题" class="headerlink" title="Modbus 协议的固有问题"></a>Modbus 协议的固有问题</h3><p>绝大多数工控协议在设计之初，仅仅考虑了功能实现、提高效率、提高可靠性等方面，而没考虑过安全性问题。Modbus 协议也不例外，尽管其已经成为事实上的工业标准。从前面原理分析可以看出其本身的安全性问题是: 缺乏认证、授权、加密等安全防护机制和功能码滥用问题。</p>
 <p><strong>( 1) 缺乏认证</strong></p>
@@ -373,15 +235,15 @@
 <p>缓冲区溢出是指在向缓冲区内填充数据时超过了缓冲区本身的容量导致溢出的数据覆盖在合法数据上，这是在软件开发中最常见也是非常危险的漏洞，可以导致系统崩溃，或者被攻击者利用来控制系统。Modbus 系统开发者大多不具备安全开发知识，这样就会产生很多的缓冲区溢出漏洞，一旦被恶意者利用会导致严重的后果。</p>
 <p><strong>( 3) Modbus TCP 安全问题</strong></p>
 <p>目前，Modbus 协议已经可以在通用计算机和通用操作系统上实现，运行于TCP /IP 之上以满足发展需要。这样，TCP /IP 协议自身存在的安全问题不可避免地会影响到工控网络安全。非法网络数据获取，中间人，拒绝服务， IP 欺骗，病毒木马等在IP 互联网中的常用攻击手段都会影响Modbus 系统安全。</p>
-<h3 id="Modbus协议常见攻击总结"><a href="#Modbus协议常见攻击总结" class="headerlink" title="Modbus协议常见攻击总结"></a>Modbus协议常见攻击总结</h3><h4 id="Modbus协议中间人攻击"><a href="#Modbus协议中间人攻击" class="headerlink" title="Modbus协议中间人攻击"></a>Modbus协议中间人攻击</h4><p><img alt="image-20191025183816402" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g8amra4y0ej30a204kgmc.jpg" data-index="22" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g8amra4y0ej30a204kgmc.jpg"></p>
+<h3 id="Modbus协议常见攻击总结"><a href="#Modbus协议常见攻击总结" class="headerlink" title="Modbus协议常见攻击总结"></a>Modbus协议常见攻击总结</h3><h4 id="Modbus协议中间人攻击"><a href="#Modbus协议中间人攻击" class="headerlink" title="Modbus协议中间人攻击"></a>Modbus协议中间人攻击</h4><p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g8amra4y0ej30a204kgmc.jpg" alt="image-20191025183816402"></p>
 <p>modbus协议易于遭受中间人攻击（MiTM），攻击类型主要包括记录和重放攻击。有许多工具可以对modbus发起中间人攻击，开源工具modbus VCR就是其一，modbus vcr与ettercap工具配合使用可以记录modbus协议的流量并进行重放，从而使系统在某段记录下的时间区间内仍表现为正常。</p>
-<h4 id="Schneider终止cpu运行攻击"><a href="#Schneider终止cpu运行攻击" class="headerlink" title="Schneider终止cpu运行攻击"></a>Schneider终止cpu运行攻击</h4><p><img alt="image-20191025184856902" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g8an2cnpdqj30a204kgmh.jpg" data-index="23" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g8an2cnpdqj30a204kgmh.jpg"></p>
+<h4 id="Schneider终止cpu运行攻击"><a href="#Schneider终止cpu运行攻击" class="headerlink" title="Schneider终止cpu运行攻击"></a>Schneider终止cpu运行攻击</h4><p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g8an2cnpdqj30a204kgmh.jpg" alt="image-20191025184856902"></p>
 <p>modbus中包括了一些未公开的功能码，这些功能码是厂商所使用的专用功能码。其中有一个特别好用的功能码：90（0*5a），对于大多数专有协议而言，必须使用工程软件才能够了解这些协议的工作方式。</p>
 <p>使用Unity Pro可以使用功能码90终止CPU的运转，导致逻辑暂停执行，PLC也将停止所有执行功能。</p>
-<p><img alt="image-20191025193055598" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g8aoa168fbj30gq0et0zm.jpg" data-index="24" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g8aoa168fbj30gq0et0zm.jpg"></p>
-<h4 id="Schneider功能码90鉴别攻击"><a href="#Schneider功能码90鉴别攻击" class="headerlink" title="Schneider功能码90鉴别攻击"></a>Schneider功能码90鉴别攻击</h4><p><img alt="image-20191025193218601" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g8aobgl4qyj30a5040dgm.jpg" data-index="25" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g8aobgl4qyj30a5040dgm.jpg"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g8aoa168fbj30gq0et0zm.jpg" alt="image-20191025193055598"></p>
+<h4 id="Schneider功能码90鉴别攻击"><a href="#Schneider功能码90鉴别攻击" class="headerlink" title="Schneider功能码90鉴别攻击"></a>Schneider功能码90鉴别攻击</h4><p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g8aobgl4qyj30a5040dgm.jpg" alt="image-20191025193218601"></p>
 <p>modbus nmap脚本通过modbus协议的功能码43和功能码90与设备通信，收集信息帮助建立设备简况（profile），使用设备自带的本地命令可以安全的从设备中提取信息，且不会对设备造成影响。</p>
-<p><img alt="image-20191025193638980" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g8aofzmw1dj30f9074jto.jpg" data-index="26" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g8aofzmw1dj30f9074jto.jpg"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g8aofzmw1dj30f9074jto.jpg" alt="image-20191025193638980"></p>
 <h3 id="安全建议"><a href="#安全建议" class="headerlink" title="安全建议"></a>安全建议</h3><p>目前，Modbus 系统采取的安全防护措施普遍不足，这里参考信息安全业内研究并结合工控系统自身的安全问题，提出了一些安全建议，能够有效地降低工业控制系统面临的威胁。</p>
 <p><strong>( 1) 从源头开始</strong></p>
 <p>工控网络漏洞，很大一部分是其实现过程出现的漏洞。如果从源头开始控制，从Modbus 系统的需求设计、开发实现、内部测试和部署等阶段，全生命周期的介入安全手段，融入安全设计、安全编码以及安全测试等技术，可以极大地消除安全漏洞，降低整个Modbus 系统的安全风险。</p>
@@ -394,252 +256,4 @@
 <p>PS：本篇文章是从多篇文章和论文总结而成，并非原创，只是本人整理，本意是希望对初学Modbus的同学有所帮助。如果涉及到侵权方面的事请私信我，立刻删除。</p>
 <p>*<strong>本文整理:rye_，转载请注明FreeBuf COM</strong></p>
 <p>*<strong>本文由Fstark在rye原文基础上进行了补充完善</strong></p>
-
-                </article>
-                <ul class="tags-postTags">
-                    
-                    <li>
-                        <a href="/tags/%E5%B7%A5%E6%8E%A7%E5%8D%8F%E8%AE%AE/" rel="tag"># 工控协议</a>
-                    </li>
-                    
-                    <li>
-                        <a href="/tags/Modbus/" rel="tag"># Modbus</a>
-                    </li>
-                    
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    
-    <nav id="gobottom" class="pagination">
-        
-        <a class="prev-post" title="MEDIACODER .M3U缓冲区溢出漏洞（CVE-2017-8869）" href="/2021/01/25/MEDIACODER%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BC%8F%E6%B4%9E/">
-            ← MEDIACODER .M3U缓冲区溢出漏洞（CVE-2017-8869）
-        </a>
-        
-        <span class="prev-next-post">·</span>
-        
-        <a class="next-post" title="shellcode回顾（0day2）" href="/2021/01/25/shellcode/">
-            shellcode回顾（0day2） →
-        </a>
-        
-    </nav>
-
-    
-    <div class="inner">
-        <div id="comment"></div>
-    </div>
-    
-</div>
-
-<div class="toc-bar">
-    <div class="toc-btn-bar">
-        <a href="#site-main" class="toc-btn">
-            <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M793.024 710.272a32 32 0 1 0 45.952-44.544l-310.304-320a32 32 0 0 0-46.4 0.48l-297.696 320a32 32 0 0 0 46.848 43.584l274.752-295.328 286.848 295.808z"></path></svg>
-        </a>
-        <div class="toc-btn toc-switch">
-            <svg class="toc-open" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M779.776 480h-387.2a32 32 0 0 0 0 64h387.2a32 32 0 0 0 0-64M779.776 672h-387.2a32 32 0 0 0 0 64h387.2a32 32 0 0 0 0-64M256 288a32 32 0 1 0 0 64 32 32 0 0 0 0-64M392.576 352h387.2a32 32 0 0 0 0-64h-387.2a32 32 0 0 0 0 64M256 480a32 32 0 1 0 0 64 32 32 0 0 0 0-64M256 672a32 32 0 1 0 0 64 32 32 0 0 0 0-64"></path></svg>
-            <svg class="toc-close hide" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M512 960c-247.039484 0-448-200.960516-448-448S264.960516 64 512 64 960 264.960516 960 512 759.039484 960 512 960zM512 128.287273c-211.584464 0-383.712727 172.128262-383.712727 383.712727 0 211.551781 172.128262 383.712727 383.712727 383.712727 211.551781 0 383.712727-172.159226 383.712727-383.712727C895.712727 300.415536 723.551781 128.287273 512 128.287273z"></path><path d="M557.05545 513.376159l138.367639-136.864185c12.576374-12.416396 12.672705-32.671738 0.25631-45.248112s-32.704421-12.672705-45.248112-0.25631l-138.560301 137.024163-136.447897-136.864185c-12.512727-12.512727-32.735385-12.576374-45.248112-0.063647-12.512727 12.480043-12.54369 32.735385-0.063647 45.248112l136.255235 136.671523-137.376804 135.904314c-12.576374 12.447359-12.672705 32.671738-0.25631 45.248112 6.271845 6.335493 14.496116 9.504099 22.751351 9.504099 8.12794 0 16.25588-3.103239 22.496761-9.247789l137.567746-136.064292 138.687596 139.136568c6.240882 6.271845 14.432469 9.407768 22.65674 9.407768 8.191587 0 16.352211-3.135923 22.591372-9.34412 12.512727-12.480043 12.54369-32.704421 0.063647-45.248112L557.05545 513.376159z"></path></svg>
-        </div>
-        <a href="#gobottom" class="toc-btn">
-            <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M231.424 346.208a32 32 0 0 0-46.848 43.584l297.696 320a32 32 0 0 0 46.4 0.48l310.304-320a32 32 0 1 0-45.952-44.544l-286.848 295.808-274.752-295.36z"></path></svg>
-        </a>
-    </div>
-    <div class="toc-main">
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%AF%E8%AF%AD"><span class="toc-text">术语</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%83%8C%E6%99%AF"><span class="toc-text">背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%8F%E8%AE%AE%E5%8E%9F%E7%90%86"><span class="toc-text">协议原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BC%A0%E8%BE%93%E6%96%B9%E5%BC%8F"><span class="toc-text">传输方式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Modbus%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B"><span class="toc-text">Modbus数据模型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Modbus-RTU%E5%92%8CModbus-ASCII%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB%EF%BC%9F"><span class="toc-text">Modbus RTU和Modbus ASCII有什么区别？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CRC%E4%B8%8ELRC"><span class="toc-text">CRC与LRC</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%A7%E7%9A%84%E6%A0%87%E7%A4%BA%E4%B8%8E%E8%AF%86%E5%88%AB"><span class="toc-text">帧的标示与识别</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MODBUS-TCP%E6%B3%A8%E6%84%8F%E7%82%B9"><span class="toc-text">MODBUS TCP注意点</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BB%E6%9C%BA%E5%92%8C%E4%BB%8E%E6%9C%BA%E3%80%81%E6%9C%8D%E5%8A%A1%E7%AB%AF%E5%92%8C%E5%AE%A2%E6%88%B7%E7%AB%AF"><span class="toc-text">主机和从机、服务端和客户端</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%98%AF%E5%90%A6%E5%8F%AF%E4%BB%A5%E5%A4%9A%E4%B8%BB%E6%9C%BA"><span class="toc-text">是否可以多主机</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#modbus-TCP%E5%8D%8F%E8%AE%AE%E7%AE%80%E8%BF%B0"><span class="toc-text">modbus TCP协议简述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#modbus-tcp-%E5%92%8C-TCP-IP%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="toc-text">modbus tcp 和 TCP IP的关系</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%9F%E8%83%BD%E7%A0%81%E4%BD%9C%E7%94%A8"><span class="toc-text">功能码作用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Modebus%E5%BC%82%E5%B8%B8%E7%A0%81"><span class="toc-text">Modebus异常码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Modbus-%E5%8D%8F%E8%AE%AE%E5%AE%89%E5%85%A8%E6%80%A7%E5%88%86%E6%9E%90"><span class="toc-text">Modbus 协议安全性分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Modbus-%E5%8D%8F%E8%AE%AE%E7%9A%84%E5%9B%BA%E6%9C%89%E9%97%AE%E9%A2%98"><span class="toc-text">Modbus 协议的固有问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0%E4%BA%A7%E7%94%9F%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-text">协议实现产生的问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Modbus%E5%8D%8F%E8%AE%AE%E5%B8%B8%E8%A7%81%E6%94%BB%E5%87%BB%E6%80%BB%E7%BB%93"><span class="toc-text">Modbus协议常见攻击总结</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Modbus%E5%8D%8F%E8%AE%AE%E4%B8%AD%E9%97%B4%E4%BA%BA%E6%94%BB%E5%87%BB"><span class="toc-text">Modbus协议中间人攻击</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Schneider%E7%BB%88%E6%AD%A2cpu%E8%BF%90%E8%A1%8C%E6%94%BB%E5%87%BB"><span class="toc-text">Schneider终止cpu运行攻击</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Schneider%E5%8A%9F%E8%83%BD%E7%A0%8190%E9%89%B4%E5%88%AB%E6%94%BB%E5%87%BB"><span class="toc-text">Schneider功能码90鉴别攻击</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E5%85%A8%E5%BB%BA%E8%AE%AE"><span class="toc-text">安全建议</span></a></li></ol></li></ol>
-    </div>
-</div>
-
-
-
-<!-- Root element of PhotoSwipe. Must have class pswp. -->
-<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
-
-    <!-- Background of PhotoSwipe. 
-         It's a separate element as animating opacity is faster than rgba(). -->
-    <div class="pswp__bg"></div>
-
-    <!-- Slides wrapper with overflow:hidden. -->
-    <div class="pswp__scroll-wrap">
-
-        <!-- Container that holds slides. 
-            PhotoSwipe keeps only 3 of them in the DOM to save memory.
-            Don't modify these 3 pswp__item elements, data is added later on. -->
-        <div class="pswp__container">
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-        </div>
-
-        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
-        <div class="pswp__ui pswp__ui--hidden">
-
-            <div class="pswp__top-bar">
-
-                <!--  Controls are self-explanatory. Order can be changed. -->
-
-                <div class="pswp__counter"></div>
-
-                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
-
-                <button class="pswp__button pswp__button--share" title="Share"></button>
-
-                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
-
-                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
-
-                <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
-                <!-- element will get class pswp__preloader--active when preloader is running -->
-                <div class="pswp__preloader">
-                    <div class="pswp__preloader__icn">
-                      <div class="pswp__preloader__cut">
-                        <div class="pswp__preloader__donut"></div>
-                      </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
-                <div class="pswp__share-tooltip"></div> 
-            </div>
-
-            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
-            </button>
-
-            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
-            </button>
-
-            <div class="pswp__caption">
-                <div class="pswp__caption__center"></div>
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-
-
-	</div>
-	
-
-
-	
-
-
-
-
-<div id="search" class="search-overlay">
-    <div class="search-form">
-        
-        <div class="search-overlay-logo">
-        	<img src="https://i.loli.net/2017/11/26/5a19c0b50432e.png" alt="Fstark">
-        </div>
-        
-        <input id="local-search-input" class="search-input" type="text" name="search" placeholder="搜索 ...">
-        <a class="search-overlay-close" href="#"></a>
-    </div>
-    <div id="local-search-result"></div>
-</div>
-
-<footer class="site-footer outer">
-	<div class="site-footer-content inner">
-		<div class="copyright">
-			<a href="/" title="Fstark">Fstark © 2021</a>
-			
-				
-			        <span hidden="true" id="/2021/01/25/Modbus/" class="leancloud-visitors" data-flag-title="工控Modbus学习笔记（在FreeBuf原文上增改）">
-			            <span>阅读量 </span>
-			            <span class="leancloud-visitors-count">0</span>
-			        </span>
-	    		
-    		
-		</div>
-		<nav class="site-footer-nav">
-			
-			<a href="https://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a>
-			<a href="https://github.com/xzhih/hexo-theme-casper" title="Casper" target="_blank" rel="noopener">Casper</a>
-		</nav>
-	</div>
-</footer>
-	
-
-
-<script>
-    if(window.navigator && navigator.serviceWorker) {
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-            for(let registration of registrations) {
-                registration.unregister()
-            }
-        })
-    }
-</script>
-
-
-<script id="scriptLoad" src="/js/allinone.min.js" async=""></script>
-
-
-<script>
-    document.getElementById('scriptLoad').addEventListener('load', function () {
-        
-        
-            var bLazy = new Blazy();
-        
-
-        
-        
-
-        
-        
-        
-            searchFunc("/");
-        
-        
-    })
-</script>
-
-
-
-
-<link rel="stylesheet" href="/photoswipe/photoswipe.css">
-
-
-<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
-
-
-<script src="/photoswipe/photoswipe.min.js"></script>
-
-
-<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
-
-
-
-
-
-<script id="valineScript" src="//unpkg.com/valine/dist/Valine.min.js" async=""></script>
-<script>
-    document.getElementById('valineScript').addEventListener("load", function() {
-        new Valine({
-            el: '#comment' ,
-            verify: false,
-            notify: false,
-            appId: '',
-            appKey: '',
-            placeholder: 'Just go go',
-            pageSize: 10,
-            avatar: 'mm',
-            visitor: true
-        })
-    });
-</script>
-
-
-
-
-
-
-
-</body></html>
+</article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/2021/01/25/MEDIACODER%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BC%8F%E6%B4%9E/" title="MEDIACODER .M3U缓冲区溢出漏洞（CVE-2017-8869）"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">上一页: MEDIACODER .M3U缓冲区溢出漏洞（CVE-2017-8869）</span></a><a class="button is-default" href="/2021/01/25/shellcode/" title="shellcode回顾（0day2）"><span class="has-text-weight-semibold">下一页: shellcode回顾（0day2）</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container"><script async repo="Haojen/Claudia-theme-blog" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><a title="twitter" target="_blank" rel="noopener nofollow" href="//twitter.com//"><i class="iconfont icon-twitter"></i></a><!-- Github--><a title="github" target="_blank" rel="noopener nofollow" href="//github.com/haojen"><i class="iconfont icon-github"></i></a><!-- Ins--><a title="instagram" target="_blank" rel="noopener nofollow" href="//www.instagram.com//"><i class="iconfont icon-ins"></i></a><!-- RSS--><!-- 知乎--><!-- 领英--><!-- 脸书--><a title="facebook" target="_blank" rel="noopener nofollow" href="//www.facebook.com//"><i class="iconfont icon-tian7_facebook"></i></a></section><p><span>Copyright ©</span><span> Fstark 2021</span></p><div class="is-flex is-justify-content-center is-flex-wrap-wrap"><p>Powered by Hexo &verbar;&nbsp;</p><p class="is-flex is-justify-content-center"><a title="Hexo theme author" target="_blank" rel="noopener" href="//github.com/haojen">Theme by Haojen&nbsp;</a></p><div style="margin-top: 2px"><a class="github-button" title="github-button" target="_blank" rel="noopener" href="https://github.com/haojen/hexo-theme-Claudia" data-color-scheme="no-preference: light; light: light; dark: dark;" data-show-count="true"></a></div></div></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/post.js"></script></body></html>

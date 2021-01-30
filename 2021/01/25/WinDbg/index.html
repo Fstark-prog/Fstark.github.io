@@ -1,183 +1,45 @@
-<!DOCTYPE html><html lang="zh-CN"><head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<link rel="preconnect" href="//www.googletagmanager.com">
-	<link rel="preconnect" href="//zz.bdstatic.com">
-	<link rel="preconnect" href="//sp0.baidu.com">
-	<link rel="preconnect" href="//www.google-analytics.com">
-	<link rel="preconnect" href="//cdn1.lncld.net">
-	<link rel="preconnect" href="//unpkg.com">
-	<link rel="preconnect" href="//app-router.leancloud.cn">
-	<link rel="preconnect" href="//9qpuwspm.api.lncld.net">
-	<link rel="preconnect" href="//gravatar.loli.net">
-
-	<title>WinDbg初步学习总结与简单实战 | Fstark</title>
-
-	<meta name="HandheldFriendly" content="True">
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-	<meta name="generator" content="hexo">
-	<meta name="author" content="Fstark">
-	<meta name="description" content="">
-
-	
-	<meta name="keywords" content="">
-	
-
-	
-	<link rel="shortcut icon" href="https://i.loli.net/2017/11/26/5a19c0b50432e.png">
-	<link rel="apple-touch-icon" href="https://i.loli.net/2017/11/26/5a19c0b50432e.png">
-	
-
-	
-	<meta name="theme-color" content="#3c484e">
-	<meta name="msapplication-TileColor" content="#3c484e">
-	
-
-	
-
-	
-
-	<meta property="og:site_name" content="Fstark">
-	<meta property="og:type" content="article">
-	<meta property="og:title" content="WinDbg初步学习总结与简单实战 | Fstark">
-	<meta property="og:description" content="">
-	<meta property="og:url" content="http://example.com/2021/01/25/WinDbg/">
-
-	
-	<meta property="article:published_time" content="2021-01-25T14:01:35+08:00"> 
-	<meta property="article:author" content="Fstark">
-	<meta property="article:published_first" content="Fstark, /2021/01/25/WinDbg/">
-	
-
-	
-	
-	
-<link rel="stylesheet" href="/css/allinonecss.min.css">
-
-
-	
-	
-	
-</head>
-
-<body class="post-template">
-	<div class="site-wrapper">
-		
-
-
-
-
-<header class="site-header post-site-header outer">
-    <div class="inner">
-        
-<nav class="site-nav"> 
-    <div class="site-nav-left">
-        <ul class="nav">
-            <li>
-                
-                <a href="/" title="Home">HOME</a>
-                
-            </li>
-            
-            
-            <li>
-                <a href="/about" title="ABOUT">ABOUT</a>
-            </li>
-            
-            
-        </ul> 
-    </div>
-    
-    <div class="search-button-area">
-        <a href="#search" class="search-button">Search ...</a>
-    </div>
-     
-    <div class="site-nav-right">
-        
-        <a href="#search" class="search-button">Search ...</a>
-         
-        
-<div class="social-links">
-    
-    
-    
-    
-    
-    <a class="social-link" title="telegram" href="https://t.me/Fstarkss" target="_blank" rel="noopener">
-        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M679.428571 746.857143l84-396q5.142857-25.142857-6-36t-29.428571-4L234.285714 501.142857q-16.571429 6.285714-22.571428 14.285714t-1.428572 15.142858 18.285715 11.142857l126.285714 39.428571 293.142857-184.571428q12-8 18.285714-3.428572 4 2.857143-2.285714 8.571429l-237.142857 214.285714-9.142857 130.285714q13.142857 0 25.714285-12.571428l61.714286-59.428572 128 94.285715q36.571429 20.571429 46.285714-21.714286z m344.571429-234.857143q0 104-40.571429 198.857143t-109.142857 163.428571-163.428571 109.142857-198.857143 40.571429-198.857143-40.571429-163.428571-109.142857-109.142857-163.428571T0 512t40.571429-198.857143 109.142857-163.428571T313.142857 40.571429 512 0t198.857143 40.571429 163.428571 109.142857 109.142857 163.428571 40.571429 198.857143z"></path></svg>
-    </a>
-    
-    
-    
-</div>
-    </div>
-</nav>
-    </div>
-</header>
-
-
-<div id="site-main" class="site-main outer" role="main">
-    <div class="inner">
-        <header class="post-full-header">
-            <div class="post-full-meta">
-                <time class="post-full-meta-date" datetime="2021-01-25T14:27:59.356Z">
-                    2021-01-25
-                </time>
-                
-                <span class="date-divider">/</span>
-                
-                <a href="/categories/%E4%BA%8C%E8%BF%9B%E5%88%B6/">二进制</a>&nbsp;&nbsp;
-                
-                
-            </div>
-            <h1 class="post-full-title">WinDbg初步学习总结与简单实战</h1>
-        </header>
-        <div class="post-full no-image">
-            
-            <div class="post-full-content">
-                <article id="photoswipe" class="markdown-body">
-                    <h3 id="WinDbg核心功能介绍"><a href="#WinDbg核心功能介绍" class="headerlink" title="WinDbg核心功能介绍"></a>WinDbg核心功能介绍</h3><p>WinDbg是在windows平台下，强大的用户态和内核态调试工具。它能够通过dmp文件轻松的定位到问题根源，可用于分析蓝屏、程序崩溃（IE崩溃）原因，是我们日常工作中必不可少的一个有力工具，学会使用它，将有效提升我们的问题解决效率和准确率。</p>
+<!DOCTYPE html><html class="appearance-auto" lang="zh-CN"><head><meta charset="UTF-8"><title>WinDbg初步学习总结与简单实战</title><meta name="description" content="May the Force be with you"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><link rel="icon" href="/images/favicon.png"><link rel="stylesheet" href="/style/common/bulma.css"><link rel="stylesheet" href="/style/base.css"><link rel="stylesheet" href="/style/common/helper.css"><script src="/js/common.js"></script><link rel="stylesheet" href="/style/post.css"><link rel="stylesheet" href="/style/themes/highlight-theme-light.css"><script src="/js/highlight.pack.js"></script><meta name="generator" content="Hexo 5.3.0"></head><body class="is-flex is-flex-direction-column"><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-space-between is-hidden-mobile"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/">Fstark's blog</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">WinDbg初步学习总结与简单实战</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">点击返回顶部</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></aside></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#WinDbg%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD%E4%BB%8B%E7%BB%8D"><span class="toc-text">WinDbg核心功能介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#WinDbg%E5%8A%A0%E8%BD%BD%E8%87%AA%E7%BC%96%E8%AF%91HelloWorld%E7%A8%8B%E5%BA%8F"><span class="toc-text">WinDbg加载自编译HelloWorld程序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#WinDbg%E5%88%86%E6%9E%90%E7%9C%9F%E5%AE%9E%E7%A8%8B%E5%BA%8F"><span class="toc-text">WinDbg分析真实程序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#WinDbg%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E6%80%BB%E7%BB%93"><span class="toc-text">WinDbg常用命令总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#WinDbg%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8"><span class="toc-text">WinDbg插件使用</span></a></li></ol></div><div class="column is-9"><header class="my-4"><a href="/tags/%E4%B8%AA%E4%BA%BA%E6%80%BB%E7%BB%93"><i class="tag post-item-tag">个人总结</i></a></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">WinDbg初步学习总结与简单实战</h1><time class="has-text-grey" datetime="2021-01-25T14:27:59.356Z">2021-01-25</time><article class="mt-2 post-content"><h3 id="WinDbg核心功能介绍"><a href="#WinDbg核心功能介绍" class="headerlink" title="WinDbg核心功能介绍"></a>WinDbg核心功能介绍</h3><p>WinDbg是在windows平台下，强大的用户态和内核态调试工具。它能够通过dmp文件轻松的定位到问题根源，可用于分析蓝屏、程序崩溃（IE崩溃）原因，是我们日常工作中必不可少的一个有力工具，学会使用它，将有效提升我们的问题解决效率和准确率。</p>
 <a id="more"></a>
 
 <h3 id="WinDbg加载自编译HelloWorld程序"><a href="#WinDbg加载自编译HelloWorld程序" class="headerlink" title="WinDbg加载自编译HelloWorld程序"></a>WinDbg加载自编译HelloWorld程序</h3><p>本部分使用的helloworld源程序与之前相比没有改动，唯一需要注意的是在使用visual c++生成文件时需要生成.pdb文件,它是该应用程序相应的符号文件，若没有它调试将变得十分困难。</p>
 <p>打开windbg，点击：File-&gt;Open Executable，选中编译好的helloworld.exe文件。随后我们使用lm命令查看一下加载了那些模块。</p>
-<p><img alt="img" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g753vsdxmaj30wr06uq3k.jpg" data-index="0" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753vsdxmaj30wr06uq3k.jpg"> </p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753vsdxmaj30wr06uq3k.jpg" alt="img"> </p>
 <p>我们想要运行到HelloWorld.exe的main函数中停下，可以使用!dh -a helloworld命令，用来在所有头部文件中搜索helloworld关键词，需要注意的是这里呈现的地址结果是相对虚拟地址（RVA），并非真实地址。</p>
-<p><img alt="img" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g753vwi9jfj30zk0igdjn.jpg" data-index="1" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753vwi9jfj30zk0igdjn.jpg"> </p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753vwi9jfj30zk0igdjn.jpg" alt="img"> </p>
 <p>从图中可得它的想对虚拟地址为0x3510，由开始lm命令中可知，helloworld模块的起始地址为0x00400000，这两个十六进制相加结果为0x403510，此即为main函数真实地址，我们使用bp命令在该处进行断点，bl可以看到断点的详情。</p>
-<p><img alt="img" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g753w084alj30yg0a43yj.jpg" data-index="2" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753w084alj30yg0a43yj.jpg"> </p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753w084alj30yg0a43yj.jpg" alt="img"> </p>
 <p>随后使用g命令运行，成功命中0号断点</p>
-<p><img alt="img" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g753w3mgeoj30yg08c0so.jpg" data-index="3" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753w3mgeoj30yg08c0so.jpg"> </p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753w3mgeoj30yg08c0so.jpg" alt="img"> </p>
 <p>此时对应的Disassembly窗口显示如下图所示</p>
-<p><img alt="img" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g753w6tj0ej31060dqwer.jpg" data-index="4" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753w6tj0ej31060dqwer.jpg"> </p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753w6tj0ej31060dqwer.jpg" alt="img"> </p>
 <p>此时即为helloworld入口点main处。事实上还有另一种更为轻松的方式来寻找入口点main，我们在windbg的命令行中直接输入bp main，让其自行判断main的位置并设置断点，但是断的位置可能并不十分精准，mainCRTStartup才是真正的程序入口点。</p>
-<p><img alt="img" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g753wb03h8j319407waa9.jpg" data-index="5" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753wb03h8j319407waa9.jpg"> </p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753wb03h8j319407waa9.jpg" alt="img"> </p>
 <h3 id="WinDbg分析真实程序"><a href="#WinDbg分析真实程序" class="headerlink" title="WinDbg分析真实程序"></a>WinDbg分析真实程序</h3><p>下面我们以windows自带的记事本为例进行简单调试。首先打开WinDbg，在”文件” 菜单上, 选择 “打开可执行文件”。 在 “打开可执行文件” 对话框中, 导航到包含 notepad.exe 的文件夹 (例如, C:\Windows\System32)。 对于 “文件名”, 请输入 notepad.exe。 单击“打开” 。</p>
-<p><img alt="img" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g753wh4010j30j40ekwiw.jpg" data-index="6" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753wh4010j30j40ekwiw.jpg"> </p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753wh4010j30j40ekwiw.jpg" alt="img"> </p>
 <p>此时若要查看Notepad.exe各个模块的符号，可以输入该命令：<a target="_blank" rel="noopener" href="https://go.microsoft.com/fwlink/p?linkid=399240">x notepad!*</a></p>
 <p>随后将会看到结果的输出。</p>
-<p><img alt="img" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g753wlfpr2j30k00bu0vr.jpg" data-index="7" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753wlfpr2j30k00bu0vr.jpg"> </p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753wlfpr2j30k00bu0vr.jpg" alt="img"> </p>
 <p>若要查看Notepad.exe 模块中包含 main 的符号, 可以命令：<a target="_blank" rel="noopener" href="https://go.microsoft.com/fwlink/p?linkid=399240">x notepad!<em>main</em></a></p>
-<p><img alt="img" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g753wp1s8fj30lu03yq3l.jpg" data-index="8" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753wp1s8fj30lu03yq3l.jpg"> </p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753wp1s8fj30lu03yq3l.jpg" alt="img"> </p>
 <p>在记事本上设置断点notepad!WinMain，输入以下命令：<a target="_blank" rel="noopener" href="http://go.microsoft.com/fwlink/p?linkid=399390">bu notepad!WinMain</a></p>
 <p>要验证是否设置了断点，请输入以下命令：<a target="_blank" rel="noopener" href="http://go.microsoft.com/fwlink/p?linkid=399391">bl</a></p>
-<p><img alt="img" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g753wsbf0cj30ls03edg0.jpg" data-index="9" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753wsbf0cj30ls03edg0.jpg"> </p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753wsbf0cj30ls03edg0.jpg" alt="img"> </p>
 <p>运行，请输入以下命令：<a target="_blank" rel="noopener" href="http://go.microsoft.com/fwlink/p?linkid=399388">g</a></p>
 <p>记事本一直运行到winmain函数，然后中断到调试器。</p>
-<p><img alt="img" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g753ww2ju9j30ks02y0ta.jpg" data-index="10" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753ww2ju9j30ks02y0ta.jpg"> </p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753ww2ju9j30ks02y0ta.jpg" alt="img"> </p>
 <p>此时要查看在记事本进程中加载的代码模块列表，请输入以下命令：<a target="_blank" rel="noopener" href="http://go.microsoft.com/fwlink/p?linkid=399237">lm</a></p>
-<p><img alt="img" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g753x0a7gkj30g809e74t.jpg" data-index="11" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753x0a7gkj30g809e74t.jpg"> </p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753x0a7gkj30g809e74t.jpg" alt="img"> </p>
 <p>要查看堆栈跟踪，请输入以下命令：<a target="_blank" rel="noopener" href="http://go.microsoft.com/fwlink/p?linkid=399389">k</a></p>
-<p><img alt="img" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g753x41aupj30mm040t96.jpg" data-index="12" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753x41aupj30mm040t96.jpg"> </p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753x41aupj30mm040t96.jpg" alt="img"> </p>
 <p>再次运行 <a target="_blank" rel="noopener" href="http://go.microsoft.com/fwlink/p?linkid=399388">g</a>，要中断记事本执行，请从“调试”菜单中选择“中断”。</p>
 <p>观察保存过程，要在zwwritefile处设置和验证断点，请输入以下命令：<a target="_blank" rel="noopener" href="http://go.microsoft.com/fwlink/p?linkid=399390">bu ntdll!ZwWriteFile</a>和<a target="_blank" rel="noopener" href="http://go.microsoft.com/fwlink/p?linkid=399391">bl</a>。</p>
-<p><img alt="img" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g753x8q76aj30dw020jrk.jpg" data-index="13" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753x8q76aj30dw020jrk.jpg"> </p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753x8q76aj30dw020jrk.jpg" alt="img"> </p>
 <p>输入g重新开始运行记事本。在记事本窗口中，输入一些文本，然后从“文件”菜单中选择“保存”。当涉及zwCreateFile时，正在运行的代码将中断。输入k以查看堆栈跟踪。</p>
-<p><img alt="img" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g753xcxf6gj319y0jg74o.jpg" data-index="14" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753xcxf6gj319y0jg74o.jpg"> </p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753xcxf6gj319y0jg74o.jpg" alt="img"> </p>
 <p>在windbg窗口的命令行左侧，注意处理器和线程号。在本例中，当前处理器编号为0，当前线程编号为2。因此，我们正在查看线程2的堆栈跟踪（它恰好运行在处理器0上）。要查看记事本进程中所有线程的列表，请输入以下命令：~</p>
-<p><img alt="img" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g753xh4ztxj30n402adg1.jpg" data-index="15" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753xh4ztxj30n402adg1.jpg"> </p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753xh4ztxj30n402adg1.jpg" alt="img"> </p>
 <p>要查看线程0的堆栈跟踪，请输入以下命令：～0s，并输入k查看详情。</p>
-<p><img alt="img" class="post-img b-lazy" data-img="https://tva1.sinaimg.cn/large/006y8mN6ly1g753xp2vz4j318i0me3yx.jpg" data-index="16" data-src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753xp2vz4j318i0me3yx.jpg"> </p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753xp2vz4j318i0me3yx.jpg" alt="img"> </p>
 <p>要退出调试并从记事本进程中分离，请输入以下命令： <a target="_blank" rel="noopener" href="http://go.microsoft.com/fwlink/p?linkid=399394">qd</a>，则本次调试结束记事本程序关闭。</p>
 <h3 id="WinDbg常用命令总结"><a href="#WinDbg常用命令总结" class="headerlink" title="WinDbg常用命令总结"></a>WinDbg常用命令总结</h3><table>
 <thead>
@@ -329,248 +191,4 @@
 <td>检查堆结构是否损坏，检测线程共享的对象等</td>
 </tr>
 </tbody></table>
-
-                </article>
-                <ul class="tags-postTags">
-                    
-                    <li>
-                        <a href="/tags/%E4%B8%AA%E4%BA%BA%E6%80%BB%E7%BB%93/" rel="tag"># 个人总结</a>
-                    </li>
-                    
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    
-    <nav id="gobottom" class="pagination">
-        
-        <a class="prev-post" title="WinAFL小白踩坑指南" href="/2021/01/25/winafl%E5%B0%9D%E8%AF%95/">
-            ← WinAFL小白踩坑指南
-        </a>
-        
-        <span class="prev-next-post">·</span>
-        
-        <a class="next-post" title="Apache ActiveMQ Fileserver漏洞组合复现" href="/2021/01/25/Apache%20ActiveMQ%20Fileserver%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">
-            Apache ActiveMQ Fileserver漏洞组合复现 →
-        </a>
-        
-    </nav>
-
-    
-    <div class="inner">
-        <div id="comment"></div>
-    </div>
-    
-</div>
-
-<div class="toc-bar">
-    <div class="toc-btn-bar">
-        <a href="#site-main" class="toc-btn">
-            <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M793.024 710.272a32 32 0 1 0 45.952-44.544l-310.304-320a32 32 0 0 0-46.4 0.48l-297.696 320a32 32 0 0 0 46.848 43.584l274.752-295.328 286.848 295.808z"></path></svg>
-        </a>
-        <div class="toc-btn toc-switch">
-            <svg class="toc-open" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M779.776 480h-387.2a32 32 0 0 0 0 64h387.2a32 32 0 0 0 0-64M779.776 672h-387.2a32 32 0 0 0 0 64h387.2a32 32 0 0 0 0-64M256 288a32 32 0 1 0 0 64 32 32 0 0 0 0-64M392.576 352h387.2a32 32 0 0 0 0-64h-387.2a32 32 0 0 0 0 64M256 480a32 32 0 1 0 0 64 32 32 0 0 0 0-64M256 672a32 32 0 1 0 0 64 32 32 0 0 0 0-64"></path></svg>
-            <svg class="toc-close hide" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M512 960c-247.039484 0-448-200.960516-448-448S264.960516 64 512 64 960 264.960516 960 512 759.039484 960 512 960zM512 128.287273c-211.584464 0-383.712727 172.128262-383.712727 383.712727 0 211.551781 172.128262 383.712727 383.712727 383.712727 211.551781 0 383.712727-172.159226 383.712727-383.712727C895.712727 300.415536 723.551781 128.287273 512 128.287273z"></path><path d="M557.05545 513.376159l138.367639-136.864185c12.576374-12.416396 12.672705-32.671738 0.25631-45.248112s-32.704421-12.672705-45.248112-0.25631l-138.560301 137.024163-136.447897-136.864185c-12.512727-12.512727-32.735385-12.576374-45.248112-0.063647-12.512727 12.480043-12.54369 32.735385-0.063647 45.248112l136.255235 136.671523-137.376804 135.904314c-12.576374 12.447359-12.672705 32.671738-0.25631 45.248112 6.271845 6.335493 14.496116 9.504099 22.751351 9.504099 8.12794 0 16.25588-3.103239 22.496761-9.247789l137.567746-136.064292 138.687596 139.136568c6.240882 6.271845 14.432469 9.407768 22.65674 9.407768 8.191587 0 16.352211-3.135923 22.591372-9.34412 12.512727-12.480043 12.54369-32.704421 0.063647-45.248112L557.05545 513.376159z"></path></svg>
-        </div>
-        <a href="#gobottom" class="toc-btn">
-            <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M231.424 346.208a32 32 0 0 0-46.848 43.584l297.696 320a32 32 0 0 0 46.4 0.48l310.304-320a32 32 0 1 0-45.952-44.544l-286.848 295.808-274.752-295.36z"></path></svg>
-        </a>
-    </div>
-    <div class="toc-main">
-        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#WinDbg%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD%E4%BB%8B%E7%BB%8D"><span class="toc-text">WinDbg核心功能介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#WinDbg%E5%8A%A0%E8%BD%BD%E8%87%AA%E7%BC%96%E8%AF%91HelloWorld%E7%A8%8B%E5%BA%8F"><span class="toc-text">WinDbg加载自编译HelloWorld程序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#WinDbg%E5%88%86%E6%9E%90%E7%9C%9F%E5%AE%9E%E7%A8%8B%E5%BA%8F"><span class="toc-text">WinDbg分析真实程序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#WinDbg%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E6%80%BB%E7%BB%93"><span class="toc-text">WinDbg常用命令总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#WinDbg%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8"><span class="toc-text">WinDbg插件使用</span></a></li></ol>
-    </div>
-</div>
-
-
-
-<!-- Root element of PhotoSwipe. Must have class pswp. -->
-<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
-
-    <!-- Background of PhotoSwipe. 
-         It's a separate element as animating opacity is faster than rgba(). -->
-    <div class="pswp__bg"></div>
-
-    <!-- Slides wrapper with overflow:hidden. -->
-    <div class="pswp__scroll-wrap">
-
-        <!-- Container that holds slides. 
-            PhotoSwipe keeps only 3 of them in the DOM to save memory.
-            Don't modify these 3 pswp__item elements, data is added later on. -->
-        <div class="pswp__container">
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-        </div>
-
-        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
-        <div class="pswp__ui pswp__ui--hidden">
-
-            <div class="pswp__top-bar">
-
-                <!--  Controls are self-explanatory. Order can be changed. -->
-
-                <div class="pswp__counter"></div>
-
-                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
-
-                <button class="pswp__button pswp__button--share" title="Share"></button>
-
-                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
-
-                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
-
-                <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
-                <!-- element will get class pswp__preloader--active when preloader is running -->
-                <div class="pswp__preloader">
-                    <div class="pswp__preloader__icn">
-                      <div class="pswp__preloader__cut">
-                        <div class="pswp__preloader__donut"></div>
-                      </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
-                <div class="pswp__share-tooltip"></div> 
-            </div>
-
-            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
-            </button>
-
-            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
-            </button>
-
-            <div class="pswp__caption">
-                <div class="pswp__caption__center"></div>
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-
-
-	</div>
-	
-
-
-	
-
-
-
-
-<div id="search" class="search-overlay">
-    <div class="search-form">
-        
-        <div class="search-overlay-logo">
-        	<img src="https://i.loli.net/2017/11/26/5a19c0b50432e.png" alt="Fstark">
-        </div>
-        
-        <input id="local-search-input" class="search-input" type="text" name="search" placeholder="搜索 ...">
-        <a class="search-overlay-close" href="#"></a>
-    </div>
-    <div id="local-search-result"></div>
-</div>
-
-<footer class="site-footer outer">
-	<div class="site-footer-content inner">
-		<div class="copyright">
-			<a href="/" title="Fstark">Fstark © 2021</a>
-			
-				
-			        <span hidden="true" id="/2021/01/25/WinDbg/" class="leancloud-visitors" data-flag-title="WinDbg初步学习总结与简单实战">
-			            <span>阅读量 </span>
-			            <span class="leancloud-visitors-count">0</span>
-			        </span>
-	    		
-    		
-		</div>
-		<nav class="site-footer-nav">
-			
-			<a href="https://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a>
-			<a href="https://github.com/xzhih/hexo-theme-casper" title="Casper" target="_blank" rel="noopener">Casper</a>
-		</nav>
-	</div>
-</footer>
-	
-
-
-<script>
-    if(window.navigator && navigator.serviceWorker) {
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-            for(let registration of registrations) {
-                registration.unregister()
-            }
-        })
-    }
-</script>
-
-
-<script id="scriptLoad" src="/js/allinone.min.js" async=""></script>
-
-
-<script>
-    document.getElementById('scriptLoad').addEventListener('load', function () {
-        
-        
-            var bLazy = new Blazy();
-        
-
-        
-        
-
-        
-        
-        
-            searchFunc("/");
-        
-        
-    })
-</script>
-
-
-
-
-<link rel="stylesheet" href="/photoswipe/photoswipe.css">
-
-
-<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
-
-
-<script src="/photoswipe/photoswipe.min.js"></script>
-
-
-<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
-
-
-
-
-
-<script id="valineScript" src="//unpkg.com/valine/dist/Valine.min.js" async=""></script>
-<script>
-    document.getElementById('valineScript').addEventListener("load", function() {
-        new Valine({
-            el: '#comment' ,
-            verify: false,
-            notify: false,
-            appId: '',
-            appKey: '',
-            placeholder: 'Just go go',
-            pageSize: 10,
-            avatar: 'mm',
-            visitor: true
-        })
-    });
-</script>
-
-
-
-
-
-
-
-</body></html>
+</article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/2021/01/25/winafl%E5%B0%9D%E8%AF%95/" title="WinAFL小白踩坑指南"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">上一页: WinAFL小白踩坑指南</span></a><a class="button is-default" href="/2021/01/25/Apache%20ActiveMQ%20Fileserver%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" title="Apache ActiveMQ Fileserver漏洞组合复现"><span class="has-text-weight-semibold">下一页: Apache ActiveMQ Fileserver漏洞组合复现</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container"><script async repo="Haojen/Claudia-theme-blog" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><a title="twitter" target="_blank" rel="noopener nofollow" href="//twitter.com//"><i class="iconfont icon-twitter"></i></a><!-- Github--><a title="github" target="_blank" rel="noopener nofollow" href="//github.com/haojen"><i class="iconfont icon-github"></i></a><!-- Ins--><a title="instagram" target="_blank" rel="noopener nofollow" href="//www.instagram.com//"><i class="iconfont icon-ins"></i></a><!-- RSS--><!-- 知乎--><!-- 领英--><!-- 脸书--><a title="facebook" target="_blank" rel="noopener nofollow" href="//www.facebook.com//"><i class="iconfont icon-tian7_facebook"></i></a></section><p><span>Copyright ©</span><span> Fstark 2021</span></p><div class="is-flex is-justify-content-center is-flex-wrap-wrap"><p>Powered by Hexo &verbar;&nbsp;</p><p class="is-flex is-justify-content-center"><a title="Hexo theme author" target="_blank" rel="noopener" href="//github.com/haojen">Theme by Haojen&nbsp;</a></p><div style="margin-top: 2px"><a class="github-button" title="github-button" target="_blank" rel="noopener" href="https://github.com/haojen/hexo-theme-Claudia" data-color-scheme="no-preference: light; light: light; dark: dark;" data-show-count="true"></a></div></div></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/post.js"></script></body></html>

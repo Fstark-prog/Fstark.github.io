@@ -1,178 +1,40 @@
-<!DOCTYPE html><html lang="zh-CN"><head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<link rel="preconnect" href="//www.googletagmanager.com">
-	<link rel="preconnect" href="//zz.bdstatic.com">
-	<link rel="preconnect" href="//sp0.baidu.com">
-	<link rel="preconnect" href="//www.google-analytics.com">
-	<link rel="preconnect" href="//cdn1.lncld.net">
-	<link rel="preconnect" href="//unpkg.com">
-	<link rel="preconnect" href="//app-router.leancloud.cn">
-	<link rel="preconnect" href="//9qpuwspm.api.lncld.net">
-	<link rel="preconnect" href="//gravatar.loli.net">
-
-	<title>使用Docker配置Nginx+PHP+MySQL | Fstark</title>
-
-	<meta name="HandheldFriendly" content="True">
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-	<meta name="generator" content="hexo">
-	<meta name="author" content="Fstark">
-	<meta name="description" content="">
-
-	
-	<meta name="keywords" content="">
-	
-
-	
-	<link rel="shortcut icon" href="https://i.loli.net/2017/11/26/5a19c0b50432e.png">
-	<link rel="apple-touch-icon" href="https://i.loli.net/2017/11/26/5a19c0b50432e.png">
-	
-
-	
-	<meta name="theme-color" content="#3c484e">
-	<meta name="msapplication-TileColor" content="#3c484e">
-	
-
-	
-
-	
-
-	<meta property="og:site_name" content="Fstark">
-	<meta property="og:type" content="article">
-	<meta property="og:title" content="使用Docker配置Nginx+PHP+MySQL | Fstark">
-	<meta property="og:description" content="">
-	<meta property="og:url" content="http://example.com/2021/01/25/%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87/">
-
-	
-	<meta property="article:published_time" content="2021-01-25T14:01:22+08:00"> 
-	<meta property="article:author" content="Fstark">
-	<meta property="article:published_first" content="Fstark, /2021/01/25/%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87/">
-	
-
-	
-	
-	
-<link rel="stylesheet" href="/css/allinonecss.min.css">
-
-
-	
-	
-	
-</head>
-
-<body class="post-template">
-	<div class="site-wrapper">
-		
-
-
-
-
-<header class="site-header post-site-header outer">
-    <div class="inner">
-        
-<nav class="site-nav"> 
-    <div class="site-nav-left">
-        <ul class="nav">
-            <li>
-                
-                <a href="/" title="Home">HOME</a>
-                
-            </li>
-            
-            
-            <li>
-                <a href="/about" title="ABOUT">ABOUT</a>
-            </li>
-            
-            
-        </ul> 
-    </div>
-    
-    <div class="search-button-area">
-        <a href="#search" class="search-button">Search ...</a>
-    </div>
-     
-    <div class="site-nav-right">
-        
-        <a href="#search" class="search-button">Search ...</a>
-         
-        
-<div class="social-links">
-    
-    
-    
-    
-    
-    <a class="social-link" title="telegram" href="https://t.me/Fstarkss" target="_blank" rel="noopener">
-        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M679.428571 746.857143l84-396q5.142857-25.142857-6-36t-29.428571-4L234.285714 501.142857q-16.571429 6.285714-22.571428 14.285714t-1.428572 15.142858 18.285715 11.142857l126.285714 39.428571 293.142857-184.571428q12-8 18.285714-3.428572 4 2.857143-2.285714 8.571429l-237.142857 214.285714-9.142857 130.285714q13.142857 0 25.714285-12.571428l61.714286-59.428572 128 94.285715q36.571429 20.571429 46.285714-21.714286z m344.571429-234.857143q0 104-40.571429 198.857143t-109.142857 163.428571-163.428571 109.142857-198.857143 40.571429-198.857143-40.571429-163.428571-109.142857-109.142857-163.428571T0 512t40.571429-198.857143 109.142857-163.428571T313.142857 40.571429 512 0t198.857143 40.571429 163.428571 109.142857 109.142857 163.428571 40.571429 198.857143z"></path></svg>
-    </a>
-    
-    
-    
-</div>
-    </div>
-</nav>
-    </div>
-</header>
-
-
-<div id="site-main" class="site-main outer" role="main">
-    <div class="inner">
-        <header class="post-full-header">
-            <div class="post-full-meta">
-                <time class="post-full-meta-date" datetime="2021-01-25T14:28:08.226Z">
-                    2021-01-25
-                </time>
-                
-                <span class="date-divider">/</span>
-                
-                <a href="/categories/%E5%85%B6%E4%BB%96/">其他</a>&nbsp;&nbsp;
-                
-                
-            </div>
-            <h1 class="post-full-title">使用Docker配置Nginx+PHP+MySQL</h1>
-        </header>
-        <div class="post-full no-image">
-            
-            <div class="post-full-content">
-                <article id="photoswipe" class="markdown-body">
-                    <p><strong>任务目标</strong>：准备学习环境，学习Web服务器的搭建过程，并做相应的加固学习</p>
+<!DOCTYPE html><html class="appearance-auto" lang="zh-CN"><head><meta charset="UTF-8"><title>使用Docker配置Nginx+PHP+MySQL</title><meta name="description" content="May the Force be with you"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><link rel="icon" href="/images/favicon.png"><link rel="stylesheet" href="/style/common/bulma.css"><link rel="stylesheet" href="/style/base.css"><link rel="stylesheet" href="/style/common/helper.css"><script src="/js/common.js"></script><link rel="stylesheet" href="/style/post.css"><link rel="stylesheet" href="/style/themes/highlight-theme-light.css"><script src="/js/highlight.pack.js"></script><meta name="generator" content="Hexo 5.3.0"></head><body class="is-flex is-flex-direction-column"><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-space-between is-hidden-mobile"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/">Fstark's blog</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">使用Docker配置Nginx+PHP+MySQL</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">点击返回顶部</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></aside></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BA%E7%94%B5%E8%84%91%E5%AE%89%E8%A3%85Docker"><span class="toc-text">为电脑安装Docker</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Docker%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AENginx"><span class="toc-text">Docker安装配置Nginx</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Docker%E5%AE%89%E8%A3%85PHP"><span class="toc-text">Docker安装PHP</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Docker%E5%AE%89%E8%A3%85MySQL"><span class="toc-text">Docker安装MySQL</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Macos%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA"><span class="toc-text">Macos安全加固</span></a></div><div class="column is-9"><header class="my-4"><a href="/tags/Docker"><i class="tag post-item-tag">Docker</i></a></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">使用Docker配置Nginx+PHP+MySQL</h1><time class="has-text-grey" datetime="2021-01-25T14:28:08.226Z">2021-01-25</time><article class="mt-2 post-content"><p><strong>任务目标</strong>：准备学习环境，学习Web服务器的搭建过程，并做相应的加固学习</p>
 <p><strong>操作系统</strong>：MacOS Catalina 10.15</p>
 <a id="more"></a>
 
 <p><strong>报告内容</strong>：</p>
 <h2 id="为电脑安装Docker"><a href="#为电脑安装Docker" class="headerlink" title="为电脑安装Docker"></a>为电脑安装Docker</h2><p>macOS 我们可以使用 Homebrew 来安装 Docker。</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ brew cask install docker</span><br></pre></td></tr></tbody></table></figure>
-<p><img alt="image-20190722111319355" class="post-img b-lazy" data-img="http://ww2.sinaimg.cn/large/006y8mN6ly1g67e4zlnb6j30uy06g0uo.jpg" data-index="0" data-src="http://ww2.sinaimg.cn/large/006y8mN6ly1g67e4zlnb6j30uy06g0uo.jpg"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ brew cask install docker</span><br></pre></td></tr></table></figure>
+<p><img src="http://ww2.sinaimg.cn/large/006y8mN6ly1g67e4zlnb6j30uy06g0uo.jpg" alt="image-20190722111319355"></p>
 <p>在Docker环境安装成功之后，就可以开始进行环境的配置了。</p>
 <h1 id="Docker安装配置Nginx"><a href="#Docker安装配置Nginx" class="headerlink" title="Docker安装配置Nginx"></a>Docker安装配置Nginx</h1><p>首先需要拉取Docker Hub上的nginx镜像，我们可以使用以下命令</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker pull nginx</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker pull nginx</span><br></pre></td></tr></table></figure>
 <p>随后我们在Docker images里就可以看到Nginx的镜像</p>
-<p><img alt="image-20190723174253192" class="post-img b-lazy" data-img="http://ww3.sinaimg.cn/large/006y8mN6ly1g67e4y4r0rj30uy0a876m.jpg" data-index="1" data-src="http://ww3.sinaimg.cn/large/006y8mN6ly1g67e4y4r0rj30uy0a876m.jpg"></p>
+<p><img src="http://ww3.sinaimg.cn/large/006y8mN6ly1g67e4y4r0rj30uy0a876m.jpg" alt="image-20190723174253192"></p>
 <p>以下命令使用 NGINX 默认的配置来启动一个 Nginx 容器实例：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker run --name Fstark-nginx -p 8081:80 -d nginx</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker run --name Fstark-nginx -p 8081:80 -d nginx</span><br></pre></td></tr></table></figure>
 <ul>
 <li><code>Fstark-nginx</code> 容器名称。</li>
 <li>the <code>-d</code>设置容器在在后台一直运行。</li>
 <li>the <code>-p</code> 端口进行映射，将本地 8081 端口映射到容器内部的 80 端口。</li>
 </ul>
 <p>此时我们就可以使用Docker ps命令查看容器是否真的在运行，以及其运行状态。</p>
-<p><img alt="image-20190723174742160" class="post-img b-lazy" data-img="http://ww3.sinaimg.cn/large/006y8mN6ly1g67e4xht2wj31kg03u0tx.jpg" data-index="2" data-src="http://ww3.sinaimg.cn/large/006y8mN6ly1g67e4xht2wj31kg03u0tx.jpg"></p>
+<p><img src="http://ww3.sinaimg.cn/large/006y8mN6ly1g67e4xht2wj31kg03u0tx.jpg" alt="image-20190723174742160"></p>
 <p>PORTS 部分表示端口映射，本地的 8081 端口映射到容器内部的 80 端口。</p>
 <p>在浏览器中打开 <strong><a target="_blank" rel="noopener" href="http://localhost:8081/">http://localhost:8081</a></strong>，效果如下：</p>
-<p><img alt="image-20190723175223816" class="post-img b-lazy" data-img="http://ww1.sinaimg.cn/large/006y8mN6ly1g67e4yvgzuj312508y403.jpg" data-index="3" data-src="http://ww1.sinaimg.cn/large/006y8mN6ly1g67e4yvgzuj312508y403.jpg"></p>
+<p><img src="http://ww1.sinaimg.cn/large/006y8mN6ly1g67e4yvgzuj312508y403.jpg" alt="image-20190723175223816"></p>
 <p>既证明nginx安装成功，随后我们要进行nginx的进一步部署。</p>
 <p>首先，创建目录 nginx, 用于存放后面的相关东西。</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir -p ~/nginx/www ~/nginx/logs ~/nginx/conf</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir -p ~&#x2F;nginx&#x2F;www ~&#x2F;nginx&#x2F;logs ~&#x2F;nginx&#x2F;conf</span><br></pre></td></tr></table></figure>
 <p>拷贝容器内 Nginx 默认配置文件到本地当前目录下的 conf 目录，容器 ID 可以查看 <strong>docker ps</strong> 命令输入中的第一列：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker cp 66e57416972d:/etc/nginx/nginx.conf ~/nginx/conf</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker cp 66e57416972d:&#x2F;etc&#x2F;nginx&#x2F;nginx.conf ~&#x2F;nginx&#x2F;conf</span><br></pre></td></tr></table></figure>
 <ul>
 <li><strong>www</strong>: 目录将映射为 nginx 容器配置的虚拟目录。</li>
 <li><strong>logs</strong>: 目录将映射为 nginx 容器的日志目录。</li>
 <li><strong>conf</strong>: 目录里的配置文件将映射为 nginx 容器的配置文件。</li>
 </ul>
 <p>部署命令如下：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -d -p 8082:80 --name Fstark-nginx-web -v ~/nginx/www:/usr/share/nginx/html -v ~/nginx/conf/nginx.conf:/etc/nginx/nginx.conf -v ~/nginx/logs:/var/log/nginx nginx</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -d -p 8082:80 --name Fstark-nginx-web -v ~&#x2F;nginx&#x2F;www:&#x2F;usr&#x2F;share&#x2F;nginx&#x2F;html -v ~&#x2F;nginx&#x2F;conf&#x2F;nginx.conf:&#x2F;etc&#x2F;nginx&#x2F;nginx.conf -v ~&#x2F;nginx&#x2F;logs:&#x2F;var&#x2F;log&#x2F;nginx nginx</span><br></pre></td></tr></table></figure>
 <p>命令说明：</p>
 <ul>
 <li><strong>-p 8082:80：</strong> 将容器的 80 端口映射到主机的 8082 端口。</li>
@@ -182,32 +44,32 @@
 <li><strong>-v ~/nginx/logs:/var/log/nginx：</strong>将我们自己创建的 logs 挂载到容器的 /var/log/nginx。</li>
 </ul>
 <p>启动以上命令后进入 ~/nginx/www 目录：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ cd ~/nginx/www</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ cd ~&#x2F;nginx&#x2F;www</span><br></pre></td></tr></table></figure>
 <p>创建 index.html 文件，内容如下：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">&lt;meta charset="utf-8"&gt;</span><br><span class="line">&lt;title&gt;Fstark的信安之路第一步&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;h1&gt;我的第一个标题&lt;/h1&gt;</span><br><span class="line">    &lt;p&gt;我的第一个段落。&lt;/p&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">&lt;meta charset&#x3D;&quot;utf-8&quot;&gt;</span><br><span class="line">&lt;title&gt;Fstark的信安之路第一步&lt;&#x2F;title&gt;</span><br><span class="line">&lt;&#x2F;head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;h1&gt;我的第一个标题&lt;&#x2F;h1&gt;</span><br><span class="line">    &lt;p&gt;我的第一个段落。&lt;&#x2F;p&gt;</span><br><span class="line">&lt;&#x2F;body&gt;</span><br><span class="line">&lt;&#x2F;html&gt;</span><br></pre></td></tr></table></figure>
 <p>输出结果为：</p>
-<p><img alt="image-20190723180542509" class="post-img b-lazy" data-img="http://ww3.sinaimg.cn/large/006y8mN6ly1g67e50kc34j30q80fumym.jpg" data-index="4" data-src="http://ww3.sinaimg.cn/large/006y8mN6ly1g67e50kc34j30q80fumym.jpg"></p>
+<p><img src="http://ww3.sinaimg.cn/large/006y8mN6ly1g67e50kc34j30q80fumym.jpg" alt="image-20190723180542509"></p>
 <h1 id="Docker安装PHP"><a href="#Docker安装PHP" class="headerlink" title="Docker安装PHP"></a>Docker安装PHP</h1><p>查找Docker Hub上的php镜像，这里我们拉取官方的镜像,标签为5.6-fpm</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull php:5.6-fpm</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull php:5.6-fpm</span><br></pre></td></tr></table></figure>
 <p>等待下载完成后，我们就可以在本地镜像列表里查到REPOSITORY为php,标签为5.6-fpm的镜像。</p>
 <p>这时就可以启动PHP了</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run --name  myphp-fpm -v ~/nginx/www:/www  -d php:5.6-fpm</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run --name  myphp-fpm -v ~&#x2F;nginx&#x2F;www:&#x2F;www  -d php:5.6-fpm</span><br></pre></td></tr></table></figure>
 <p>命令说明：</p>
 <ul>
 <li><strong>–name myphp-fpm</strong> : 将容器命名为 myphp-fpm。</li>
 <li><strong>-v ~/nginx/www:/www</strong> : 将主机中项目的目录 www 挂载到容器的 /www</li>
 </ul>
 <p>创建 ~/nginx/conf/conf.d 目录：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir ~/nginx/conf/conf.d </span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir ~&#x2F;nginx&#x2F;conf&#x2F;conf.d </span><br></pre></td></tr></table></figure>
 <p>在该目录下添加 <strong>~/nginx/conf/conf.d/Fstark-php.conf</strong> 文件，内容如下：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">server {</span><br><span class="line">    listen       80;</span><br><span class="line">    server_name  localhost;</span><br><span class="line"></span><br><span class="line">    location / {</span><br><span class="line">        root   /usr/share/nginx/html;</span><br><span class="line">        index  index.html index.htm index.php;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    error_page   500 502 503 504  /50x.html;</span><br><span class="line">    location = /50x.html {</span><br><span class="line">        root   /usr/share/nginx/html;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    location ~ \.php$ {</span><br><span class="line">        fastcgi_pass   php:9000;</span><br><span class="line">        fastcgi_index  index.php;</span><br><span class="line">        fastcgi_param  SCRIPT_FILENAME  /www/$fastcgi_script_name;</span><br><span class="line">        include        fastcgi_params;</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen       80;</span><br><span class="line">    server_name  localhost;</span><br><span class="line"></span><br><span class="line">    location &#x2F; &#123;</span><br><span class="line">        root   &#x2F;usr&#x2F;share&#x2F;nginx&#x2F;html;</span><br><span class="line">        index  index.html index.htm index.php;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    error_page   500 502 503 504  &#x2F;50x.html;</span><br><span class="line">    location &#x3D; &#x2F;50x.html &#123;</span><br><span class="line">        root   &#x2F;usr&#x2F;share&#x2F;nginx&#x2F;html;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    location ~ \.php$ &#123;</span><br><span class="line">        fastcgi_pass   php:9000;</span><br><span class="line">        fastcgi_index  index.php;</span><br><span class="line">        fastcgi_param  SCRIPT_FILENAME  &#x2F;www&#x2F;$fastcgi_script_name;</span><br><span class="line">        include        fastcgi_params;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>配置文件说明：</p>
 <ul>
 <li><strong>php:9000</strong>: 表示 php-fpm 服务的 URL，下面会具体说明。</li>
 <li><strong>/www/</strong>: 是 <strong>myphp-fpm</strong> 中 php 文件的存储路径，映射到本地的 ~/nginx/www 目录。</li>
 </ul>
 <p>启动 nginx：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker run --name Fstark-php-nginx -p 8083:80 -d \</span><br><span class="line">    -v ~/nginx/www:/usr/share/nginx/html:ro \</span><br><span class="line">    -v ~/nginx/conf/conf.d:/etc/nginx/conf.d:ro \</span><br><span class="line">    --link myphp-fpm:php \</span><br><span class="line">    nginx</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker run --name Fstark-php-nginx -p 8083:80 -d \</span><br><span class="line">    -v ~&#x2F;nginx&#x2F;www:&#x2F;usr&#x2F;share&#x2F;nginx&#x2F;html:ro \</span><br><span class="line">    -v ~&#x2F;nginx&#x2F;conf&#x2F;conf.d:&#x2F;etc&#x2F;nginx&#x2F;conf.d:ro \</span><br><span class="line">    --link myphp-fpm:php \</span><br><span class="line">    nginx</span><br></pre></td></tr></table></figure>
 <ul>
 <li><strong>-p 8083:80</strong>: 端口映射，把 <strong>nginx</strong> 中的 80 映射到本地的 8083 端口。</li>
 <li><strong>~/nginx/www</strong>: 是本地 html 文件的存储目录，/usr/share/nginx/html 是容器内 html 文件的存储目录。</li>
@@ -215,14 +77,14 @@
 <li><strong>–link myphp-fpm:php</strong>: 把 <strong>myphp-fpm</strong> 的网络并入 <strong>nginx</strong>，并通过修改 <strong>nginx</strong> 的 /etc/hosts，把域名 <strong>php</strong> 映射成 127.0.0.1，让 nginx 通过 php:9000 访问 php-fpm。</li>
 </ul>
 <p>接下来我们在 ~/nginx/www 目录下创建 index.php，代码如下：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">echo phpinfo();</span><br><span class="line">?&gt;</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">echo phpinfo();</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
 <p>浏览器打开 <strong><a target="_blank" rel="noopener" href="http://127.0.0.1:8083/index.php">http://127.0.0.1:8083/index.php</a></strong>，显示如下：</p>
-<p><img alt="image-20190725134655475" class="post-img b-lazy" data-img="http://ww3.sinaimg.cn/large/006y8mN6ly1g67e5218caj31pb0u0qbg.jpg" data-index="5" data-src="http://ww3.sinaimg.cn/large/006y8mN6ly1g67e5218caj31pb0u0qbg.jpg"></p>
+<p><img src="http://ww3.sinaimg.cn/large/006y8mN6ly1g67e5218caj31pb0u0qbg.jpg" alt="image-20190725134655475"></p>
 <p>如图可知，php配置成功。</p>
 <h1 id="Docker安装MySQL"><a href="#Docker安装MySQL" class="headerlink" title="Docker安装MySQL"></a>Docker安装MySQL</h1><p>查找Docker Hub上的mysql镜像，这里我拉取官方的镜像,标签为5.6</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull mysql:5.6</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull mysql:5.6</span><br></pre></td></tr></table></figure>
 <p>等待下载完成后，我们就可以在本地镜像列表里查到REPOSITORY为mysql,标签为5.6的镜像。随后运行容器</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -p 3306:3306 --name mymysql -v $PWD/conf:/etc/mysql/conf.d -v $PWD/logs:/logs -v $PWD/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.6</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -p 3306:3306 --name mymysql -v $PWD&#x2F;conf:&#x2F;etc&#x2F;mysql&#x2F;conf.d -v $PWD&#x2F;logs:&#x2F;logs -v $PWD&#x2F;data:&#x2F;var&#x2F;lib&#x2F;mysql -e MYSQL_ROOT_PASSWORD&#x3D;123456 -d mysql:5.6</span><br></pre></td></tr></table></figure>
 <p>命令说明：</p>
 <ul>
 <li><strong>-p 3306:3306</strong>：将容器的 3306 端口映射到主机的 3306 端口。</li>
@@ -231,32 +93,32 @@
 <li><strong>-v $PWD/data:/var/lib/mysql</strong> ：将主机当前目录下的data目录挂载到容器的 /var/lib/mysql 。</li>
 <li><strong>-e MYSQL_ROOT_PASSWORD=123456：</strong>初始化 root 用户的密码。</li>
 </ul>
-<p><img alt="截屏2019-07-25下午2.23.07" class="post-img b-lazy" data-img="http://ww4.sinaimg.cn/large/006y8mN6ly1g67e501gtgj31t2066dj1.jpg" data-index="6" data-src="http://ww4.sinaimg.cn/large/006y8mN6ly1g67e501gtgj31t2066dj1.jpg"></p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run --name myadmin -d --link mymysql:db -p 8080:80 phpmyadmin/phpmyadmin</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="http://ww4.sinaimg.cn/large/006y8mN6ly1g67e501gtgj31t2066dj1.jpg" alt="截屏2019-07-25下午2.23.07"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run --name myadmin -d --link mymysql:db -p 8080:80 phpmyadmin&#x2F;phpmyadmin</span><br></pre></td></tr></table></figure>
 <p>此时可以连接到数据库</p>
-<p><img alt="image-20190725145426373" class="post-img b-lazy" data-img="http://ww1.sinaimg.cn/large/006y8mN6ly1g67e51492aj316y0u0afd.jpg" data-index="7" data-src="http://ww1.sinaimg.cn/large/006y8mN6ly1g67e51492aj316y0u0afd.jpg"></p>
+<p><img src="http://ww1.sinaimg.cn/large/006y8mN6ly1g67e51492aj316y0u0afd.jpg" alt="image-20190725145426373"></p>
 <h1 id="Macos安全加固"><a href="#Macos安全加固" class="headerlink" title="Macos安全加固"></a>Macos安全加固</h1><p>安全加固（Security Reinforce，SR）对主机、网络设备、应用系统、操作系统、中间件、数据库等进行全面的基线加固和组件升级，针对系统存在的高危漏洞和安全隐患等提供安全加固方案，整体上提高系统的安全防御能力。   我查阅了阿里云的官方安全公告和技术，嘶吼论坛里的资料以及谷歌搜索的结果，整合了Mac os操作系统的一些安全加固。</p>
 <p><strong>(1) 安全启动</strong></p>
 <p>在2018年以后的MacBook主机中，通过TouchBar内部新安装的T2芯片（包括Secure Enclave），支持安全启动（Secure Boot）功能。要检查是否已经启用安全启动，需要在开机时同时按下COMMAND + R键。在输入固件密码后，可以访问菜单栏中的“启动安全实用程序”（Startup Security Utility）。如果MacBook中带有T2芯片（TouchBar），则可以看到“安全启动”（Secure Boot）和“外部启动”（External Boot）两个选项。我们强烈建议，在需要保证较高安全性的情况下，应选择“安全启动”。在禁止从外部介质启动时，应选择“外部启动”。</p>
-<p><font color="red"><strong><em>这一条不太理解，因为我的电脑是2015年配置的，不含此芯片</em></strong></font> </p>
+<p><font color=red><strong><em>这一条不太理解，因为我的电脑是2015年配置的，不含此芯片</em></strong></font> </p>
 <p><strong>(2) 终端保护</strong></p>
 <p>默认情况下，macOS已经具有保护机制，例如：XProtect（恶意软件检测）、Secure Boot、代码签名验证、沙箱应用程序和系统完整性保护。此外，如果启用了MDM（例如在macOS服务器上），则可以通过不同的策略配置设备和管理设备。如果需要安装其他终端保护工具，应该评估该工具是否支持macOS设备。</p>
-<p><font color="red"><strong><em>对终端进行保护，防止第三方的恶意输入。计算机使用人员离开后不会被其他人员或者黑客木马操作自己的机子，减少安全隐患。保证机密文档，只有授权用户才能访问，其他用户不经过授权无法访问和查看文件夹中的文件；</em></strong></font> </p>
+<p><font color=red><strong><em>对终端进行保护，防止第三方的恶意输入。计算机使用人员离开后不会被其他人员或者黑客木马操作自己的机子，减少安全隐患。保证机密文档，只有授权用户才能访问，其他用户不经过授权无法访问和查看文件夹中的文件；</em></strong></font> </p>
 <p><strong>(3) 日志和事件收集</strong></p>
 <p>管理员可以根据实际需要，配置macOS的审计框架。通过/Applications/Utilities/Console.app，可以查看到整合后的日志。默认情况下，macOS支持以syslogd守护程序，通过UDP/514端口发送日志。但是，由于缺乏对TLS/SSL的支持，建议不要使用此项功能，预计Apple很快就会弃用这项功能。如果您所在的企业环境中不支持包含代理的macOS SISM，建议可以从本地整合日志，并且避免通过网络发送未经加密的日志。借助macOS提供的日志实用程序，可以以安全的方式获取此类日志，只需日志收集服务器的接收端打开TCP端口（需支持TLS/SSL）。例如，在MacBook上执行以下命令，可以通过加密通道将每个失败的sudo尝试发送到日志服务器：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">log stream --style syslog --predicate 'process == "sudo" and eventMessage contains "incorrect password"' | openssl s_client -host &lt;RemoteServer&gt; -port &lt;Port&gt;</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">log stream --style syslog --predicate &#39;process &#x3D;&#x3D; &quot;sudo&quot; and eventMessage contains &quot;incorrect password&quot;&#39; | openssl s_client -host &lt;RemoteServer&gt; -port &lt;Port&gt;</span><br></pre></td></tr></table></figure>
 <p>日志服务器将收到类似的日志消息，如下所示：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Filtering the log data using "process == "sudo" AND composedMessage CONTAINS "incorrect password""</span><br><span class="line">Timestamp                       (process)[PID]</span><br><span class="line">2018-10-24 17:23:33.842651+0200  localhost sudo[2002]:   MacBook_ERNW : 2 incorrect password attempts ; TTY=ttys002 ; PWD=/Users/MacBook_ERNW ; USER=root ; COMMAND=su</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Filtering the log data using &quot;process &#x3D;&#x3D; &quot;sudo&quot; AND composedMessage CONTAINS &quot;incorrect password&quot;&quot;</span><br><span class="line">Timestamp                       (process)[PID]</span><br><span class="line">2018-10-24 17:23:33.842651+0200  localhost sudo[2002]:   MacBook_ERNW : 2 incorrect password attempts ; TTY&#x3D;ttys002 ; PWD&#x3D;&#x2F;Users&#x2F;MacBook_ERNW ; USER&#x3D;root ; COMMAND&#x3D;su</span><br></pre></td></tr></table></figure>
 <p>可以使用macOS登录项，来自动启动日志流。此外，管理员可以根据需要，使用过滤器来过滤实际需要的日志。</p>
-<p><font color="red"><strong><em>出现任何问题，可以通过日志查找根源，发现问题，进而解决问题</em></strong></font> </p>
+<p><font color=red><strong><em>出现任何问题，可以通过日志查找根源，发现问题，进而解决问题</em></strong></font> </p>
 <p><strong>(4) 移动设备管理</strong></p>
 <p>将MacBook与移动设备管理系统（MDM，如macOS服务器）连接，可以强制操作系统必须部署指定的策略。此外，可以通过MDM解决方案来实现部署证书和连接到活动目录（Active Directory）。</p>
 <p><strong>(5) 确保标准帐户和默认帐户的安全性</strong></p>
 <p>macOS会始终强制用户创建新帐户。即使用户以管理员权限帐户运行，也不会拥有与“root”相同的权限，这就是macOS称之为系统完整性保护（SIP）的机制。SIP将拒绝使用者对系统目录（例如：/System）的任何更改。</p>
-<p><font color="red"><strong><em>防止root权限出现一些安全问题</em></strong></font> </p>
+<p><font color=red><strong><em>防止root权限出现一些安全问题</em></strong></font> </p>
 <p><strong>(6) 用户权限分离</strong></p>
 <p>建议用户使用不同的帐户，分别进行管理和日常活动。并且，应该为特殊任务和系统维护创建一个具有管理员权限的帐户，为日常使用过程创建一个普通帐户，从而避免攻击者快速提升权限。</p>
-<p><font color="red"><strong><em>防止root权限出现一些安全问题</em></strong></font> </p>
+<p><font color=red><strong><em>防止root权限出现一些安全问题</em></strong></font> </p>
 <p><strong>(7) 确保密码安全</strong></p>
 <p>应确保所有用户都使用强密码，强密码的具体定义如下：</p>
 <p>最小密码长度至少为8个字符；</p>
@@ -266,432 +128,188 @@
 <p>同一个密码最多使用180天；</p>
 <p>用户名不得作为密码的一部分；</p>
 <p>新设置的密码，与最近5次设置的历史密码不能相同。</p>
-<p><font color="red"><strong><em>密码安全十分重要，房子爆破和被入库，需要及时的更换密码</em></strong></font> </p>
+<p><font color=red><strong><em>密码安全十分重要，房子爆破和被入库，需要及时的更换密码</em></strong></font> </p>
 <p><strong>(8) 强制密码安全策略（重要）</strong></p>
 <p>管理员可以使用命令行工具pwpolicy，来强制实施密码策略。以下命令可以强制执行上述策略：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pwpolicy -u -setpolicy "minChars=8 requiresAlpha=1 requiresNumeric=1 maxMinutesUntilChangePassword=259200 usingHistory=5 usingExpirationDate=1 passwordCannotBeName=1 requiresMixedCase=1 requiresSymbol=1"</span><br></pre></td></tr></tbody></table></figure>
-<p><font color="red"><strong><em>强制使用密码，虽然麻烦，但是增强了安全性</em></strong></font> </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pwpolicy -u -setpolicy &quot;minChars&#x3D;8 requiresAlpha&#x3D;1 requiresNumeric&#x3D;1 maxMinutesUntilChangePassword&#x3D;259200 usingHistory&#x3D;5 usingExpirationDate&#x3D;1 passwordCannotBeName&#x3D;1 requiresMixedCase&#x3D;1 requiresSymbol&#x3D;1&quot;</span><br></pre></td></tr></table></figure>
+<p><font color=red><strong><em>强制使用密码，虽然麻烦，但是增强了安全性</em></strong></font> </p>
 <p><strong>(9) 双因素身份验证（可选）</strong></p>
 <p>从macOS 10.11和iOS 9开始，这些Apple设备就内置了双因素身份验证机制，可以保护用户的Apple ID。如果访问了任何需要登录Apple ID的内容，身份验证码就会被推送到另一台安装了macOS 10.11以上版本或iOS 9以上版本系统的设备上。这一过程可能会影响用户的macOS安装，因为可以通过Apple ID重置设备的密码。如果用户需要使用Apple ID执行各种任务，那么建议使用双因素身份验证。</p>
-<p><font color="red"><strong><em>两步验证，大大增强了ID的安全性</em></strong></font> </p>
+<p><font color=red><strong><em>两步验证，大大增强了ID的安全性</em></strong></font> </p>
 <p><strong>(10) 自动登录和用户列表（重要）</strong></p>
 <p>在“系统偏好设置”（System Perferences）中，选择“用户和组”（Users &amp; Groups），选择“登录选项”（Login Options），将“自动登录”（Automatic Login）设置为禁用，将“显示登录窗口”（Display Login Window）设置为“用户名和密码”（Name and Password），并禁用密码提示（Password Hints）。</p>
-<p><font color="red"><strong><em>禁用用户列表，这样会降低攻击者正确猜测登录凭据的可能性</em></strong></font> </p>
+<p><font color=red><strong><em>禁用用户列表，这样会降低攻击者正确猜测登录凭据的可能性</em></strong></font> </p>
 <p><strong>(11) 登录导语（可选）</strong></p>
 <p>可以设置登录导语（Login Banner），从而在登录时显示包含策略的信息。</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo defaults write /Library/Preferences/com.apple.loginwindow LoginwindowText “text”</span><br></pre></td></tr></tbody></table></figure>
-<p><font color="red"><strong><em>起到提示性的作用</em></strong></font> </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo defaults write &#x2F;Library&#x2F;Preferences&#x2F;com.apple.loginwindow LoginwindowText “text”</span><br></pre></td></tr></table></figure>
+<p><font color=red><strong><em>起到提示性的作用</em></strong></font> </p>
 <p><strong>(12) 访客帐户（重要）</strong></p>
 <p>应该始终禁用访客帐户的所有内容，并且停用访客账户。</p>
 <p>在“系统偏好设置”中，选择“用户和组”，确保已经禁用访客账户（Guest Users）。</p>
-<p><font color="red"><strong><em>停用访客访问，减小被侵入进而提权的风险</em></strong></font> </p>
+<p><font color=red><strong><em>停用访客访问，减小被侵入进而提权的风险</em></strong></font> </p>
 <p><strong>(13) 限制Sudoers文件（重要）</strong></p>
 <p>要限制宽限期（Grace Period）并限制为单个ttys，应使用visudo命令，编辑/etc/sudoers，添加以下内容：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Defaults timestamp_timeout=0</span><br><span class="line">Defaults tty_tickets</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Defaults timestamp_timeout&#x3D;0</span><br><span class="line">Defaults tty_tickets</span><br></pre></td></tr></table></figure>
 <p><strong>(14) 自动锁定登录钥匙串（可选）</strong></p>
 <p>打开钥匙串访问（Keychain Access），选择登录钥匙串。选择“编辑”（Edit），更改钥匙串设置“登录”。将“不活动[…]分钟后锁定”（Lock after […] minutes）的数值设置为10。勾选“睡眠时锁定”（Lock when sleeping）选项。</p>
 <p>注意：自动锁定钥匙串将会影响用户体验，每个锁定守护进程（例如：Wi-Fi服务）都需要解锁。因此，Wi-Fi环境下的自动夜间备份将会受到影响。</p>
-<p><font color="red"><strong><em>登录钥匙串，许多登录窗口会自动填充密码，对用户十分危险</em></strong></font> </p>
+<p><font color=red><strong><em>登录钥匙串，许多登录窗口会自动填充密码，对用户十分危险</em></strong></font> </p>
 <p><strong>(15) 修复当前系统漏洞（重要）</strong></p>
 <p>在执行本指南中的加固措施之前，强烈建议先将当前系统升级到最新且已经安装补丁的状态。可以通过“Apple菜单” – “App Store” – “升级”（Updates）来检查当前系统的更新情况。</p>
 <p>或者，也可以在命令行中输入以下命令：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ softwareupdate -l</span><br></pre></td></tr></tbody></table></figure>
-<p><font color="red"><strong><em>及时升级系统，修补漏洞，十分重要</em></strong></font> </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ softwareupdate -l</span><br></pre></td></tr></table></figure>
+<p><font color=red><strong><em>及时升级系统，修补漏洞，十分重要</em></strong></font> </p>
 <p><strong>(16) 自动更新（重要）</strong></p>
 <p>建议始终启用自动更新，以自动向系统提供最新的安全修复程序。可以通过以下命令检查是否启用此设置：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ defaults read /Library/Preferences/com.apple.SoftwareUpdate AutomaticallyInstallMacOSUpdates</span><br><span class="line">1</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ defaults read &#x2F;Library&#x2F;Preferences&#x2F;com.apple.SoftwareUpdate AutomaticallyInstallMacOSUpdates</span><br><span class="line">1</span><br></pre></td></tr></table></figure>
 <p>如果启用了自动更新，则返回值应该为1，如上面输出所示。如果该设置不存在，可以通过以下命令来手动设置：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticallyInstallMacOSUpdates -int 1</span><br></pre></td></tr></tbody></table></figure>
-<p><font color="red"><strong><em>自动更新，修补漏洞</em></strong></font> </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo defaults write &#x2F;Library&#x2F;Preferences&#x2F;com.apple.SoftwareUpdate AutomaticallyInstallMacOSUpdates -int 1</span><br></pre></td></tr></table></figure>
+<p><font color=red><strong><em>自动更新，修补漏洞</em></strong></font> </p>
 <p><strong>(17) Gatekeeper（重要）</strong></p>
 <p>Gatekeeper将检查应用程序是否使用有效的Apple证书进行签名。通过以下方式来检查应用程序是否具有签名：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">spctl –a /Applications/test.app</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">spctl –a &#x2F;Applications&#x2F;test.app</span><br></pre></td></tr></table></figure>
 <p>如果要将其添加到Gatekeeper，可以使用如下命令：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">spctl --add test.app</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">spctl --add test.app</span><br></pre></td></tr></table></figure>
 <p>或者直接执行下面的操作：</p>
 <p>右键单击，选择“打开”。</p>
 <p>注意：在一些情况下，系统可能仍然会拒绝打开应用程序。这时，我们可以强行启动：</p>
 <p>点击“系统偏好设置”，选择“安全和隐私”（Security &amp; Privacy），选择“常规”（General）。然后打开应用程序。</p>
-<p><font color="red"><strong><em>安装程序时，验证签名，提高安装软件的安全性</em></strong></font> </p>
+<p><font color=red><strong><em>安装程序时，验证签名，提高安装软件的安全性</em></strong></font> </p>
 <p><strong>(18) 执行代码签名机制（重要）</strong></p>
 <p>可以编辑/etc/sysctl.conf，在其中添加以下行：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vm.cs_force_kill=1  # Kill process if invalidated</span><br><span class="line">vm.cs_force_hard=1  # Fail operation if invalidated</span><br><span class="line">vm.cs_all_vnodes=1  # Apply on all Vnodes</span><br><span class="line">vm.cs_enforcement=1 # Globally apply code signing enforcement</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vm.cs_force_kill&#x3D;1  # Kill process if invalidated</span><br><span class="line">vm.cs_force_hard&#x3D;1  # Fail operation if invalidated</span><br><span class="line">vm.cs_all_vnodes&#x3D;1  # Apply on all Vnodes</span><br><span class="line">vm.cs_enforcement&#x3D;1 # Globally apply code signing enforcement</span><br></pre></td></tr></table></figure>
 <p>注意：此项更改需要禁用系统完整性保护，在加固后请手动启用。在新安装的系统上，sysctl.conf可能不存在，管理员可以创建该文件并重新启动系统。</p>
 <p><strong>(19) 禁用元数据文件创建（重要）</strong></p>
 <p>建议禁止在macOS在远程卷（例如：网络存储、USB存储）上创建临时文件。下面的命令可以阻止此类行为：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true</span><br><span class="line">defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true</span><br></pre></td></tr></tbody></table></figure>
-<p><font color="red"><strong><em>防止入侵者创建一些不好的东西</em></strong></font> </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true</span><br><span class="line">defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true</span><br></pre></td></tr></table></figure>
+<p><font color=red><strong><em>防止入侵者创建一些不好的东西</em></strong></font> </p>
 <p><strong>(20) 禁用保存到iCloud（重要）</strong></p>
 <p>以下命令可以阻止macOS将文件直接保存到任何iCloud服务器：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false</span><br></pre></td></tr></tbody></table></figure>
-<p><font color="red"><strong><em>防止对数据构成威胁</em></strong></font> </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false</span><br></pre></td></tr></table></figure>
+<p><font color=red><strong><em>防止对数据构成威胁</em></strong></font> </p>
 <p><strong>(21) 禁用诊断（重要）</strong></p>
 <p>要避免向Apple或App Developers发送数据，请禁用以下内容：</p>
 <p>在“系统偏好设置”中，选择“安全和隐私”，选择“隐私”（Privacy），选择“诊断和使用”（Diagnostics &amp; Usage）。取消选中“向Apple发送诊断和使用数据”（Send diagnostic &amp; usage data to Apple），取消选中“与应用开发者共享崩溃数据”（Share crash data with app developers）。</p>
-<p><font color="red"><strong><em>禁止发送数据给开发者，防止数据泄露</em></strong></font> </p>
+<p><font color=red><strong><em>禁止发送数据给开发者，防止数据泄露</em></strong></font> </p>
 <p><strong>(22) 禁用Handoff（重要）</strong></p>
 <p>Apple Handoff是一项保持工作区同步的功能，但该功能需要向Apple发送数据，建议禁用这一功能。</p>
 <p>在“系统首选项”（System Preferences）中，选择“常规”（General），取消选中“允许在此Mac和iCloud设备之间切换”（Allow Handoff between this Mac and your iCloud devices），并将“最近项目”设置为“无”（None）。</p>
-<p><font color="red"><strong><em>禁止发送无必要的数据</em></strong></font> </p>
+<p><font color=red><strong><em>禁止发送无必要的数据</em></strong></font> </p>
 <p><strong>(23) FileVault（重要）</strong></p>
 <p>建议启动FileVault，以在设备上启用完整磁盘加密。该功能应该已经默认启用。但是，在安装macOS之后再打开FileVault会更加安全，因为此时的伪随机数生成器会具有更加随机的种子。</p>
 <p>点击“系统偏好设置” – “安全和隐私” – “FileVault”，选择“启用FileVault”。</p>
 <p>*可选设置：</p>
 <p>如果要在休眠时，从内存中删除加密密钥，并从内存中断电，可以使用以下命令：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo pmset -a destroyfvkeyonstandby 1 hibernatemode 25</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo pmset -a destroyfvkeyonstandby 1 hibernatemode 25</span><br></pre></td></tr></table></figure>
 <p>注意：这项操作可能会对用户体验产生影响，因为必须要在每次合盖/开盖后解密磁盘。因此，启动过程最多可能需要10秒钟时间。我们建议对安全性要求较高的计算机设置此选项，其首选设置如下：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo pmset -a powernap 0</span><br><span class="line">sudo pmset -a standby 0</span><br><span class="line">sudo pmset -a standbydelay 0</span><br><span class="line">sudo pmset -a autopoweroff 0</span><br></pre></td></tr></tbody></table></figure>
-<p><font color="red"><strong><em>启用完整的数据加密，大大增加安全性</em></strong></font> </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo pmset -a powernap 0</span><br><span class="line">sudo pmset -a standby 0</span><br><span class="line">sudo pmset -a standbydelay 0</span><br><span class="line">sudo pmset -a autopoweroff 0</span><br></pre></td></tr></table></figure>
+<p><font color=red><strong><em>启用完整的数据加密，大大增加安全性</em></strong></font> </p>
 <p><strong>(24) 防火墙（重要）</strong></p>
 <p>建议启用具有完整功能的防火墙，并阻止所有传入流量。</p>
 <p>点击“系统偏好设置” – “安全和隐私” – “防火墙”，点击“打开防火墙”（Turn on Firewall）。选择“防火墙选项”（Firewall Options），设置“阻止所有传入连接”（Block All Incoming Connections），设置“启用隐身模式”（Enable Stealth Mode）。</p>
-<p><font color="red"><strong><em>启用防火墙，增强安全性</em></strong></font> </p>
+<p><font color=red><strong><em>启用防火墙，增强安全性</em></strong></font> </p>
 <p><strong>(25) 需要管理员密码（重要）</strong></p>
 <p>建议始终要求在验证管理员密码后才能访问系统设置。</p>
-<p><font color="red"><strong><em>root权限账号一定要加强管理</em></strong></font> </p>
+<p><font color=red><strong><em>root权限账号一定要加强管理</em></strong></font> </p>
 <p><strong>(26) 屏幕保护程序和解锁（重要）</strong></p>
 <p>建议在不活动时，自动锁定屏幕。</p>
 <p>点击“系统偏好设置” – “桌面和屏幕保护程序”（Desktop &amp; Screensaver） – “屏幕保护程序”（Screensaver）。根据需要调整时间范围，我们建议将其设置为5分钟。</p>
 <p>点击“系统偏好设置” – “安全和隐私” – “常规”，设置“睡眠或屏幕保护程序开始后立即需要密码”（Require password immediately after sleep or screen saver begins）。</p>
-<p><font color="red"><strong><em>防止主人离开时，有人不经允许使用</em></strong></font> </p>
+<p><font color=red><strong><em>防止主人离开时，有人不经允许使用</em></strong></font> </p>
 <p><strong>(27) 文件扩展名（重要）</strong></p>
 <p>要始终掌握用户正在处理的文件类型，建议开启显示文件扩展名。</p>
 <p>打开“访达”（Finder），选择“设置”（Settings） – “高级”（Advanced），选择“显示所有文件扩展名”（Show all filename extensions）。</p>
-<p><font color="red"><strong><em>显示文件扩展名</em></strong></font> </p>
+<p><font color=red><strong><em>显示文件扩展名</em></strong></font> </p>
 <p><strong>(28) 阻止Safari打开已知类型文件（重要）</strong></p>
 <p>如果用户使用Safari作为主要的浏览器，建议阻止Safari在下载文件后打开已知文件类型的文件。</p>
 <p>打开Safari，选择“首选项”（Preferences），选择“常规”（General），取消“下载后打开安全文件”（Open safe files after downloading）。</p>
-<p><font color="red"><strong><em>文件不要直接打开，要经过安全性的验证</em></strong></font> </p>
+<p><font color=red><strong><em>文件不要直接打开，要经过安全性的验证</em></strong></font> </p>
 <p><strong>(29) 设置严格的全局Umask（可选）</strong></p>
 <p>严格限制全局Umask默认使用用户将来创建的任何文件或目录的权限。我们可以使用以下命令来调整全局Umask：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo launchctl config system umask 027</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo launchctl config system umask 027</span><br></pre></td></tr></table></figure>
 <p>注意：这可能会破坏依赖于较少限制的umask的其他软件安装。</p>
-<p><font color="red"><strong><em>控制权限</em></strong></font> </p>
+<p><font color=red><strong><em>控制权限</em></strong></font> </p>
 <p><strong>(30) 禁用远程Apple事件（重要）</strong></p>
 <p>建议禁用远程Apple事件服务（默认禁用）。该服务可用于通过网络对另一台Mac上的软件执行操作。因此，它应该始终被禁用。下面的命令可以检查是否启用了远程Apple事件：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemsetup –getremoteappleevents</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemsetup –getremoteappleevents</span><br></pre></td></tr></table></figure>
 <p>应确保输出为：</p>
 <p>Remote Apple Events: Off</p>
 <p>如果启用，那么可以使用以下命令来禁用：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemsetup -setremoteappleevents off</span><br></pre></td></tr></tbody></table></figure>
-<p><font color="red"><strong><em>防止通过漏洞远程控制电脑</em></strong></font> </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemsetup -setremoteappleevents off</span><br></pre></td></tr></table></figure>
+<p><font color=red><strong><em>防止通过漏洞远程控制电脑</em></strong></font> </p>
 <p><strong>(31) 禁用蓝牙（可选）</strong></p>
 <p>由于此前存在一些针对蓝牙配对和身份检测的攻击方法，因此建议在不需要使用蓝牙时禁用蓝牙。</p>
 <p>点击“系统偏好设置” – “蓝牙”（Bluetooth），选择“停用蓝牙”（Deactivate Bluetooth）。</p>
 <p>注意：取消激活蓝牙，将会断开蓝牙键盘、蓝牙鼠标或蓝牙耳机等外接设备。</p>
-<p><font color="red"><strong><em>非必要时禁止使用蓝牙</em></strong></font> </p>
+<p><font color=red><strong><em>非必要时禁止使用蓝牙</em></strong></font> </p>
 <p><strong>(32) 固件密码（重要）</strong></p>
 <p>要防止单用户模式（Single User Mode）和可引导设备，建议设置足够复杂的固件密码。</p>
 <p>在Mac启动时，按下Command + R，将Mac启动到恢复模式（Recovery Mode）。选择“实用程序”（Utilities） – “固件密码实用程序”（Firmware Password Utility），然后设置一个足够复杂的密码。</p>
 <p>注意：忘记此密码，可能会导致Mac完全不可用，并阻止计算机起动因此，存储该密码的密码管理器是一个有效的解决方案。此外，无论MacBook的实际键盘布局如何，当尝试访问固件安全组件时，将始终映射英语的默认设置。</p>
-<p><font color="red"><strong><em>固件密码会大大增加安全性</em></strong></font> </p>
+<p><font color=red><strong><em>固件密码会大大增加安全性</em></strong></font> </p>
 <p><strong>(33) Setuid和Setgid（可选）</strong></p>
 <p>改变二进制文件的Setuid位，是比较重要的一个设置。这可能会影响这些二进制文件的功能，但管理员始终可以撤销这些步骤。使用以下命令，可以获取所有SUID二进制文件的列表：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo find / -perm -04000 -ls</span><br><span class="line">sudo find / -perm -02000 –ls</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo find &#x2F; -perm -04000 -ls</span><br><span class="line">sudo find &#x2F; -perm -02000 –ls</span><br></pre></td></tr></table></figure>
 <p>在这里，过滤掉我们认为“代码质量较差”或通常不信任的应用程序（例如：鼠标外接设备驱动程序）。以下命令可以取消设置文件和目录的描述权限：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">chmod u-s #file</span><br><span class="line">chmod g-s #file</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">chmod u-s #file</span><br><span class="line">chmod g-s #file</span><br></pre></td></tr></table></figure>
 <p><strong>(34) 禁用核心转储（重要）</strong></p>
 <p>要限制内核信息泄露，请禁用核心转储功能。可以编辑/etc/sysctl.conf中的以下行：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kern.coredump=0</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kern.coredump&#x3D;0</span><br></pre></td></tr></table></figure>
 <p>注意：此项更改需要禁用系统完整性保护，在加固后请手动启用。在新安装的系统上，sysctl.conf可能不存在，管理员可以创建该文件并重新启动系统。</p>
 <p>由于Kerneldumps可以帮助进行调试，因此可以暂时启用：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo sysctl -w kern.coredump=1</span><br></pre></td></tr></tbody></table></figure>
-<p><font color="red"><strong><em>核心位置不应该随意开启权限，防止内核信息泄露</em></strong></font> </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo sysctl -w kern.coredump&#x3D;1</span><br></pre></td></tr></table></figure>
+<p><font color=red><strong><em>核心位置不应该随意开启权限，防止内核信息泄露</em></strong></font> </p>
 <p><strong>(35) 禁用USB/蓝牙和其他大容量存储设备（可选）</strong></p>
 <p>在某些情况下，需要禁用将任何大容量存储插入系统。这一点可以通过删除KEXT驱动程序或使用企业级MDM工具来实现。</p>
 <p>要完全禁用USB大容量存储设备，可以删除/System/Library/Extensions中的KEXT驱动程序IOUSBMassStorageClass.kext（必须禁用SIP）。也可以通过删除前面所提到的文件夹中的IOBlueToothFamily来完全禁用蓝牙。删除KEXT驱动程序后，需要在目录上执行以下命令，以重建kernelcache：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">touch /System/Library/Extensions</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">touch &#x2F;System&#x2F;Library&#x2F;Extensions</span><br></pre></td></tr></table></figure>
 <p>注意：由于无法插入大容量存储设备，可能会影响MacBook的可用性。但是，USB键盘仍然有效。</p>
 <p>此外，一些商业软件（例如：<a target="_blank" rel="noopener" href="https://www.endpointprotector.com/products/endpoint-protector%EF%BC%89%E5%8F%AF%E4%BB%A5%E6%89%A7%E8%A1%8C%E7%B1%BB%E4%BC%BC%E7%9A%84%E7%AB%AF%E5%8F%A3%E9%98%BB%E6%AD%A2%EF%BC%8C%E4%BD%86%E6%88%91%E4%BB%AC%E8%BF%98%E6%B2%A1%E6%9C%89%E5%AF%B9%E5%85%B6%E8%BF%9B%E8%A1%8C%E8%BF%87%E4%BB%BB%E4%BD%95%E6%B5%8B%E8%AF%95%E3%80%82">https://www.endpointprotector.com/products/endpoint-protector）可以执行类似的端口阻止，但我们还没有对其进行过任何测试。</a></p>
-<p><font color="red"><strong><em>必要时，防止大容量的存储设备</em></strong></font> </p>
+<p><font color=red><strong><em>必要时，防止大容量的存储设备</em></strong></font> </p>
 <p><strong>(36) 高级防火墙（可选）</strong></p>
 <p>建议管理员更加准确地监控应用了就溜。软件防火墙可以为不同位置和不同网络生成自己的规则集。我们推荐一个更高级的防火墙，例如“Little Snitch”、“Radio Silence”和“Handoff”，这些都是完全成熟的本地防火墙（收费）。如果管理员希望使用免费的防火墙，可以查看精简版的“Murus”。</p>
 <p><strong>·</strong> <a target="_blank" rel="noopener" href="https://www.obdev.at/products/littlesnitch/index-de.html">https://www.obdev.at/products/littlesnitch/index-de.html</a></p>
 <p><strong>·</strong> <a target="_blank" rel="noopener" href="https://www.oneperiodic.com/products/handsoff/">https://www.oneperiodic.com/products/handsoff/</a></p>
 <p><strong>·</strong> <a target="_blank" rel="noopener" href="https://radiosilenceapp.com/">https://radiosilenceapp.com/</a></p>
 <p><strong>·</strong> <a target="_blank" rel="noopener" href="http://www.murusfirewall.com/">http://www.murusfirewall.com/</a></p>
-<p><font color="red"><strong><em>使用高级防火墙，进一步提高安全性</em></strong></font> </p>
+<p><font color=red><strong><em>使用高级防火墙，进一步提高安全性</em></strong></font> </p>
 <p><strong>(37) 禁用LAN唤醒（重要）</strong></p>
 <p>选择“系统偏好设置” – “节能”（Energy Saver），取消“网络访问唤醒”（Wake for network access）。</p>
-<p><font color="red"><strong><em>防止网络唤醒，防止恶意唤醒</em></strong></font> </p>
+<p><font color=red><strong><em>防止网络唤醒，防止恶意唤醒</em></strong></font> </p>
 <p><strong>(38) 禁用Apple文件协议AFP（重要）</strong></p>
 <p>这一协议相当于SMB协议，在macOS 10.11上默认被禁用。管理员可以在以下位置进行验证：</p>
 <p>选择“系统偏好设置” – “共享”（Sharing），选择“文件共享”（File Sharing） – “选项”（Options），取消设置“使用AFP共享文件和文件夹”（Share Files and folders using AFP）。</p>
 <p>注意：也可以通过命令行实现禁用：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo launchctl unload -w /System/Library/LaunchAgents/AppleFileServer.plist</span><br></pre></td></tr></tbody></table></figure>
-<p><font color="red"><strong><em>减少使用共享性的功能，有信息泄露的风险</em></strong></font> </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo launchctl unload -w &#x2F;System&#x2F;Library&#x2F;LaunchAgents&#x2F;AppleFileServer.plist</span><br></pre></td></tr></table></figure>
+<p><font color=red><strong><em>减少使用共享性的功能，有信息泄露的风险</em></strong></font> </p>
 <p><strong>(39) 禁用不必要的服务（可选）</strong></p>
 <p>管理员可以使用以下命令，禁用不必要的服务：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo launchctl unload -w /System/Library/LaunchAgents/&lt;Service</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo launchctl unload -w &#x2F;System&#x2F;Library&#x2F;LaunchAgents&#x2F;&lt;Service</span><br></pre></td></tr></table></figure>
 <p>注意：这可能会破坏系统的原有功能。要重新加载这些服务，只需将上述命令中的“unload”替换为“load”。</p>
 <p>我们在本文的最后，补充了一个可能是不必要服务的清单。</p>
 <p>更多服务（Plistfiles）可以在以下目录中找到：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">/System/Library/LaunchDaemons</span><br><span class="line">/System/Library/LaunchAgents</span><br><span class="line">/Library/LaunchDaemons</span><br><span class="line">/Library/LaunchAgents</span><br><span class="line">/Users//Library/LaunchDaemons</span><br><span class="line">/Users//Library/LaunchAgents</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;System&#x2F;Library&#x2F;LaunchDaemons</span><br><span class="line">&#x2F;System&#x2F;Library&#x2F;LaunchAgents</span><br><span class="line">&#x2F;Library&#x2F;LaunchDaemons</span><br><span class="line">&#x2F;Library&#x2F;LaunchAgents</span><br><span class="line">&#x2F;Users&#x2F;&#x2F;Library&#x2F;LaunchDaemons</span><br><span class="line">&#x2F;Users&#x2F;&#x2F;Library&#x2F;LaunchAgents</span><br></pre></td></tr></table></figure>
 <p><strong>(40) 禁用共享（重要）</strong></p>
 <p>默认情况下，会禁用共享。管理员可以在这里进行验证：</p>
 <p>点击“系统偏好设置” – “共享”，取消其中所有不需要的选项。</p>
-<p><font color="red"><strong><em>禁止共享</em></strong></font> </p>
+<p><font color=red><strong><em>禁止共享</em></strong></font> </p>
 <p><strong>(41) 通过NTP启用网络时间同步（重要）</strong></p>
 <p>系统时钟对于日志文件来说非常重要。要确保时钟始终正确，并且未被损坏，可以使用以下命令：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo systemsetup -setnetworktimeserver "time.euro.apple.com"</span><br><span class="line">sudo systemsetup -setusingnetworktime on</span><br><span class="line">echo "restrict default ignore" &gt;&gt; /etc/ntp.conf</span><br></pre></td></tr></tbody></table></figure>
-<p><font color="red"><strong><em>保证时钟同步争取，避免恶意病毒利用更改时间进行攻击</em></strong></font> </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo systemsetup -setnetworktimeserver &quot;time.euro.apple.com&quot;</span><br><span class="line">sudo systemsetup -setusingnetworktime on</span><br><span class="line">echo &quot;restrict default ignore&quot; &gt;&gt; &#x2F;etc&#x2F;ntp.conf</span><br></pre></td></tr></table></figure>
+<p><font color=red><strong><em>保证时钟同步争取，避免恶意病毒利用更改时间进行攻击</em></strong></font> </p>
 <p><strong>(42) 计算机名/主机名（重要）</strong></p>
 <p>建议平布主机名称，因为其中包含用户名和当前操作系统信息（MacBook → Mac OS）。因此，可以使用以下命令来更改通过网络显示的名称：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo scutil --set ComputerName ExampleName</span><br><span class="line">sudo scutil --set LocalHostName ExampleName</span><br></pre></td></tr></tbody></table></figure>
-<p><font color="red"><strong><em>不要在名字内透露出系统的信息</em></strong></font> </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo scutil --set ComputerName ExampleName</span><br><span class="line">sudo scutil --set LocalHostName ExampleName</span><br></pre></td></tr></table></figure>
+<p><font color=red><strong><em>不要在名字内透露出系统的信息</em></strong></font> </p>
 <p><strong>(43) 限制广告追踪（重要）</strong></p>
 <p>要限制设备的追踪，请禁用以下内容：</p>
 <p>点击“系统偏好设置” – “安全和隐私” – “隐私” – “广告”（Advertising），选中“限制广告追踪”（Limit Ad Tracking）。</p>
-<p><font color="red"><strong><em>限制广告获取隐私信息</em></strong></font> </p>
+<p><font color=red><strong><em>限制广告获取隐私信息</em></strong></font> </p>
 <p><strong>(44) 追踪服务（重要）</strong></p>
 <p>建议禁用追踪服务。如果用户决定使用追踪服务，则可以仅禁用Spotlight建议。</p>
 <p>点击“系统偏好设置” – “安全和隐私” – “隐私” – “位置服务”（Location Services），选择“系统服务”（System Services） – 详细信息（Details），取消选中“Spotlight建议”（Spotlight Suggestions）。</p>
-<p><font color="red"><strong><em>不要轻易打开位置信息，存在被追踪的风险</em></strong></font> </p>
+<p><font color=red><strong><em>不要轻易打开位置信息，存在被追踪的风险</em></strong></font> </p>
 <p><strong>附录：建议禁用的服务清单</strong></p>
 <p>下面列出了服务文件以及建议禁用的相应功能。如果没有特殊需要，不建议启用下面的服务。</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">com.apple.AppleFileServer.plist  AFP</span><br><span class="line">ftp.plist  FTP</span><br><span class="line">org.apache.httpd.plist  HTTP Server</span><br><span class="line">epcc.plist       Remote Apple Events</span><br><span class="line">com.apple.xgridagentd.plist       Xgrid</span><br><span class="line">com.apple.xgridcontrollerd.plist        Xgrid</span><br><span class="line">com.apple.InternetSharing.plist  Iternet Sharing</span><br><span class="line">com.apple.dashboard.advisory.fetch.plist  Dashboard Auto-Update</span><br><span class="line">com.apple.UserNotificationCenter.plist     User notifications</span><br><span class="line">com.apple.RemoteDesktop.PrivilegeProxy.plist       ARD</span><br><span class="line">com.apple.RemoteDesktop.plist        ARD</span><br><span class="line">com.apple.IIDCAssistant.plist      iSight</span><br><span class="line">com.apple.blued.plist   Bluetooth</span><br><span class="line">com.apple.RemoteUI.plist   Remote Control</span><br><span class="line">com.apple.gamed.plist        Game Center</span><br></pre></td></tr></tbody></table></figure>
-
-                </article>
-                <ul class="tags-postTags">
-                    
-                    <li>
-                        <a href="/tags/Docker/" rel="tag"># Docker</a>
-                    </li>
-                    
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    
-    <nav id="gobottom" class="pagination">
-        
-        <a class="prev-post" title="花指令初步学习总结与简单实战" href="/2021/01/25/%E8%8A%B1%E6%8C%87%E4%BB%A4/">
-            ← 花指令初步学习总结与简单实战
-        </a>
-        
-        <span class="prev-next-post">·</span>
-        
-        <a class="next-post" title="加壳脱壳初步学习总结与简单实战" href="/2021/01/25/%E5%8A%A0%E5%A3%B3%E8%84%B1%E5%A3%B3/">
-            加壳脱壳初步学习总结与简单实战 →
-        </a>
-        
-    </nav>
-
-    
-    <div class="inner">
-        <div id="comment"></div>
-    </div>
-    
-</div>
-
-<div class="toc-bar">
-    <div class="toc-btn-bar">
-        <a href="#site-main" class="toc-btn">
-            <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M793.024 710.272a32 32 0 1 0 45.952-44.544l-310.304-320a32 32 0 0 0-46.4 0.48l-297.696 320a32 32 0 0 0 46.848 43.584l274.752-295.328 286.848 295.808z"></path></svg>
-        </a>
-        <div class="toc-btn toc-switch">
-            <svg class="toc-open" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M779.776 480h-387.2a32 32 0 0 0 0 64h387.2a32 32 0 0 0 0-64M779.776 672h-387.2a32 32 0 0 0 0 64h387.2a32 32 0 0 0 0-64M256 288a32 32 0 1 0 0 64 32 32 0 0 0 0-64M392.576 352h387.2a32 32 0 0 0 0-64h-387.2a32 32 0 0 0 0 64M256 480a32 32 0 1 0 0 64 32 32 0 0 0 0-64M256 672a32 32 0 1 0 0 64 32 32 0 0 0 0-64"></path></svg>
-            <svg class="toc-close hide" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M512 960c-247.039484 0-448-200.960516-448-448S264.960516 64 512 64 960 264.960516 960 512 759.039484 960 512 960zM512 128.287273c-211.584464 0-383.712727 172.128262-383.712727 383.712727 0 211.551781 172.128262 383.712727 383.712727 383.712727 211.551781 0 383.712727-172.159226 383.712727-383.712727C895.712727 300.415536 723.551781 128.287273 512 128.287273z"></path><path d="M557.05545 513.376159l138.367639-136.864185c12.576374-12.416396 12.672705-32.671738 0.25631-45.248112s-32.704421-12.672705-45.248112-0.25631l-138.560301 137.024163-136.447897-136.864185c-12.512727-12.512727-32.735385-12.576374-45.248112-0.063647-12.512727 12.480043-12.54369 32.735385-0.063647 45.248112l136.255235 136.671523-137.376804 135.904314c-12.576374 12.447359-12.672705 32.671738-0.25631 45.248112 6.271845 6.335493 14.496116 9.504099 22.751351 9.504099 8.12794 0 16.25588-3.103239 22.496761-9.247789l137.567746-136.064292 138.687596 139.136568c6.240882 6.271845 14.432469 9.407768 22.65674 9.407768 8.191587 0 16.352211-3.135923 22.591372-9.34412 12.512727-12.480043 12.54369-32.704421 0.063647-45.248112L557.05545 513.376159z"></path></svg>
-        </div>
-        <a href="#gobottom" class="toc-btn">
-            <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M231.424 346.208a32 32 0 0 0-46.848 43.584l297.696 320a32 32 0 0 0 46.4 0.48l310.304-320a32 32 0 1 0-45.952-44.544l-286.848 295.808-274.752-295.36z"></path></svg>
-        </a>
-    </div>
-    <div class="toc-main">
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BA%E7%94%B5%E8%84%91%E5%AE%89%E8%A3%85Docker"><span class="toc-text">为电脑安装Docker</span></a></li></ol><li class="toc-item toc-level-1"><a class="toc-link" href="#Docker%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AENginx"><span class="toc-text">Docker安装配置Nginx</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Docker%E5%AE%89%E8%A3%85PHP"><span class="toc-text">Docker安装PHP</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Docker%E5%AE%89%E8%A3%85MySQL"><span class="toc-text">Docker安装MySQL</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Macos%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA"><span class="toc-text">Macos安全加固</span></a>
-    </li></div>
-</div>
-
-
-
-<!-- Root element of PhotoSwipe. Must have class pswp. -->
-<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
-
-    <!-- Background of PhotoSwipe. 
-         It's a separate element as animating opacity is faster than rgba(). -->
-    <div class="pswp__bg"></div>
-
-    <!-- Slides wrapper with overflow:hidden. -->
-    <div class="pswp__scroll-wrap">
-
-        <!-- Container that holds slides. 
-            PhotoSwipe keeps only 3 of them in the DOM to save memory.
-            Don't modify these 3 pswp__item elements, data is added later on. -->
-        <div class="pswp__container">
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-        </div>
-
-        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
-        <div class="pswp__ui pswp__ui--hidden">
-
-            <div class="pswp__top-bar">
-
-                <!--  Controls are self-explanatory. Order can be changed. -->
-
-                <div class="pswp__counter"></div>
-
-                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
-
-                <button class="pswp__button pswp__button--share" title="Share"></button>
-
-                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
-
-                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
-
-                <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
-                <!-- element will get class pswp__preloader--active when preloader is running -->
-                <div class="pswp__preloader">
-                    <div class="pswp__preloader__icn">
-                      <div class="pswp__preloader__cut">
-                        <div class="pswp__preloader__donut"></div>
-                      </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
-                <div class="pswp__share-tooltip"></div> 
-            </div>
-
-            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
-            </button>
-
-            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
-            </button>
-
-            <div class="pswp__caption">
-                <div class="pswp__caption__center"></div>
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-
-
-	</div>
-	
-
-
-	
-
-
-
-
-<div id="search" class="search-overlay">
-    <div class="search-form">
-        
-        <div class="search-overlay-logo">
-        	<img src="https://i.loli.net/2017/11/26/5a19c0b50432e.png" alt="Fstark">
-        </div>
-        
-        <input id="local-search-input" class="search-input" type="text" name="search" placeholder="搜索 ...">
-        <a class="search-overlay-close" href="#"></a>
-    </div>
-    <div id="local-search-result"></div>
-</div>
-
-<footer class="site-footer outer">
-	<div class="site-footer-content inner">
-		<div class="copyright">
-			<a href="/" title="Fstark">Fstark © 2021</a>
-			
-				
-			        <span hidden="true" id="/2021/01/25/%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87/" class="leancloud-visitors" data-flag-title="使用Docker配置Nginx+PHP+MySQL">
-			            <span>阅读量 </span>
-			            <span class="leancloud-visitors-count">0</span>
-			        </span>
-	    		
-    		
-		</div>
-		<nav class="site-footer-nav">
-			
-			<a href="https://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a>
-			<a href="https://github.com/xzhih/hexo-theme-casper" title="Casper" target="_blank" rel="noopener">Casper</a>
-		</nav>
-	</div>
-</footer>
-	
-
-
-<script>
-    if(window.navigator && navigator.serviceWorker) {
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-            for(let registration of registrations) {
-                registration.unregister()
-            }
-        })
-    }
-</script>
-
-
-<script id="scriptLoad" src="/js/allinone.min.js" async=""></script>
-
-
-<script>
-    document.getElementById('scriptLoad').addEventListener('load', function () {
-        
-        
-            var bLazy = new Blazy();
-        
-
-        
-        
-
-        
-        
-        
-            searchFunc("/");
-        
-        
-    })
-</script>
-
-
-
-
-<link rel="stylesheet" href="/photoswipe/photoswipe.css">
-
-
-<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
-
-
-<script src="/photoswipe/photoswipe.min.js"></script>
-
-
-<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
-
-
-
-
-
-<script id="valineScript" src="//unpkg.com/valine/dist/Valine.min.js" async=""></script>
-<script>
-    document.getElementById('valineScript').addEventListener("load", function() {
-        new Valine({
-            el: '#comment' ,
-            verify: false,
-            notify: false,
-            appId: '',
-            appKey: '',
-            placeholder: 'Just go go',
-            pageSize: 10,
-            avatar: 'mm',
-            visitor: true
-        })
-    });
-</script>
-
-
-
-
-
-
-
-</body></html>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">com.apple.AppleFileServer.plist  AFP</span><br><span class="line">ftp.plist  FTP</span><br><span class="line">org.apache.httpd.plist  HTTP Server</span><br><span class="line">epcc.plist       Remote Apple Events</span><br><span class="line">com.apple.xgridagentd.plist       Xgrid</span><br><span class="line">com.apple.xgridcontrollerd.plist        Xgrid</span><br><span class="line">com.apple.InternetSharing.plist  Iternet Sharing</span><br><span class="line">com.apple.dashboard.advisory.fetch.plist  Dashboard Auto-Update</span><br><span class="line">com.apple.UserNotificationCenter.plist     User notifications</span><br><span class="line">com.apple.RemoteDesktop.PrivilegeProxy.plist       ARD</span><br><span class="line">com.apple.RemoteDesktop.plist        ARD</span><br><span class="line">com.apple.IIDCAssistant.plist      iSight</span><br><span class="line">com.apple.blued.plist   Bluetooth</span><br><span class="line">com.apple.RemoteUI.plist   Remote Control</span><br><span class="line">com.apple.gamed.plist        Game Center</span><br></pre></td></tr></table></figure>
+</article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/2021/01/25/%E8%8A%B1%E6%8C%87%E4%BB%A4/" title="花指令初步学习总结与简单实战"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">上一页: 花指令初步学习总结与简单实战</span></a><a class="button is-default" href="/2021/01/25/%E5%8A%A0%E5%A3%B3%E8%84%B1%E5%A3%B3/" title="加壳脱壳初步学习总结与简单实战"><span class="has-text-weight-semibold">下一页: 加壳脱壳初步学习总结与简单实战</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container"><script async repo="Haojen/Claudia-theme-blog" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><a title="twitter" target="_blank" rel="noopener nofollow" href="//twitter.com//"><i class="iconfont icon-twitter"></i></a><!-- Github--><a title="github" target="_blank" rel="noopener nofollow" href="//github.com/haojen"><i class="iconfont icon-github"></i></a><!-- Ins--><a title="instagram" target="_blank" rel="noopener nofollow" href="//www.instagram.com//"><i class="iconfont icon-ins"></i></a><!-- RSS--><!-- 知乎--><!-- 领英--><!-- 脸书--><a title="facebook" target="_blank" rel="noopener nofollow" href="//www.facebook.com//"><i class="iconfont icon-tian7_facebook"></i></a></section><p><span>Copyright ©</span><span> Fstark 2021</span></p><div class="is-flex is-justify-content-center is-flex-wrap-wrap"><p>Powered by Hexo &verbar;&nbsp;</p><p class="is-flex is-justify-content-center"><a title="Hexo theme author" target="_blank" rel="noopener" href="//github.com/haojen">Theme by Haojen&nbsp;</a></p><div style="margin-top: 2px"><a class="github-button" title="github-button" target="_blank" rel="noopener" href="https://github.com/haojen/hexo-theme-Claudia" data-color-scheme="no-preference: light; light: light; dark: dark;" data-show-count="true"></a></div></div></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/post.js"></script></body></html>
