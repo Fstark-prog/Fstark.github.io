@@ -24,86 +24,107 @@
 <h3 id="本地部署"><a href="#本地部署" class="headerlink" title="本地部署"></a>本地部署</h3><p>请注意：本项目大量依赖Google服务，强烈建议提前设置代理软件，大部分issue都与此有关，如果条件允许直接在路由器代理效果最好</p>
 <p><strong>mac命令行代理</strong></p>
 <p>给git设置全局代理</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config --global http.proxy socks5://127.0.0.1:1080</span><br></pre></td></tr></table></figure>
+<pre><code class="bash">git config --global http.proxy socks5://127.0.0.1:1080</code></pre>
 <p>仅github代码库走代理，国内git库不走</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config --global http.https://github.com.proxy socks5://127.0.0.1:1080</span><br></pre></td></tr></table></figure>
+<pre><code class="bash">git config --global http.https://github.com.proxy socks5://127.0.0.1:1080</code></pre>
 <p>移除上面设置的git代理</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global --<span class="built_in">unset</span> http.proxy</span><br><span class="line">git config --global --<span class="built_in">unset</span> http.https://github.com.proxy</span><br></pre></td></tr></table></figure>
+<pre><code class="bash">git config --global --unset http.proxy
+git config --global --unset http.https://github.com.proxy</code></pre>
 <p>终端全代理</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> http_proxy=http://127.0.0.1:1080;</span><br><span class="line"><span class="built_in">export</span> https_proxy=http://127.0.0.1:1080;</span><br></pre></td></tr></table></figure>
+<pre><code class="bash">export http_proxy=http://127.0.0.1:1080;
+export https_proxy=http://127.0.0.1:1080;</code></pre>
 <p><strong>路由代理</strong></p>
 <p>买个华硕/网件路由刷老毛桃/潘多拉/梅林刷fancyss</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://github.com/hq450/fancyss</span><br></pre></td></tr></table></figure>
+<pre><code class="http">https://github.com/hq450/fancyss</code></pre>
 <h4 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h4><h5 id="git源码"><a href="#git源码" class="headerlink" title="git源码"></a>git源码</h5><p>首先把源码先下载到本地</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/google/clusterfuzz</span><br></pre></td></tr></table></figure>
+<pre><code class="bash">git clone https://github.com/google/clusterfuzz</code></pre>
 <p>官方建议使用我们代码的<a target="_blank" rel="noopener" href="https://github.com/google/clusterfuzz/releases/latest">最新发行版</a>（而不是master分支）。您可以使用以下命令签出特定版本：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout tags/vX.Y.Z</span><br></pre></td></tr></table></figure>
+<pre><code class="bash">git checkout tags/vX.Y.Z</code></pre>
 <p>其中XYZ是发行版本（例如1.0.1）</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1geuol766paj30w40eiq6m.jpg" alt="截屏2020-05-15 下午9.36.10"></p>
 <h5 id="安装并配置Google-Cloud-SDK"><a href="#安装并配置Google-Cloud-SDK" class="headerlink" title="安装并配置Google Cloud SDK"></a>安装并配置Google Cloud SDK</h5><p>按照<a target="_blank" rel="noopener" href="https://cloud.google.com/sdk/">在线说明</a>安装Google Cloud SDK ，mac 下可直接用解压后的 <code>install.sh</code> 脚本一键安装</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1geuopf7sk3j30vs0eitbf.jpg" alt="image-20200516225901713"></p>
 <p>这里请记得配置身份文件，否则最后运行时会报错。在<a target="_blank" rel="noopener" href="https://console.cloud.google.com/apis/credentials/serviceaccountkey?_ga=2.81690135.165030320.1589549867-1464700725.1589549867">“创建服务帐号密钥”页面</a>里申请json文件，通过设定环境变量 GOOGLE_APPLICATION_CREDENTIALS，向您的应用代码提供身份验证凭据。将 [PATH] 替换为包含您服务帐号密钥的 JSON 文件的路径。此变量仅适用于当前的 shell 会话，因此，如果您打开新的会话，请重新设置该变量。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> GOOGLE_APPLICATION_CREDENTIALS=<span class="string">&quot;/home/user/Downloads/[FILE_NAME].json&quot;</span></span><br></pre></td></tr></table></figure>
+<pre><code class="bash">export GOOGLE_APPLICATION_CREDENTIALS=&quot;/home/user/Downloads/[FILE_NAME].json&quot;</code></pre>
 <p>确认命令行是否可用使用 gcloud 命令</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcloud -v</span><br></pre></td></tr></table></figure>
+<pre><code class="bash">gcloud -v</code></pre>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1geuoy94l3cj30fu064q3t.jpg" alt="image-20200516230731150"></p>
 <h5 id="使用依赖脚本安装依赖库"><a href="#使用依赖脚本安装依赖库" class="headerlink" title="使用依赖脚本安装依赖库"></a>使用依赖脚本安装依赖库</h5><p>该步骤请在clusterfuzz文件内执行，不然报错</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> clusterfuzz</span><br></pre></td></tr></table></figure>
+<pre><code class="bash">cd clusterfuzz</code></pre>
 <p>利用官方自带的依赖脚本clusterfuzz/local/install_deps.bash进行安装，在该步骤运行时间长可能遇到的坑最多，究其根本还是代理问题，如果遇错请反复尝试本节开始的几个代理设置。</p>
 <p>该依赖脚本需要homebrew，请自行安装。如果按照官方命令无法安装（被墙）可将命令行中地址复制到浏览器，打开后保存网页为后缀sh格式到本地运行</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://brew.sh/index_zh-cn</span><br></pre></td></tr></table></figure>
+<pre><code class="http">https://brew.sh/index_zh-cn</code></pre>
 <p>如果顺利，经过漫长等待install_deps.bash运行成功后如下图所示</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1geup36bgqkj30zo0pitpu.jpg" alt="截屏2020-05-16 下午6.47.09"></p>
 <p>以上步骤看起来简单，但是实际安装过程会问题不断，github有人提供docker 镜像已成功打包，基于 ubuntu 16.04 系统。镜像中已运行完毕之前步骤，装好了所有依赖。镜像地址：<a target="_blank" rel="noopener" href="https://hub.docker.com/r/chenhengjie123/clusterfuzz_local">https://hub.docker.com/r/chenhengjie123/clusterfuzz_local</a></p>
 <p>可通过 <code>docker run -it --name clusterfuzz --network host chenhengjie123/clusterfuzz_local</code> 进入镜像运行环境，进入后续的步骤。clusterfuzz 的源代码存放在镜像的 /clusterfuzz 目录。</p>
 <h5 id="加载pipenv"><a href="#加载pipenv" class="headerlink" title="加载pipenv"></a>加载pipenv</h5><p>运行<code>local/install_deps.bash</code>脚本后，通过运行以下命令激活pipenv：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pipenv shell</span><br></pre></td></tr></table></figure>
+<pre><code class="bash">pipenv shell</code></pre>
 <p>这将加载当前环境中的所有Python依赖项。</p>
 <p>您可以通过运行以下命令来验证一切正常：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python butler.py --<span class="built_in">help</span></span><br></pre></td></tr></table></figure>
+<pre><code class="python">python butler.py --help</code></pre>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1geupgryiiaj30wi0fa77g.jpg" alt="截屏2020-05-16 下午6.52.27"></p>
 <h4 id="本地运行"><a href="#本地运行" class="headerlink" title="本地运行"></a>本地运行</h4><p>主要分为两个部分，一个是本地服务器，另一个是本地机器人实例</p>
 <h5 id="运行本地服务器"><a href="#运行本地服务器" class="headerlink" title="运行本地服务器"></a>运行本地服务器</h5><p>首次运行，添加 <code>--bootstrap</code> 进行各个数据的初始化。同时加上 <code>--skip-install-deps</code> 可跳过依赖安装（之前依赖包已装，可大大加快速度）</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python butler.py run_server --bootstrap --skip-install-deps</span><br></pre></td></tr></table></figure>
+<pre><code class="python">python butler.py run_server --bootstrap --skip-install-deps</code></pre>
 <p>如果不是第一次运行，要去掉 <code>--bootstrap</code> 参数，不然数据会重置。</p>
 <p>过程中会蹦提示需要安装java SDK</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew cask install java</span><br></pre></td></tr></table></figure>
+<pre><code class="bash">brew cask install java</code></pre>
 <p>开始可能需要几秒钟。一旦看到类似的输出行<code>INFO  admin_server.py:] Starting admin server</code>，就可以通过导航到<a target="_blank" rel="noopener" href="http://localhost:9000/">http://localhost:9000</a>来看到Web界面。</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1geups3cl4xj31ja0swtfz.jpg" alt="image-20200516233611704"></p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1geupsm3z3mj31fm0ihacn.jpg" alt="截屏2020-05-16 下午8.52.57"></p>
 <h5 id="运行执行机器人"><a href="#运行执行机器人" class="headerlink" title="运行执行机器人"></a>运行执行机器人</h5><p>官方命令：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python butler.py run_bot --name my-bot /path/to/my-bot</span><br></pre></td></tr></table></figure>
+<pre><code class="python">python butler.py run_bot --name my-bot /path/to/my-bot</code></pre>
 <p>其中 my-bot 可以替换为喜欢的名称。 fzy-bot`</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python butler.py run_bot --name fzy-bot `pwd`/fzy-bot</span><br></pre></td></tr></table></figure>
+<pre><code class="python">python butler.py run_bot --name fzy-bot `pwd`/fzy-bot</code></pre>
 <p>执行成功后，可在前一步的管理员界面看到机器人状态。</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gevsgtyq2jj31d60andge.jpg" alt="截屏2020-05-17 下午1.49.22"></p>
 <p>可通过</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tail -f `<span class="built_in">pwd</span>`/fzy-bot/bot.log</span><br></pre></td></tr></table></figure>
+<pre><code class="bash">tail -f `pwd`/fzy-bot/bot.log</code></pre>
 <p>查看机器人实时日志输出。</p>
 <p>至此clusterfuzz已经搭建起来了，下面的任务就是跑一个实际的例子看看真实效果</p>
 <h4 id="实例测试–OpenSSL心脏滴血"><a href="#实例测试–OpenSSL心脏滴血" class="headerlink" title="实例测试–OpenSSL心脏滴血"></a>实例测试–OpenSSL心脏滴血</h4><p>LibFuzzer和AFL需要使用Clang编译器中的工具,使用Clang <strong>6.0</strong>或更高版本提供的功能。要获得Clang构建，可以从<a target="_blank" rel="noopener" href="https://llvm.org/builds/">快照页面</a>（Windows）下载它，或按照<a target="_blank" rel="noopener" href="https://apt.llvm.org/">apt页面</a>（Ubuntu / Debian）上的说明进行操作。否则，您可以从<a target="_blank" rel="noopener" href="http://releases.llvm.org/download.html">发行版页面</a>下载Clang发行<a target="_blank" rel="noopener" href="http://releases.llvm.org/download.html">版，</a>或使用包管理器安装一个Clang发行<a target="_blank" rel="noopener" href="http://releases.llvm.org/download.html">版</a>。我们将在示例中将这些编译器称为<code>$CC</code>和<code>$CXX</code>。在环境中进行设置，以便您可以复制并粘贴示例命令：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> CC=/path/to/clang</span><br><span class="line"><span class="built_in">export</span> CXX=/path/to/clang++</span><br></pre></td></tr></table></figure>
+<pre><code class="bash">export CC=/path/to/clang
+export CXX=/path/to/clang++</code></pre>
 <p>如果是用的mac，直接装一个xcode或者xcode的命令行工具就行</p>
 <p>Command Line Tools安装：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xcode-select --install </span><br></pre></td></tr></table></figure>
+<pre><code class="bash">xcode-select --install </code></pre>
 <p>在安装完clang后，按照官方的教程开始安装OpenSSL的心脏滴血示例</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 下载并解压包含这个漏洞的 OpenSSL :</span></span><br><span class="line">curl -O https:*//www.openssl.org/<span class="built_in">source</span>/openssl-1.0.1f.tar.gz</span><br><span class="line">tar xf openssl-1.0.1f.tar.gz</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用 AScan 和 fuzzer 插桩编译 OpenSSL:</span></span><br><span class="line"><span class="built_in">cd</span> openssl-1.0.1f/</span><br><span class="line">./config    </span><br></pre></td></tr></table></figure>
+<pre><code class="bash"># 下载并解压包含这个漏洞的 OpenSSL :
+curl -O https:*//www.openssl.org/source/openssl-1.0.1f.tar.gz
+tar xf openssl-1.0.1f.tar.gz
+
+# 使用 AScan 和 fuzzer 插桩编译 OpenSSL:
+cd openssl-1.0.1f/
+./config    </code></pre>
 <p>注意，这里有个小坑，如果使用mac用./config后面clang时会出错，此处编译环境切记使用</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./Configure darwin64-x86_64-cc</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<pre><code class="bash">./Configure darwin64-x86_64-cc
+</code></pre>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gevsqs0wppj30wm0ic43k.jpg" alt="截屏2020-05-17 下午4.18.41"></p>
 <p>继续向下走</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 注意：$CC 必须指向 clang 二进制文件。简单地说，按照这个命令来写就对了</span></span><br><span class="line">make CC=<span class="string">&quot;<span class="variable">$CC</span> -g -fsanitize=address,fuzzer-no-link&quot;</span></span><br><span class="line"><span class="built_in">cd</span> ..</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<pre><code class="bash"># 注意：$CC 必须指向 clang 二进制文件。简单地说，按照这个命令来写就对了
+make CC=&quot;$CC -g -fsanitize=address,fuzzer-no-link&quot;
+cd ..
+</code></pre>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gevswbusfzj30w20co419.jpg" alt="截屏2020-05-17 下午5.46.52"></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 下载 fuzz target 和它的数据依赖:</span></span><br><span class="line">curl -O https://raw.githubusercontent.com/google/clusterfuzz/master/docs/setting-up-fuzzing/heartbleed/handshake-fuzzer.cc</span><br><span class="line">curl -O https://raw.githubusercontent.com/google/clusterfuzz/master/docs/setting-up-fuzzing/heartbleed/server.key</span><br><span class="line">curl -O https://raw.githubusercontent.com/google/clusterfuzz/master/docs/setting-up-fuzzing/heartbleed/server.pem</span><br></pre></td></tr></table></figure>
+<pre><code class="bash"># 下载 fuzz target 和它的数据依赖:
+curl -O https://raw.githubusercontent.com/google/clusterfuzz/master/docs/setting-up-fuzzing/heartbleed/handshake-fuzzer.cc
+curl -O https://raw.githubusercontent.com/google/clusterfuzz/master/docs/setting-up-fuzzing/heartbleed/server.key
+curl -O https://raw.githubusercontent.com/google/clusterfuzz/master/docs/setting-up-fuzzing/heartbleed/server.pem</code></pre>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gevsulwz8uj30wk0byq62.jpg" alt="截屏2020-05-17 下午5.46.34"></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 编译可用于 ClusterFuzz 的 OpenSSL fuzz target （$CXX 需要指向一个 clang++ 二进制文件）:</span></span><br><span class="line"><span class="variable">$CXX</span> -g handshake-fuzzer.cc -fsanitize=address,fuzzer openssl-1.0.1f/libssl.a \</span><br><span class="line">  openssl-1.0.1f/libcrypto.a -std=c++17 -Iopenssl-1.0.1f/include/ -lstdc++fs   \</span><br><span class="line">  -ldl -lstdc++ -o handshake-fuzzer</span><br><span class="line"></span><br><span class="line">zip openssl-fuzzer-build.zip handshake-fuzzer server.key server.pem</span><br></pre></td></tr></table></figure>
+<pre><code class="bash"># 编译可用于 ClusterFuzz 的 OpenSSL fuzz target （$CXX 需要指向一个 clang++ 二进制文件）:
+$CXX -g handshake-fuzzer.cc -fsanitize=address,fuzzer openssl-1.0.1f/libssl.a \
+  openssl-1.0.1f/libcrypto.a -std=c++17 -Iopenssl-1.0.1f/include/ -lstdc++fs   \
+  -ldl -lstdc++ -o handshake-fuzzer
+
+zip openssl-fuzzer-build.zip handshake-fuzzer server.key server.pem</code></pre>
 <p>这一步对于mac是个坑，会报错ld: library not found for -lstdc++fs</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gevsy9jf2pj31a20420tp.jpg" alt="image-20200517221128743"></p>
 <p>经过仔细地搜索发现在xcode10之后，苹果官方就已经取消了对stdc++包的支持</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gevt1hj96cj30iq02cwep.jpg" alt="image-20200517221435111"></p>
 <p>网上有论坛中提供一个思路，把开发者环境退回xcode10之前的一个系统版本（10.9）来回避这个问题，现版本为catalina（10.15） </p>
 <p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/53287975/pybind11-doesnt-work-or-c-doesnt-compile-after-upgrading-to-mojave-lstdc">升级到Mojave后，Pybind11无法正常工作或C ++无法编译：-lstdc ++未找到</a></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> MACOSX_DEPLOYMENT_TARGET=10.9</span><br></pre></td></tr></table></figure>
+<pre><code class="bash">export MACOSX_DEPLOYMENT_TARGET=10.9</code></pre>
 <p>退回后再次运行，会报错**’~path’ is unavailable: introduced in macOS 10.15**</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gevt7xhfkdj31ay0k00x5.jpg" alt="image-20200517222046241"></p>
 <p>经过查阅无法从10.15生成可以针对/运行于10.15之前的MacOS版本的可执行文件</p>

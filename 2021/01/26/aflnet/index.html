@@ -1,5 +1,9 @@
 <!DOCTYPE html><html class="appearance-auto" lang="zh-CN"><head><meta charset="UTF-8"><title>Aflnet简单实践</title><meta name="description" content="May the Force be with you"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><link rel="icon" href="/images/favicon.png"><link rel="stylesheet" href="/style/common/bulma.css"><link rel="stylesheet" href="/style/base.css"><link rel="stylesheet" href="/style/common/helper.css"><script src="/js/common.js"></script><link rel="stylesheet" href="/style/post.css"><link rel="stylesheet" href="/style/themes/highlight-theme-light.css"><script src="/js/highlight.pack.js"></script><meta name="generator" content="Hexo 5.3.0"></head><body class="is-flex is-flex-direction-column"><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-space-between is-hidden-mobile"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/">Fstark's blog</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">Aflnet简单实践</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">点击返回顶部</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></aside></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E8%A3%85"><span class="toc-text">安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E8%B7%B5%E2%80%93%E4%BB%A5dnsmasq%E4%B8%BA%E4%BE%8B"><span class="toc-text">实践–以dnsmasq为例</span></a></li></ol></div><div class="column is-9"><header class="my-4"><a href="/tags/fuzz"><i class="tag post-item-tag">fuzz</i></a><a href="/tags/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB"><i class="tag post-item-tag">论文阅读</i></a></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">Aflnet简单实践</h1><time class="has-text-grey" datetime="2021-01-26T09:45:00.000Z">2021-01-26</time><article class="mt-2 post-content"><p> AFLNet已在2020年ICST上被接受发布。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">@inproceedings&#123;AFLNet,</span><br><span class="line">author&#x3D;&#123;Van&#123;-&#125;Thuan Pham and Marcel B&#123;\&quot;o&#125;hme and Abhik Roychoudhury&#125;,</span><br><span class="line">title&#x3D;&#123;AFLNet: A Greybox Fuzzer for Network Protocols&#125;,</span><br><span class="line">booktitle&#x3D;&#123;Proceedings of the 13rd IEEE International Conference on Software Testing, Verification and Validation : Testing Tools Track&#125;,</span><br><span class="line">year&#x3D;&#123;2020&#125;,&#125;</span><br></pre></td></tr></table></figure>
+<pre><code>@inproceedings&#123;AFLNet,
+author=&#123;Van&#123;-&#125;Thuan Pham and Marcel B&#123;\&quot;o&#125;hme and Abhik Roychoudhury&#125;,
+title=&#123;AFLNet: A Greybox Fuzzer for Network Protocols&#125;,
+booktitle=&#123;Proceedings of the 13rd IEEE International Conference on Software Testing, Verification and Validation : Testing Tools Track&#125;,
+year=&#123;2020&#125;,&#125;</code></pre>
 <a id="more"></a>
 
 <p>AFLNET是一个基于AFL开发的网络协议测试工具，其最大的优点在于有效地利用了服务器的响应信息，以指导下一次的Fuzz。</p>
@@ -7,7 +11,20 @@
 <p> 其流程可以描述如下:程序的输入是数据包文件，程序内部的parser会对数据包进行分析，Parser随协议不同而采用不同设计，目的在于解析出Request请求，这些请求将组合为一个个序列，作为序列数据集。数据集中的序列会通过Mutator变异后发往Server，Server对request返回response，response数据包将被程序捕获，提取其中的状态码，判断该状态码位于FSM的何处，若原本的模型中不存在该状态码，则FSM中会增加一个结点代表该状态。程序中的State Selector将会分析程序当前的FSM模型，从中选出较少遍历/未曾遍历的状态（这是通过一个优先级机制实现的），传递给sequence selector，使之选择出可以触发该状态的request序列。当然，一开始由于缺乏统计信息，State的选取是随机化的。</p>
 <p><img src="https://i.loli.net/2020/10/05/Zylq4FunIUhm6JR.png" alt="image-20201005165901975"></p>
 <h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p>aflnet官方的教程非常详细，首先下载</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> First, <span class="built_in">clone</span> this AFLNet repository to a folder named aflnet</span></span><br><span class="line">git clone &lt;links to the repository&gt; aflnet</span><br><span class="line"><span class="meta">#</span><span class="bash"> Then move to the <span class="built_in">source</span> code folder</span></span><br><span class="line">cd aflnet</span><br><span class="line">make clean all</span><br><span class="line">cd llvm_mode</span><br><span class="line"><span class="meta">#</span><span class="bash"> The following make <span class="built_in">command</span> may not work <span class="keyword">if</span> llvm-config cannot be found</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> To fix this issue, just <span class="built_in">set</span> the LLVM_CONFIG env. variable to the specific llvm-config version on your machine</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> On Ubuntu 18.04, it could be llvm-config-6.0 <span class="keyword">if</span> you have installed clang using apt-get</span></span><br><span class="line">make</span><br><span class="line"><span class="meta">#</span><span class="bash"> Move to AFLNet<span class="string">&#x27;s parent folder</span></span></span><br><span class="line">cd ../..</span><br><span class="line">export AFLNET=$(pwd)/aflnet</span><br><span class="line">export WORKDIR=$(pwd)</span><br></pre></td></tr></table></figure>
+<pre><code class="shell"># First, clone this AFLNet repository to a folder named aflnet
+git clone &lt;links to the repository&gt; aflnet
+# Then move to the source code folder
+cd aflnet
+make clean all
+cd llvm_mode
+# The following make command may not work if llvm-config cannot be found
+# To fix this issue, just set the LLVM_CONFIG env. variable to the specific llvm-config version on your machine
+# On Ubuntu 18.04, it could be llvm-config-6.0 if you have installed clang using apt-get
+make
+# Move to AFLNet&#39;s parent folder
+cd ../..
+export AFLNET=$(pwd)/aflnet
+export WORKDIR=$(pwd)</code></pre>
 <p>aflnet的用法和afl非常相似，可以afl –help查看详情</p>
 <ul>
 <li><strong><em>-N netinfo</em></strong>: server information 服务器信息 (e.g., tcp://127.0.0.1/8554)</li>
@@ -22,19 +39,58 @@
 <li><strong><em>-s algo</em></strong>: (optional) seed selection algorithm种子选择算法 (e.g., 1. RANDOM_SELECTION, 2. ROUND_ROBIN, 3. FAVOR)</li>
 </ul>
 <p><strong>实例命令：</strong></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">afl-fuzz -d -i in -o out -N &lt;server info&gt; -x &lt;dictionary file&gt; -P &lt;protocol&gt; -D 10000 -q 3 -s 3 -E -K -R &lt;executable binary and its arguments (e.g., port number)&gt;</span><br></pre></td></tr></table></figure>
+<pre><code class="shell">afl-fuzz -d -i in -o out -N &lt;server info&gt; -x &lt;dictionary file&gt; -P &lt;protocol&gt; -D 10000 -q 3 -s 3 -E -K -R &lt;executable binary and its arguments (e.g., port number)&gt;</code></pre>
 <h3 id="实践–以dnsmasq为例"><a href="#实践–以dnsmasq为例" class="headerlink" title="实践–以dnsmasq为例"></a>实践–以dnsmasq为例</h3><p>首先下载dnsmasq的源码,切换版本到2.73，使用afl-clang-fast进行编译</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> Assuming AFLNet is <span class="keyword">in</span> ~/aflnet</span></span><br><span class="line">export AFLNET=$HOME/aflnet</span><br><span class="line">export WORKDIR=$HOME</span><br><span class="line">export AFL_PATH=$AFLNET</span><br><span class="line">if [[ ! $PATH == *&quot;$AFLNET&quot;* ]]; then export PATH=$AFLNET:$PATH; fi</span><br><span class="line">cd ~</span><br><span class="line"><span class="meta">#</span><span class="bash"> Clone the Dnsmasq repository</span></span><br><span class="line">git clone git://thekelleys.org.uk/dnsmasq.git</span><br><span class="line"><span class="meta">#</span><span class="bash"> Move to the directory</span></span><br><span class="line">cd dnsmasq</span><br><span class="line"><span class="meta">#</span><span class="bash"> Checkout a specific version</span></span><br><span class="line">git checkout v2.73rc6</span><br><span class="line"><span class="meta">#</span><span class="bash"> Compile <span class="built_in">source</span></span></span><br><span class="line">CC=$AFLNET/afl-clang-fast make</span><br><span class="line"><span class="meta">#</span><span class="bash"> Copy configuration file</span></span><br><span class="line">sudo cp $AFLNET/tutorials/dnsmasq/dnsmasq.conf /etc/</span><br><span class="line"><span class="meta">#</span><span class="bash"> Move to the src directory</span></span><br><span class="line">cd src/</span><br></pre></td></tr></table></figure>
+<pre><code class="shell"># Assuming AFLNet is in ~/aflnet
+export AFLNET=$HOME/aflnet
+export WORKDIR=$HOME
+export AFL_PATH=$AFLNET
+if [[ ! $PATH == *&quot;$AFLNET&quot;* ]]; then export PATH=$AFLNET:$PATH; fi
+cd ~
+# Clone the Dnsmasq repository
+git clone git://thekelleys.org.uk/dnsmasq.git
+# Move to the directory
+cd dnsmasq
+# Checkout a specific version
+git checkout v2.73rc6
+# Compile source
+CC=$AFLNET/afl-clang-fast make
+# Copy configuration file
+sudo cp $AFLNET/tutorials/dnsmasq/dnsmasq.conf /etc/
+# Move to the src directory
+cd src/</code></pre>
 <p>成功编译Dnsmasq之后，我们可以通过添加地址来解析并<code>dig</code>用于查询主机名来测试服务器：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> Add an address to resolve</span></span><br><span class="line">echo address=/test.com/5.5.5.5 | sudo tee -a /etc/dnsmasq.conf</span><br><span class="line"><span class="meta">#</span><span class="bash"> Run Dnsmasq and don<span class="string">&#x27;t daemonize (the dnsmasq.conf file will specify port 5353)</span></span></span><br><span class="line">./dnsmasq</span><br></pre></td></tr></table></figure>
+<pre><code class="shell"># Add an address to resolve
+echo address=/test.com/5.5.5.5 | sudo tee -a /etc/dnsmasq.conf
+# Run Dnsmasq and don&#39;t daemonize (the dnsmasq.conf file will specify port 5353)
+./dnsmasq</code></pre>
 <p>然后我们dig一下目标</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">dig @127.0.0.1 -p 5353 test.com</span><br><span class="line"></span><br><span class="line">; &lt;&lt;&gt;&gt; DiG 9.11.3-1ubuntu1.12-Ubuntu &lt;&lt;&gt;&gt; @127.0.0.1 -p 5353 test.com</span><br><span class="line">; (1 server found)</span><br><span class="line">;; global options: +cmd</span><br><span class="line">;; Got answer:</span><br><span class="line">;; -&gt;&gt;HEADER&lt;&lt;- opcode: QUERY, status: NOERROR, id: 40722</span><br><span class="line">;; flags: qr aa rd ra ad; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0</span><br><span class="line"></span><br><span class="line">;; QUESTION SECTION:</span><br><span class="line">;test.com.			IN	A</span><br><span class="line"></span><br><span class="line">;; ANSWER SECTION:</span><br><span class="line">test.com.		0	IN	A	5.5.5.5</span><br><span class="line"></span><br><span class="line">;; Query time: 0 msec</span><br><span class="line">;; SERVER: 127.0.0.1#5353(127.0.0.1)</span><br><span class="line">;; WHEN: Tue May 19 14:19:38 EDT 2020</span><br><span class="line">;; MSG SIZE  rcvd: 42</span><br></pre></td></tr></table></figure>
+<pre><code>dig @127.0.0.1 -p 5353 test.com
+
+; &lt;&lt;&gt;&gt; DiG 9.11.3-1ubuntu1.12-Ubuntu &lt;&lt;&gt;&gt; @127.0.0.1 -p 5353 test.com
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; -&gt;&gt;HEADER&lt;&lt;- opcode: QUERY, status: NOERROR, id: 40722
+;; flags: qr aa rd ra ad; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
+
+;; QUESTION SECTION:
+;test.com.            IN    A
+
+;; ANSWER SECTION:
+test.com.        0    IN    A    5.5.5.5
+
+;; Query time: 0 msec
+;; SERVER: 127.0.0.1#5353(127.0.0.1)
+;; WHEN: Tue May 19 14:19:38 EDT 2020
+;; MSG SIZE  rcvd: 42</code></pre>
 <p>可以开始进行fuzz了</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd $WORKDIR/dnsmasq/src</span><br><span class="line">afl-fuzz -d -i $AFLNET/tutorials/dnsmasq/in-dns -o out-dns -N tcp://127.0.0.1/5353 -P DNS -D 10000 -K -R ./dnsmasq</span><br></pre></td></tr></table></figure>
+<pre><code class="shell">cd $WORKDIR/dnsmasq/src
+afl-fuzz -d -i $AFLNET/tutorials/dnsmasq/in-dns -o out-dns -N tcp://127.0.0.1/5353 -P DNS -D 10000 -K -R ./dnsmasq</code></pre>
 <p>运行一段时间后就会有crash了</p>
 <p><img src="https://i.loli.net/2020/09/29/uEFhGyWXidzct9C.png" alt="image-20200929152459965"></p>
 <p>当有crash之后我们如何重现漏洞现场，aflnet之中自带了重现工具aflnet-replay，具体用法类似于</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aflnet-replay packet_file protocol port [first_resp_timeout(us) [follow-up_resp_timeout(ms)]]</span><br></pre></td></tr></table></figure>
+<pre><code class="shell">aflnet-replay packet_file protocol port [first_resp_timeout(us) [follow-up_resp_timeout(ms)]]</code></pre>
 <p>我们可以先gdb 一下dnsmasq然后使用aflnet-replay发送poc</p>
 <p><img src="https://i.loli.net/2020/10/05/EI3oTXiGKw7QnpR.png" alt="image-20201005173801528"></p>
 <p>可以看到目标服务崩溃了，位置断在forward.c:1895上</p>

@@ -32,22 +32,61 @@ XSS漏洞，通常指的是恶意攻击者利用浏览器的动态展示数据�
 <p>如果按照作用对象划分，还可以划为针对用户和针对Web服务两种大类，具体作用可看下图：</p>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6bncs2ff3j312s0hcdi8.jpg" alt="image-20190825090358128"></p>
 <center>Figure 2 XSS的作用图</center>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> </span><br><span class="line"><span class="comment">// Is there any input? </span></span><br><span class="line"><span class="keyword">if</span>( array_key_exists( <span class="string">&quot;name&quot;</span>, <span class="variable">$_GET</span> ) &amp;&amp; <span class="variable">$_GET</span>[ <span class="string">&#x27;name&#x27;</span> ] != <span class="literal">NULL</span> ) &#123; </span><br><span class="line">	<span class="comment">// Feedback for end user</span></span><br><span class="line">	<span class="keyword">echo</span><span class="string">&#x27;&lt;pre&gt;Hello &#x27;</span>. <span class="variable">$_GET</span>[ <span class="string">&#x27;name&#x27;</span> ] . <span class="string">&#x27;&lt;/pre&gt;&#x27;</span>; </span><br><span class="line">&#125; </span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+```php
+<?php 
+// Is there any input? 
+if( array_key_exists( "name", $_GET ) && $_GET[ 'name' ] != NULL ) { 
+    // Feedback for end user
+    echo'<pre>Hello '. $_GET[ 'name' ] . '</pre>'; 
+} 
+?>
+```
+
 
 
 <h1 id="常见XSS分析"><a href="#常见XSS分析" class="headerlink" title="常见XSS分析"></a>常见XSS分析</h1><h2 id="反射型-XSS"><a href="#反射型-XSS" class="headerlink" title="反射型 XSS"></a>反射型 XSS</h2><p>反射型跨站脚本（Reflected Cross-Site Scripting）是最常见，也是使用最广的一种，可将恶意脚本附加到 URL 地址的参数中。</p>
 <p>反射型 XSS 的利用一般是攻击者通过特定手法（如电子邮件），诱使用户去访问一个包含恶意代码的 URL，当受害者点击这些专门设计的链接的时候，恶意代码会直接在受害者主机上的浏览器执行。此类 XSS 通常出现在网站的搜索栏、用户登录口等地方，常用来窃取客户端 Cookies 或进行钓鱼欺骗。</p>
 <p>服务器端代码：</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="comment">// Is there any input?</span></span><br><span class="line"><span class="keyword">if</span>( array_key_exists( <span class="string">&quot;name&quot;</span>, <span class="variable">$_GET</span> ) &amp;&amp; <span class="variable">$_GET</span>[ <span class="string">&#x27;name&#x27;</span> ] != <span class="literal">NULL</span> ) &#123; </span><br><span class="line">    <span class="comment">// Feedback for end user </span></span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&#x27;&lt;pre&gt;Hello &#x27;</span> . <span class="variable">$_GET</span>[ <span class="string">&#x27;name&#x27;</span> ] . <span class="string">&#x27;&lt;/pre&gt;&#x27;</span>; </span><br><span class="line">&#125; </span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<pre><code class="php">&lt;?php
+// Is there any input?
+if( array_key_exists( &quot;name&quot;, $_GET ) &amp;&amp; $_GET[ &#39;name&#39; ] != NULL ) &#123; 
+    // Feedback for end user 
+    echo &#39;&lt;pre&gt;Hello &#39; . $_GET[ &#39;name&#39; ] . &#39;&lt;/pre&gt;&#39;; 
+&#125; 
+?&gt;</code></pre>
 <p>可以看到，代码直接引用了 name 参数，并没有做任何的过滤和检查，存在明显的 XSS 漏洞。</p>
 <h2 id="持久型-XSS"><a href="#持久型-XSS" class="headerlink" title="持久型 XSS"></a>持久型 XSS</h2><p>持久型跨站脚本（Persistent Cross-Site Scripting）也等同于存储型跨站脚本（Stored Cross-Site Scripting）。</p>
 <p>此类 XSS 不需要用户单击特定 URL 就能执行跨站脚本，攻击者事先将恶意代码上传或储存到漏洞服务器中，只要受害者浏览包含此恶意代码的页面就会执行恶意代码。持久型 XSS 一般出现在网站留言、评论、博客日志等交互处，恶意脚本存储到客户端或者服务端的数据库中。</p>
 <p>服务器端代码：</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">  <span class="keyword">if</span>( <span class="keyword">isset</span>( <span class="variable">$_POST</span>[ <span class="string">&#x27;btnSign&#x27;</span> ] ) ) &#123;</span><br><span class="line">    <span class="comment">// Get input</span></span><br><span class="line">    <span class="variable">$message</span> = trim( <span class="variable">$_POST</span>[ <span class="string">&#x27;mtxMessage&#x27;</span> ] );</span><br><span class="line">    <span class="variable">$name</span>    = trim( <span class="variable">$_POST</span>[ <span class="string">&#x27;txtName&#x27;</span> ] );</span><br><span class="line">    <span class="comment">// Sanitize message input</span></span><br><span class="line">    <span class="variable">$message</span> = stripslashes( <span class="variable">$message</span> );</span><br><span class="line">    <span class="variable">$message</span> = mysql_real_escape_string( <span class="variable">$message</span> );</span><br><span class="line">    <span class="comment">// Sanitize name input</span></span><br><span class="line">    <span class="variable">$name</span> = mysql_real_escape_string( <span class="variable">$name</span> );</span><br><span class="line">    <span class="comment">// Update database</span></span><br><span class="line">    <span class="variable">$query</span>  = <span class="string">&quot;INSERT INTO guestbook ( comment, name ) VALUES ( &#x27;<span class="subst">$message</span>&#x27;, &#x27;<span class="subst">$name</span>&#x27; );&quot;</span>;</span><br><span class="line">    <span class="variable">$result</span> = mysql_query( <span class="variable">$query</span> ) <span class="keyword">or</span> <span class="keyword">die</span>( <span class="string">&#x27;&lt;pre&gt;&#x27;</span> . mysql_error() . <span class="string">&#x27;&lt;/pre&gt;&#x27;</span> );</span><br><span class="line">    <span class="comment">//mysql_close(); &#125;</span></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<pre><code class="php">&lt;?php
+  if( isset( $_POST[ &#39;btnSign&#39; ] ) ) &#123;
+    // Get input
+    $message = trim( $_POST[ &#39;mtxMessage&#39; ] );
+    $name    = trim( $_POST[ &#39;txtName&#39; ] );
+    // Sanitize message input
+    $message = stripslashes( $message );
+    $message = mysql_real_escape_string( $message );
+    // Sanitize name input
+    $name = mysql_real_escape_string( $name );
+    // Update database
+    $query  = &quot;INSERT INTO guestbook ( comment, name ) VALUES ( &#39;$message&#39;, &#39;$name&#39; );&quot;;
+    $result = mysql_query( $query ) or die( &#39;&lt;pre&gt;&#39; . mysql_error() . &#39;&lt;/pre&gt;&#39; );
+    //mysql_close(); &#125;
+?&gt;</code></pre>
 <p>代码只对一些空白符、特殊符号、反斜杠进行了删除或转义，没有做 XSS 的过滤和检查，且存储在数据库中，明显存在存储型 XSS 漏洞。</p>
 <h2 id="DOM-XSS"><a href="#DOM-XSS" class="headerlink" title="DOM XSS"></a>DOM XSS</h2><p>传统的 XSS 漏洞一般出现在服务器端代码中，而 DOM-Based XSS 是基于 DOM 文档对象模型的一种漏洞，所以，受客户端浏览器的脚本代码所影响。客户端 JavaScript 可以访问浏览器的 DOM 文本对象模型，因此能够决定用于加载当前页面的 URL。换句话说，客户端的脚本程序可以通过 DOM 动态地检查和修改页面内容，它不依赖于服务器端的数据，而从客户端获得 DOM 中的数据（如从 URL 中提取数据）并在本地执行。另一方面，浏览器用户可以操纵 DOM 中的一些对象，例如 URL、location 等。用户在客户端输入的数据如果包含了恶意 JavaScript 脚本，而这些脚本没有经过适当的过滤和消毒，那么应用程序就可能受到基于 DOM 的 XSS 攻击。</p>
 <p>HTML 代码：</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>DOM-XSS test<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">      <span class="keyword">var</span> a=<span class="built_in">document</span>.URL;</span></span><br><span class="line"><span class="javascript">	    <span class="built_in">document</span>.write(a.substring(a.indexOf(<span class="string">&quot;a=&quot;</span>)+<span class="number">2</span>,a.length));</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<pre><code class="html">&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;DOM-XSS test&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;script&gt;
+      var a=document.URL;
+        document.write(a.substring(a.indexOf(&quot;a=&quot;)+2,a.length));
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
 <p>将代码保存在 domXSS.html 中，浏览器访问：</p>
 <p><a target="_blank" rel="noopener" href="http://127.0.0.1/domXSS.html?a=%3Cscript%3Ealert(%27XSS%27)%3C/script%3E">http://127.0.0.1/domXSS.html?a=&lt;script&gt;alert(&#39;XSS&#39;)&lt;/script&gt;</a></p>
 <p>即可触发 XSS 漏洞。</p>
@@ -97,7 +136,23 @@ XSS漏洞，通常指的是恶意攻击者利用浏览器的动态展示数据�
 <p>前端在使用 <code>.innerHTML</code>、<code>.outerHTML</code>、<code>document.write()</code> 时要特别小心，不要把不可信的数据作为 HTML 插到页面上，而应尽量使用 <code>.textContent</code>、<code>.setAttribute()</code> 等。</p>
 <p>如果用 Vue/React 技术栈，并且不使用 <code>v-html</code>或<code>dangerouslySetInnerHTML</code> 功能，就在前端 render 阶段避免 <code>innerHTML</code>、<code>outerHTML</code> 的 XSS 隐患。</p>
 <p>DOM 中的内联事件监听器，如 <code>location、onclick、onerror、onload、onmouseover</code> 等，<code>&lt;a&gt;</code> 标签的 <code>href</code> 属性，JavaScript 的 <code>eval()、setTimeout()、setInterval()</code> 等，都能把字符串作为代码运行。如果不可信的数据拼接到字符串中传递给这些 API，很容易产生安全隐患，请务必避免。</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 内联事件监听器中包含恶意代码 --&gt;</span><br><span class="line">&lt;img onclick=<span class="string">&quot;UNTRUSTED&quot;</span> onerror=<span class="string">&quot;UNTRUSTED&quot;</span> src=<span class="string">&quot;data:image/png,&quot;</span>&gt;</span><br><span class="line"></span><br><span class="line">&lt;!-- 链接内包含恶意代码 --&gt;</span><br><span class="line">&lt;a href=<span class="string">&quot;UNTRUSTED&quot;</span>&gt;<span class="number">1</span>&lt;/a&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line"><span class="comment">// setTimeout()/setInterval() 中调用恶意代码</span></span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="string">&quot;UNTRUSTED&quot;</span>)</span><br><span class="line"><span class="built_in">setInterval</span>(<span class="string">&quot;UNTRUSTED&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// location 调用恶意代码</span></span><br><span class="line">location.href = <span class="string">&#x27;UNTRUSTED&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// eval() 中调用恶意代码</span></span><br><span class="line"><span class="built_in">eval</span>(<span class="string">&quot;UNTRUSTED&quot;</span>)</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<pre><code class="js">&lt;!-- 内联事件监听器中包含恶意代码 --&gt;
+&lt;img onclick=&quot;UNTRUSTED&quot; onerror=&quot;UNTRUSTED&quot; src=&quot;data:image/png,&quot;&gt;
+
+&lt;!-- 链接内包含恶意代码 --&gt;
+&lt;a href=&quot;UNTRUSTED&quot;&gt;1&lt;/a&gt;
+
+&lt;script&gt;
+// setTimeout()/setInterval() 中调用恶意代码
+setTimeout(&quot;UNTRUSTED&quot;)
+setInterval(&quot;UNTRUSTED&quot;)
+
+// location 调用恶意代码
+location.href = &#39;UNTRUSTED&#39;
+
+// eval() 中调用恶意代码
+eval(&quot;UNTRUSTED&quot;)
+&lt;/script&gt;</code></pre>
 <p>如果项目中有用到这些的话，一定要避免在字符串中拼接不可信数据。</p>
 <h2 id="防御方法二-服务器端过滤（转义）"><a href="#防御方法二-服务器端过滤（转义）" class="headerlink" title="防御方法二 服务器端过滤（转义）"></a>防御方法二 服务器端过滤（转义）</h2><p>XSS的本质就是”恶意注入”，恶意的数据被当成了代码一部分来执行，从而混淆了原本的语义，产生了新的语义。</p>
 <p>服务器端过滤指的是对部分输入的数据进行相应的编码转换，这样就会将输入解读为数据而不是XSS，阻碍了漏洞的执行。编码的转换主要包括HTML实体编码和JavaScript编码：</p>
@@ -142,7 +197,52 @@ XSS漏洞，通常指的是恶意攻击者利用浏览器的动态展示数据�
 </tbody></table>
 <p>所以要完善 XSS 防护措施，我们要使用更完善更细致的转义策略。</p>
 <p>例如在工程里，常用的转义库为 <code>org.owasp.encoder</code>。以下代码引用自 <a href="https://link.juejin.im/?target=https://www.owasp.org/index.php/OWASP_Java_Encoder_Project%23tab=Use_the_Java_Encoder_Project">org.owasp.encoder 的官方说明</a>。</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- HTML 标签内文字内容 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span>&gt;</span>&lt;%= Encode.forHtml(UNTRUSTED) %&gt;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- HTML 标签属性值 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">value</span>=<span class="string">&quot;&lt;%= Encode.forHtml(UNTRUSTED) %&gt;&quot;</span> /&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- CSS 属性值 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">&quot;width:&lt;= Encode.forCssString(UNTRUSTED) %&gt;&quot;</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- CSS URL --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">&quot;background:&lt;= Encode.forCssUrl(UNTRUSTED) %&gt;&quot;</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- JavaScript 内联代码块 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">  <span class="keyword">var</span> msg = <span class="string">&quot;&lt;%= Encode.forJavaScript(UNTRUSTED) %&gt;&quot;</span>;</span></span><br><span class="line">  alert(msg);</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- JavaScript 内联代码块内嵌 JSON --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript"><span class="keyword">var</span> __INITIAL_STATE__ = <span class="built_in">JSON</span>.parse(<span class="string">&#x27;&lt;%= Encoder.forJavaScript(data.to_json) %&gt;&#x27;</span>);</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- HTML 标签内联监听器 --&gt;</span></span><br><span class="line">&lt;button</span><br><span class="line">  onclick=&quot;alert(&#x27;&lt;%= Encode.forJavaScript(UNTRUSTED) %&gt;&#x27;);&quot;&gt;</span><br><span class="line">  click me</span><br><span class="line"><span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- URL 参数 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;/search?value=&lt;%= Encode.forUriComponent(UNTRUSTED) %&gt;&amp;order=1#top&quot;</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- URL 路径 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;/page/&lt;%= Encode.forUriComponent(UNTRUSTED) %&gt;&quot;</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!--</span></span><br><span class="line"><span class="comment">  URL.</span></span><br><span class="line"><span class="comment">  注意：要根据项目情况进行过滤，禁止掉 &quot;javascript:&quot; 链接、非法 scheme 等</span></span><br><span class="line"><span class="comment">--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&#x27;&lt;%=</span></span></span><br><span class="line"><span class="tag"><span class="string">  urlValidator.isValid(UNTRUSTED) ?</span></span></span><br><span class="line"><span class="tag"><span class="string">    Encode.forHtml(UNTRUSTED) :</span></span></span><br><span class="line"><span class="tag"><span class="string">    &quot;/404&quot;</span></span></span><br><span class="line"><span class="tag"><span class="string">%&gt;&#x27;</span>&gt;</span></span><br><span class="line">  link</span><br><span class="line"><span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<pre><code class="html">&lt;!-- HTML 标签内文字内容 --&gt;
+&lt;div&gt;&lt;%= Encode.forHtml(UNTRUSTED) %&gt;&lt;/div&gt;
+
+&lt;!-- HTML 标签属性值 --&gt;
+&lt;input value=&quot;&lt;%= Encode.forHtml(UNTRUSTED) %&gt;&quot; /&gt;
+
+&lt;!-- CSS 属性值 --&gt;
+&lt;div style=&quot;width:&lt;= Encode.forCssString(UNTRUSTED) %&gt;&quot;&gt;
+
+&lt;!-- CSS URL --&gt;
+&lt;div style=&quot;background:&lt;= Encode.forCssUrl(UNTRUSTED) %&gt;&quot;&gt;
+
+&lt;!-- JavaScript 内联代码块 --&gt;
+&lt;script&gt;
+  var msg = &quot;&lt;%= Encode.forJavaScript(UNTRUSTED) %&gt;&quot;;
+  alert(msg);
+&lt;/script&gt;
+
+&lt;!-- JavaScript 内联代码块内嵌 JSON --&gt;
+&lt;script&gt;
+var __INITIAL_STATE__ = JSON.parse(&#39;&lt;%= Encoder.forJavaScript(data.to_json) %&gt;&#39;);
+&lt;/script&gt;
+
+&lt;!-- HTML 标签内联监听器 --&gt;
+&lt;button
+  onclick=&quot;alert(&#39;&lt;%= Encode.forJavaScript(UNTRUSTED) %&gt;&#39;);&quot;&gt;
+  click me
+&lt;/button&gt;
+
+&lt;!-- URL 参数 --&gt;
+&lt;a href=&quot;/search?value=&lt;%= Encode.forUriComponent(UNTRUSTED) %&gt;&amp;order=1#top&quot;&gt;
+
+&lt;!-- URL 路径 --&gt;
+&lt;a href=&quot;/page/&lt;%= Encode.forUriComponent(UNTRUSTED) %&gt;&quot;&gt;
+
+&lt;!--
+  URL.
+  注意：要根据项目情况进行过滤，禁止掉 &quot;javascript:&quot; 链接、非法 scheme 等
+--&gt;
+&lt;a href=&#39;&lt;%=
+  urlValidator.isValid(UNTRUSTED) ?
+    Encode.forHtml(UNTRUSTED) :
+    &quot;/404&quot;
+%&gt;&#39;&gt;
+  link
+&lt;/a&gt;</code></pre>
 <p>可见，HTML 的编码是十分复杂的，在不同的上下文里要使用相应的转义规则。开发人员要注意在正确的地方使用正确的编码方式，有时为了防御XSS，在一个地方我们需要联合<code>HTMLEncode、JavaScriptEncode</code>进行编码，甚至是叠加，并不是固定一种方式编码。具体在哪种地方使用哪种编转义可以总结如下：</p>
 <ol>
 <li><p> <strong>在HTML标签、属性中输出</strong>——用HTMLEncode</p>
@@ -181,7 +281,7 @@ XSS漏洞，通常指的是恶意攻击者利用浏览器的动态展示数据�
 </li>
 </ul>
 <p>想要启用CSP主要可以使用两种方式，一种是通过网页的<code>\&lt;meta&gt;</code>标签。</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">&quot;Content-Security-Policy&quot;</span> <span class="attr">content</span>=<span class="string">&quot;script-src &#x27;self&#x27;; object-src &#x27;none&#x27;; style-src cdn.example.org third-party.org; child-src https:&quot;</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<pre><code class="html">&lt;meta http-equiv=&quot;Content-Security-Policy&quot; content=&quot;script-src &#39;self&#39;; object-src &#39;none&#39;; style-src cdn.example.org third-party.org; child-src https:&quot;&gt;</code></pre>
 <p>在上面代码中，CSP 做了如下配置：</p>
 <ul>
 <li><p>  脚本：只信任当前域名</p>
@@ -200,7 +300,7 @@ XSS漏洞，通常指的是恶意攻击者利用浏览器的动态展示数据�
 <p>CSP作为一种安全策略，浏览器对它响应头的兼容性也是随着版本的更迭逐渐扩大的，早期的 Chrome 是通过 X-WebKit-CSP 响应头来支持 CSP 的，而 firefox 和 IE 则支持 X-Content-Security-Policy，Chrome25 和 Firefox23 开始支持标准的 Content-Security-Policy。现有的主流浏览器不同版本号对于CSP响应头的兼容性如下图所示：</p>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6bo6s320zj31c40p4481.jpg" alt="image-20190825093247902"></p>
 <p>要使用 CSP，只需要服务端输出类似这样的响应头就行了：</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Content-Security-Policy: default-src &#x27;self&#x27;</span><br></pre></td></tr></table></figure>
+<pre><code class="html">Content-Security-Policy: default-src &#39;self&#39;</code></pre>
 <p>在这个响应头之中<code>default-src</code> 是 CSP 指令，多个指令之间用英文分号分割；<code>&#39;self&#39; </code>是指令值，多个指令值用英文空格分割。</p>
 <p>目前，有这些 CSP 指令：</p>
 <table>
@@ -347,12 +447,22 @@ XSS漏洞，通常指的是恶意攻击者利用浏览器的动态展示数据�
 </blockquote>
 <p>x-xss-protection头很容易实现，只需要轻微的Web服务器配置的变化。</p>
 <p><strong>在Nginx中启用</strong></p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">add_header</span> x-xss-protection <span class="string">&quot;1; mode=block&quot;</span> always;</span><br></pre></td></tr></table></figure>
+<pre><code class="nginx">add_header x-xss-protection &quot;1; mode=block&quot; always;</code></pre>
 <p><strong>在Apache中启用</strong></p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">header always set x-xss-protection <span class="string">&quot;1; mode=block&quot;</span></span><br></pre></td></tr></table></figure>
+<pre><code class="php">header always set x-xss-protection &quot;1; mode=block&quot;</code></pre>
 <p><strong>在IIS上启用</strong></p>
 <p>要在IIS上启用，只需以下代码添加到您网站的Web.config文件中即可。</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;system.webServer&gt;</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    &lt;httpProtocol&gt;</span><br><span class="line">        &lt;customHeaders&gt;</span><br><span class="line">            &lt;add name=<span class="string">&quot;X-XSS-Protection&quot;</span> value=<span class="string">&quot;1; mode=block&quot;</span> /&gt;</span><br><span class="line">        &lt;/customHeaders&gt;</span><br><span class="line">    &lt;/httpProtocol&gt;</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line">&lt;/system.webServer&gt;</span><br></pre></td></tr></table></figure>
+<pre><code class="php">&lt;system.webServer&gt;
+    ...
+
+    &lt;httpProtocol&gt;
+        &lt;customHeaders&gt;
+            &lt;add name=&quot;X-XSS-Protection&quot; value=&quot;1; mode=block&quot; /&gt;
+        &lt;/customHeaders&gt;
+    &lt;/httpProtocol&gt;
+
+    ...
+&lt;/system.webServer&gt;</code></pre>
 <p>在进行配置之后，还需要检查以确保x-xss-protection头确实已经被启用。以下是一些快速检查的简单方法：</p>
 <ol>
 <li> 打开Chrome DevTools中的网络选项卡，如果您的站点使用安全标头，它将显示在标题选项卡内。</li>
@@ -405,13 +515,16 @@ XSS漏洞，通常指的是恶意攻击者利用浏览器的动态展示数据�
 <p>下图是OWASP中所列XSSer的运作流程：</p>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6bomjsj42j314p0u0thz.jpg" alt="image-20190825094756457"></p>
 <p>XSSer可在许多平台上运行。它需要Python和以下库：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- python-pycurl - Python bindings to libcurl</span><br><span class="line">- python-xmlbuilder - create xml/(x)html files - Python <span class="number">2.</span>x</span><br><span class="line">- python-beautifulsoup - error-tolerant HTML parser <span class="keyword">for</span> Python</span><br><span class="line">- python-geoip - Python bindings <span class="keyword">for</span> the GeoIP IP-to-country resolver library</span><br></pre></td></tr></table></figure>
+<pre><code class="python">- python-pycurl - Python bindings to libcurl
+- python-xmlbuilder - create xml/(x)html files - Python 2.x
+- python-beautifulsoup - error-tolerant HTML parser for Python
+- python-geoip - Python bindings for the GeoIP IP-to-country resolver library</code></pre>
 <p>若在基于Debian的系统上安装需要：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install python-pycurl python-xmlbuilder python-beautifulsoup python-geoip</span><br></pre></td></tr></table></figure>
+<pre><code>sudo apt-get install python-pycurl python-xmlbuilder python-beautifulsoup python-geoip</code></pre>
 <p>利用”xsser -h”可以列出所有功能XSSer包：</p>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6booea5q7j30jc0cv3zo.jpg" alt="img"></p>
 <p>若要发起简单的XSS注入攻击可用：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">root @ kali ：〜＃xsser -u“http:&#x2F;&#x2F;192.168.169.130&#x2F;xss&#x2F;example1.php?name&#x3D;hacker”</span><br></pre></td></tr></table></figure>
+<pre><code>root @ kali ：〜＃xsser -u“http://192.168.169.130/xss/example1.php?name=hacker”</code></pre>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6bopcyo2ij30jc0g3ta7.jpg" alt="img"></p>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6bopzvbulj30jc0g375l.jpg" alt="img"></p>
 <p>XSSer的主要特点是：</p>

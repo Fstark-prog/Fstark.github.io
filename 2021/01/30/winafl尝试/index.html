@@ -12,11 +12,21 @@
 <p>(3)在命令提示工具中进入WinAFL的目录下</p>
 <p>(4) 在Visual Studio命令提示工具中输入如下命令进行WinAFL编译安装（需将-DDynamoRIO_DIR参数设置为你的DynamoRIO cmake文件所在位置）</p>
 <p>32-bit build:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mkdir build32</span><br><span class="line">cd build32</span><br><span class="line">cmake -G&quot;Visual Studio 16 2019&quot; -A Win32 .. -DDynamoRIO_DIR=..\path\to\DynamoRIO\cmake </span><br><span class="line">cmake --build . --config Release</span><br></pre></td></tr></table></figure>
+<pre><code class="shell">mkdir build32
+cd build32
+cmake -G&quot;Visual Studio 16 2019&quot; -A Win32 .. -DDynamoRIO_DIR=..\path\to\DynamoRIO\cmake 
+cmake --build . --config Release</code></pre>
 <p>64-bit build:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mkdir build64</span><br><span class="line">cd build64</span><br><span class="line">cmake -G&quot;Visual Studio 16 2019&quot; -A x64 .. -DDynamoRIO_DIR=..\path\to\DynamoRIO\cmake</span><br><span class="line">cmake --build . --config Release</span><br></pre></td></tr></table></figure>
+<pre><code class="shell">mkdir build64
+cd build64
+cmake -G&quot;Visual Studio 16 2019&quot; -A x64 .. -DDynamoRIO_DIR=..\path\to\DynamoRIO\cmake
+cmake --build . --config Release</code></pre>
 <p>这里需要注意一下-G选择平台时VS16与之前版本默认目标平台架构是有些区别的：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cmake -G &quot;Visual Studio 16 2019&quot; -A Win32   ;x32</span><br><span class="line">cmake -G &quot;Visual Studio 16 2019&quot; -A x64     ;x64  默认目标平台名称（架构）为Win64</span><br><span class="line"></span><br><span class="line">cmake -G &quot;Visual Studio 15 2017&quot;            ;x32  默认目标平台名称（架构）为Win32</span><br><span class="line">cmake -G &quot;Visual Studio 15 2017 Win64&quot;      ;x64</span><br></pre></td></tr></table></figure>
+<pre><code class="shell">cmake -G &quot;Visual Studio 16 2019&quot; -A Win32   ;x32
+cmake -G &quot;Visual Studio 16 2019&quot; -A x64     ;x64  默认目标平台名称（架构）为Win64
+
+cmake -G &quot;Visual Studio 15 2017&quot;            ;x32  默认目标平台名称（架构）为Win32
+cmake -G &quot;Visual Studio 15 2017 Win64&quot;      ;x64</code></pre>
 <p>winafl 命令行参数，主要分为三段,(afl执行参数–dynamoRIO执行参数–程序执行参数)</p>
 <ul>
 <li>afl执行参数主要包括<ul>
@@ -48,11 +58,11 @@
 </ol>
 <p>在winafl中，他们存在于 winafl-cmin.py，对输入的样本文件进行最小化处理，以用来提高 WinAFL 的执行效率。</p>
 <p>筛选命令</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python winafl-cmin.py --working-<span class="built_in">dir</span> C:\Users\test\Desktop\winafl-master\build32\<span class="built_in">bin</span>\Release -D C:\Users\test\Desktop\DynamoRIO-Windows-<span class="number">8.0</span><span class="number">.0</span>-<span class="number">1</span>\bin32 -t <span class="number">100000</span> -i C:\Users\test\Desktop\jpg -o C:\Users\test\Desktop\jpg\out -coverage_module FreeImage.dll -target_module Project1.exe -target_method main -nargs <span class="number">2</span> -- C:\Users\test\source\repos\Project1\Release\Project1.exe @@</span><br></pre></td></tr></table></figure>
+<pre><code class="python">python winafl-cmin.py --working-dir C:\Users\test\Desktop\winafl-master\build32\bin\Release -D C:\Users\test\Desktop\DynamoRIO-Windows-8.0.0-1\bin32 -t 100000 -i C:\Users\test\Desktop\jpg -o C:\Users\test\Desktop\jpg\out -coverage_module FreeImage.dll -target_module Project1.exe -target_method main -nargs 2 -- C:\Users\test\source\repos\Project1\Release\Project1.exe @@</code></pre>
 <p>此时可能出现[!] Dry-run failed, 2 executions resulted differently:Tuples matching? False的报错</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge6ywxmm5cj30p206iq5z.jpg" alt="截屏2020-04-24 下午6.00.34"></p>
 <p>看来测试用例中存在一些坏的用例，导致不能正确精简，在语料库所在文件夹可以利用以下bash脚本简单判断一下</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">λ <span class="keyword">for</span> file <span class="keyword">in</span> *; <span class="keyword">do</span> <span class="built_in">printf</span> <span class="string">&quot;==== FILE: <span class="variable">$file</span> =====\n&quot;</span>;/c/Users/<span class="built_in">test</span>/<span class="built_in">source</span>/repos/Project1/Release/Project1.exe <span class="variable">$file</span> ;<span class="built_in">echo</span> $?; <span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<pre><code class="bash">λ for file in *; do printf &quot;==== FILE: $file =====\n&quot;;/c/Users/test/source/repos/Project1/Release/Project1.exe $file ;echo $?; done</code></pre>
 <p>正常运行的文件返回值都是0，有问题的文件返回结果都不太正常</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge70jesh5mj30h80at422.jpg" alt="image-20200426113452542"></p>
 <p>把这些返回结果不太正常的删除之后，再运行一次语料库蒸馏，发现运行成功了</p>
@@ -60,23 +70,95 @@
 <p>可以看到原本429张被精简到了148张，确实少了不少，根据参考教程中的提示，Winafl在处理大于4Kb的图片时，速度会变得很慢，因此再删除一波，最终语料库就剩下这么点了。</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge70r1i5iaj31cj0lwqrn.jpg" alt="image-20200426114211822"></p>
 <h3 id="开始运行"><a href="#开始运行" class="headerlink" title="开始运行"></a>开始运行</h3><p>经过动态和静态的简单分析后，发现ABC看图主要调用Freeimage.dll进行图片解析的，决定对 FreeImage 库的载入函数进行模糊测试，针对 FreeImage_LoadU 函数编写测试程序</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> _CRT_SECURE_NO_WARNINGS</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;windows.h&gt; </span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;tchar.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">extern</span> <span class="string">&quot;C&quot;</span> __declspec(dllexport) <span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span>** argv)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">test</span><span class="params">(HINSTANCE hinstLib, <span class="keyword">wchar_t</span>* PathName)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">wchar_t</span>* <span class="title">charToWChar</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* text)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">DWORD</span><span class="params">(__stdcall* FreeImage_GetFileTypeU)</span><span class="params">(<span class="keyword">const</span> <span class="keyword">wchar_t</span>* lpszPathName, <span class="keyword">int</span> flag)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">DWORD</span><span class="params">(__stdcall* FreeImage_Initialise)</span><span class="params">(BOOL load_local_plugins_only)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">DWORD</span><span class="params">(__stdcall* FreeImage_DeInitialise)</span><span class="params">()</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">DWORD</span><span class="params">(__stdcall* FreeImage_LoadU)</span><span class="params">(DWORD format, <span class="keyword">const</span> <span class="keyword">wchar_t</span>* lpszPathName, <span class="keyword">int</span> flag)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">DWORD</span><span class="params">(__stdcall* FreeImage_UnLoad)</span><span class="params">(DWORD dib)</span></span>;</span><br><span class="line"></span><br><span class="line">FreeImage_Initialise Initialise;</span><br><span class="line">FreeImage_GetFileTypeU LoadFileType;</span><br><span class="line">FreeImage_LoadU LoadU; DWORD load;</span><br><span class="line">FreeImage_UnLoad UnLoad;</span><br><span class="line">FreeImage_DeInitialise DeInitialise;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span>** argv)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (argc &lt; <span class="number">2</span>) &#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;Usage: %s &lt; file&gt;\n&quot;</span>, argv[<span class="number">0</span>]);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">wchar_t</span>* PathName = charToWChar(argv[<span class="number">1</span>]);</span><br><span class="line"></span><br><span class="line">	HINSTANCE hinstLib; BOOL fFreeResult, fRunTimeLinkSuccess = FALSE; DWORD Error = <span class="literal">NULL</span>;</span><br><span class="line">	hinstLib = LoadLibrary(TEXT(<span class="string">&quot;C:\\FreeImage.dll&quot;</span>));</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (hinstLib != <span class="literal">NULL</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		fRunTimeLinkSuccess = TRUE;</span><br><span class="line"></span><br><span class="line">		Initialise = (FreeImage_Initialise)GetProcAddress(hinstLib, (LPCSTR)<span class="number">163</span>); <span class="comment">// 初始化 FreeImage 库</span></span><br><span class="line">		LoadFileType = (FreeImage_GetFileTypeU)GetProcAddress(hinstLib, (LPCSTR)<span class="number">126</span>);<span class="comment">// 获取位图文件类型</span></span><br><span class="line">		LoadU = (FreeImage_LoadU)GetProcAddress(hinstLib, (LPCSTR)<span class="number">181</span>);	<span class="comment">// 加载位图</span></span><br><span class="line">		UnLoad = (FreeImage_UnLoad)GetProcAddress(hinstLib, (LPCSTR)<span class="number">242</span>);<span class="comment">// 卸载位图</span></span><br><span class="line">		DeInitialise = (FreeImage_DeInitialise)GetProcAddress(hinstLib, (LPCSTR)<span class="number">83</span>);<span class="comment">//卸载 FreeImage 库</span></span><br><span class="line"></span><br><span class="line">		test(hinstLib, PathName);</span><br><span class="line">		fFreeResult = FreeLibrary(hinstLib);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (!fRunTimeLinkSuccess)</span><br><span class="line">		<span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;加载函数失败, Error: &quot;</span> &lt;&lt; Error &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">test</span><span class="params">(HINSTANCE hinstLib, <span class="keyword">wchar_t</span>* PathName)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	</span><br><span class="line">	DWORD FileType = (LoadFileType)(PathName, <span class="number">0</span>);</span><br><span class="line">	load = (LoadU)(FileType, PathName, <span class="number">0</span>);</span><br><span class="line">	<span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">wchar_t</span>* <span class="title">charToWChar</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* text)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">size_t</span> size = <span class="built_in">strlen</span>(text) + <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">wchar_t</span>* wa = <span class="keyword">new</span> <span class="keyword">wchar_t</span>[size];</span><br><span class="line">	mbstowcs(wa, text, size);</span><br><span class="line">	<span class="keyword">return</span> wa;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="c++">#define _CRT_SECURE_NO_WARNINGS
+#include &lt;windows.h&gt; 
+#include &lt;tchar.h&gt;
+#include &lt;iostream&gt;
+using namespace std;
+
+extern &quot;C&quot; __declspec(dllexport) int main(int argc, char** argv);
+void test(HINSTANCE hinstLib, wchar_t* PathName);
+wchar_t* charToWChar(const char* text);
+
+typedef DWORD(__stdcall* FreeImage_GetFileTypeU)(const wchar_t* lpszPathName, int flag);
+typedef DWORD(__stdcall* FreeImage_Initialise)(BOOL load_local_plugins_only);
+typedef DWORD(__stdcall* FreeImage_DeInitialise)();
+typedef DWORD(__stdcall* FreeImage_LoadU)(DWORD format, const wchar_t* lpszPathName, int flag);
+typedef DWORD(__stdcall* FreeImage_UnLoad)(DWORD dib);
+
+FreeImage_Initialise Initialise;
+FreeImage_GetFileTypeU LoadFileType;
+FreeImage_LoadU LoadU; DWORD load;
+FreeImage_UnLoad UnLoad;
+FreeImage_DeInitialise DeInitialise;
+
+int main(int argc, char** argv)
+&#123;
+    if (argc &lt; 2) &#123;
+        printf(&quot;Usage: %s &lt; file&gt;\n&quot;, argv[0]);
+        return 0;
+    &#125;
+
+    wchar_t* PathName = charToWChar(argv[1]);
+
+    HINSTANCE hinstLib; BOOL fFreeResult, fRunTimeLinkSuccess = FALSE; DWORD Error = NULL;
+    hinstLib = LoadLibrary(TEXT(&quot;C:\\FreeImage.dll&quot;));
+
+    if (hinstLib != NULL)
+    &#123;
+        fRunTimeLinkSuccess = TRUE;
+
+        Initialise = (FreeImage_Initialise)GetProcAddress(hinstLib, (LPCSTR)163); // 初始化 FreeImage 库
+        LoadFileType = (FreeImage_GetFileTypeU)GetProcAddress(hinstLib, (LPCSTR)126);// 获取位图文件类型
+        LoadU = (FreeImage_LoadU)GetProcAddress(hinstLib, (LPCSTR)181);    // 加载位图
+        UnLoad = (FreeImage_UnLoad)GetProcAddress(hinstLib, (LPCSTR)242);// 卸载位图
+        DeInitialise = (FreeImage_DeInitialise)GetProcAddress(hinstLib, (LPCSTR)83);//卸载 FreeImage 库
+
+        test(hinstLib, PathName);
+        fFreeResult = FreeLibrary(hinstLib);
+    &#125;
+
+    if (!fRunTimeLinkSuccess)
+        cout &lt;&lt; &quot;加载函数失败, Error: &quot; &lt;&lt; Error &lt;&lt; endl;
+    return 0;
+&#125;
+
+void test(HINSTANCE hinstLib, wchar_t* PathName)
+&#123;
+
+    DWORD FileType = (LoadFileType)(PathName, 0);
+    load = (LoadU)(FileType, PathName, 0);
+    return;
+
+&#125;
+
+wchar_t* charToWChar(const char* text)
+&#123;
+    size_t size = strlen(text) + 1;
+    wchar_t* wa = new wchar_t[size];
+    mbstowcs(wa, text, size);
+    return wa;
+&#125;</code></pre>
 <p>在对该程序进行编译之后，可以先简单测试一下WinAFL 是否可以正常使用。-debug 表示设置为调试模式。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\winafl\bin32&gt; C:\Users\test\Desktop\DynamoRIO-Windows-8.0.0-1\bin32\drrun.exe -c winafl.dll -debug -coverage_module FreeImage.dll -target_module Project1.exe -target_method main -fuzz_iterations 10 -nargs 2 -- C:\Users\test\source\repos\Project1\Debug\Project1.exe C:\Users\test\Desktop\jpg\1x1-low.jpg</span><br></pre></td></tr></table></figure>
+<pre><code class="shell">\winafl\bin32&gt; C:\Users\test\Desktop\DynamoRIO-Windows-8.0.0-1\bin32\drrun.exe -c winafl.dll -debug -coverage_module FreeImage.dll -target_module Project1.exe -target_method main -fuzz_iterations 10 -nargs 2 -- C:\Users\test\source\repos\Project1\Debug\Project1.exe C:\Users\test\Desktop\jpg\1x1-low.jpg</code></pre>
 <p>如下图所示，日志文件当中模块加载正常并没有错误显示</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge71bk08znj30u80htk1b.jpg" alt="image-20200426120155981"></p>
 <p>下面就要开始模糊测试了，按照教程进行的，但是它的目标函数是main，我们来看看结果如何。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">afl-fuzz.exe -i C:\Users\test\Desktop\jpg\out -o C:\Users\test\Desktop\jpg\re -D C:\Users\test\Desktop\DynamoRIO-Windows-8.0.0-1\bin32 -t 9000 -- -coverage_module FreeImage.dll -target_module Project1.exe -target_method main -fuzz_iterations 5000 -nargs 2 -- C:\Users\test\source\repos\Project1\Debug\Project1.exe @@</span><br></pre></td></tr></table></figure>
+<pre><code class="shell">afl-fuzz.exe -i C:\Users\test\Desktop\jpg\out -o C:\Users\test\Desktop\jpg\re -D C:\Users\test\Desktop\DynamoRIO-Windows-8.0.0-1\bin32 -t 9000 -- -coverage_module FreeImage.dll -target_module Project1.exe -target_method main -fuzz_iterations 5000 -nargs 2 -- C:\Users\test\source\repos\Project1\Debug\Project1.exe @@</code></pre>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge71f0ipmzj30lq0kvn4l.jpg" alt="截屏2020-04-23 下午5.17.24"></p>
 <p>如图所示，可以跑是可以跑，但是这个速度实在太慢了，执行main函数浪费了太多时间，实际上我们的load函数只测test函数就可以，我们将-target_method改为test尝试一下</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">afl-fuzz.exe -i C:\Users\test\Desktop\jpg\out -o C:\Users\test\Desktop\jpg\re -D C:\Users\test\Desktop\DynamoRIO-Windows-8.0.0-1\bin32 -t 9000 -- -coverage_module FreeImage.dll -target_module Project1.exe -target_method test -fuzz_iterations 5000 -nargs 2 -- C:\Users\test\source\repos\Project1\Debug\Project1.exe @@</span><br></pre></td></tr></table></figure>
+<pre><code class="shell">afl-fuzz.exe -i C:\Users\test\Desktop\jpg\out -o C:\Users\test\Desktop\jpg\re -D C:\Users\test\Desktop\DynamoRIO-Windows-8.0.0-1\bin32 -t 9000 -- -coverage_module FreeImage.dll -target_module Project1.exe -target_method test -fuzz_iterations 5000 -nargs 2 -- C:\Users\test\source\repos\Project1\Debug\Project1.exe @@</code></pre>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge71j4kjn3j30hd079jsl.jpg" alt="1587641858789_8DC06F32-53EE-4A64-8FD1-45907DC9CF93"></p>
 <p>然后就蹦框了，看起来是没有找到我们写的test函数，忘了在vs里把test函数也导出</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge71lacv24j30i90200tk.jpg" alt="image-20200426121116517"></p>
 <p>这里导出后再编译一遍，再尝试一下，成功了，这速度明显提升了好几倍啊</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge71q85ybaj30ko0bkn57.jpg" alt="image-20200426121601823"></p>
 <p>为了让fuzz效率更高一点，充分利用cpu的多核，进行多核系统的并行测试</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">afl-fuzz.exe -i C:\Users\test\Desktop\jpg\out -o C:\Users\test\Desktop\jpg\re -M master -D C:\Users\test\Desktop\DynamoRIO-Windows-8.0.0-1\bin32 -t 9000 -- -coverage_module FreeImage.dll -target_module Project1.exe -target_method test -fuzz_iterations 5000 -nargs 2 -- C:\Users\test\source\repos\Project1\Debug\Project1.exe @@</span><br><span class="line"></span><br><span class="line">afl-fuzz.exe -i C:\Users\test\Desktop\jpg\out -o C:\Users\test\Desktop\jpg\re -S slaver01 -D C:\Users\test\Desktop\DynamoRIO-Windows-8.0.0-1\bin32 -t 9000 -- -coverage_module FreeImage.dll -target_module Project1.exe -target_method test -fuzz_iterations 5000 -nargs 2 -- C:\Users\test\source\repos\Project1\Debug\Project1.exe @@</span><br><span class="line"></span><br><span class="line">afl-fuzz.exe -i C:\Users\test\Desktop\jpg\out -o C:\Users\test\Desktop\jpg\re -S slaver02 -D C:\Users\test\Desktop\DynamoRIO-Windows-8.0.0-1\bin32 -t 9000 -- -coverage_module FreeImage.dll -target_module Project1.exe -target_method test -fuzz_iterations 5000 -nargs 2 -- C:\Users\test\source\repos\Project1\Debug\Project1.exe @@</span><br></pre></td></tr></table></figure>
+<pre><code class="shell">afl-fuzz.exe -i C:\Users\test\Desktop\jpg\out -o C:\Users\test\Desktop\jpg\re -M master -D C:\Users\test\Desktop\DynamoRIO-Windows-8.0.0-1\bin32 -t 9000 -- -coverage_module FreeImage.dll -target_module Project1.exe -target_method test -fuzz_iterations 5000 -nargs 2 -- C:\Users\test\source\repos\Project1\Debug\Project1.exe @@
+
+afl-fuzz.exe -i C:\Users\test\Desktop\jpg\out -o C:\Users\test\Desktop\jpg\re -S slaver01 -D C:\Users\test\Desktop\DynamoRIO-Windows-8.0.0-1\bin32 -t 9000 -- -coverage_module FreeImage.dll -target_module Project1.exe -target_method test -fuzz_iterations 5000 -nargs 2 -- C:\Users\test\source\repos\Project1\Debug\Project1.exe @@
+
+afl-fuzz.exe -i C:\Users\test\Desktop\jpg\out -o C:\Users\test\Desktop\jpg\re -S slaver02 -D C:\Users\test\Desktop\DynamoRIO-Windows-8.0.0-1\bin32 -t 9000 -- -coverage_module FreeImage.dll -target_module Project1.exe -target_method test -fuzz_iterations 5000 -nargs 2 -- C:\Users\test\source\repos\Project1\Debug\Project1.exe @@</code></pre>
 <p>因为我的配置比较垃圾只有四核，所以就开这么多了😂核多的朋友请自行往上添加，挂了一个晚上跑出来了不少的crash，我们先试一下</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge71vxdm8lj30dx08pn0e.jpg" alt="image-20200426122130582"></p>
 <p>扔到ABC看图里，发现真的崩溃了</p>
@@ -90,7 +172,21 @@
 </ul>
 <p>如果使用默认设置安装Windows的Python和调试工具，则BugId应该能够运行而无需调整任何设置。您可以在本地文件系统上任意位置解压缩BugId</p>
 <p>但是理论上BugID需要一个一个进行文件分析，而Crash这么多，只是就可以写一个Python脚本来帮助我们</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">sys.path.append(<span class="string">r&quot;C:\Users\test\Desktop\BugId-master&quot;</span>)</span><br><span class="line">testcases = []</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> root, dirs, files <span class="keyword">in</span> os.walk(<span class="string">r&quot;C:\Users\test\Desktop\jpg\re\slaver01\crashes&quot;</span>, topdown=<span class="literal">False</span>):</span><br><span class="line">    <span class="keyword">for</span> name <span class="keyword">in</span> files:</span><br><span class="line">        testcase =  os.path.abspath(os.path.join(root, name))</span><br><span class="line">        testcases.append(testcase)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> testcase <span class="keyword">in</span> testcases:</span><br><span class="line">    <span class="built_in">print</span> (<span class="string">&quot;[*] Gonna run: &quot;</span>, testcase)</span><br><span class="line">    os.system(<span class="string">r&#x27;PageHeap.cmd &quot;Project1.exe&quot; ON&#x27;</span>)</span><br><span class="line">    os.system(<span class="string">r&#x27;python C:\Users\test\Desktop\BugId-master\BugId.py C:\Users\test\source\repos\Project1\Debug\Project1.exe --isa= x86 -- %s&#x27;</span> % testcase)</span><br></pre></td></tr></table></figure>
+<pre><code class="python">import sys
+import os
+
+sys.path.append(r&quot;C:\Users\test\Desktop\BugId-master&quot;)
+testcases = []
+
+for root, dirs, files in os.walk(r&quot;C:\Users\test\Desktop\jpg\re\slaver01\crashes&quot;, topdown=False):
+    for name in files:
+        testcase =  os.path.abspath(os.path.join(root, name))
+        testcases.append(testcase)
+
+for testcase in testcases:
+    print (&quot;[*] Gonna run: &quot;, testcase)
+    os.system(r&#39;PageHeap.cmd &quot;Project1.exe&quot; ON&#39;)
+    os.system(r&#39;python C:\Users\test\Desktop\BugId-master\BugId.py C:\Users\test\source\repos\Project1\Debug\Project1.exe --isa= x86 -- %s&#39; % testcase)</code></pre>
 <p>请注意在最后的程序后面加上–isa= x86哦，不加默认作为64位调试会报错</p>
 <p>运行脚本之后，我们就看到源源不断的bug信息出来了</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge72be2rxoj31bn0jw4ok.jpg" alt="image-20200426123621956"></p>

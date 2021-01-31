@@ -2,5 +2,130 @@
 <a id="more"></a>
 
 <p>最近几个月天天用Teamview，不出所料的被商业版了。扒了扒网上的方法，重装清注册表的，还有就是win下那个换ID的启动器可惜mac用不了，在github上找到一个TeamViewer ID Changer for MAC OS挺长时间没更新了，里面文件的位置都变了也用不了，简单改了改现在的最新版本可以使用，使用root用户运行后重启登陆就可以了。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python </span></span><br><span class="line"></span><br><span class="line"><span class="comment">#coding:utf-8</span></span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> glob</span><br><span class="line"><span class="keyword">import</span> platform</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line"><span class="keyword">import</span> string</span><br><span class="line"></span><br><span class="line">print(<span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">--------------------------------</span></span><br><span class="line"><span class="string">TeamViewer ID Changer for MAC OS</span></span><br><span class="line"><span class="string">--------------------------------</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> platform.system() != <span class="string">&#x27;Darwin&#x27;</span>:</span><br><span class="line">    print(<span class="string">&#x27;This script can be run only on MAC OS.&#x27;</span>)</span><br><span class="line">    sys.exit();</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> os.geteuid() != <span class="number">0</span>:</span><br><span class="line">    print(<span class="string">&#x27;This script must be run form root.&#x27;</span>)</span><br><span class="line">    sys.exit();</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> os.environ.has_key(<span class="string">&#x27;SUDO_USER&#x27;</span>):</span><br><span class="line">    USERNAME = os.environ[<span class="string">&#x27;SUDO_USER&#x27;</span>]</span><br><span class="line">    <span class="keyword">if</span> USERNAME == <span class="string">&#x27;root&#x27;</span>:</span><br><span class="line">       print(<span class="string">&#x27;Can not find user name. Run this script via sudo from regular user&#x27;</span>)</span><br><span class="line">       sys.exit();</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">&#x27;Can not find user name. Run this script via sudo from regular user&#x27;</span>)</span><br><span class="line">    sys.exit();</span><br><span class="line"></span><br><span class="line">HOMEDIRLIB = <span class="string">&#x27;/Users/&#x27;</span> + USERNAME  + <span class="string">&#x27;/library/preferences/&#x27;</span></span><br><span class="line">GLOBALLIB  =  <span class="string">&#x27;/library/preferences/&#x27;</span></span><br><span class="line"></span><br><span class="line">CONFIGS = []</span><br><span class="line"></span><br><span class="line"><span class="comment"># Find config files</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">listdir_fullpath</span>(<span class="params">d</span>):</span></span><br><span class="line">    <span class="keyword">return</span> [os.path.join(d, f) <span class="keyword">for</span> f <span class="keyword">in</span> os.listdir(d)]</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> file <span class="keyword">in</span> listdir_fullpath(HOMEDIRLIB):</span><br><span class="line">    <span class="keyword">if</span> <span class="string">&#x27;teamviewer&#x27;</span>.lower() <span class="keyword">in</span> file.lower():</span><br><span class="line">        CONFIGS.append(file)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> CONFIGS:</span><br><span class="line">    <span class="built_in">print</span> (<span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">There is no TemViewer configs found.</span></span><br><span class="line"><span class="string">Maybe you have deleted it manualy or never run TeamViewer after installation.</span></span><br><span class="line"><span class="string">Nothing to delete.</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span>)</span><br><span class="line"><span class="comment"># Delete config files</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">&quot;Configs found:\n&quot;</span>)</span><br><span class="line">    <span class="keyword">for</span> file <span class="keyword">in</span> CONFIGS:</span><br><span class="line">        <span class="built_in">print</span> file</span><br><span class="line"></span><br><span class="line">    print(<span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">This files will be DELETED permanently.</span></span><br><span class="line"><span class="string">All TeamViewer settings will be lost</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span>)</span><br><span class="line">    raw_input(<span class="string">&quot;Press Enter to continue or CTR+C to abort...&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> file <span class="keyword">in</span> CONFIGS:</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            os.remove(file)</span><br><span class="line">        <span class="keyword">except</span>:</span><br><span class="line">            print(<span class="string">&quot;Cannot delete config files. Permission denied?&quot;</span>)</span><br><span class="line">            sys.exit();</span><br><span class="line">    print(<span class="string">&quot;Done.&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Find binaryes</span></span><br><span class="line"></span><br><span class="line">TMBINARYES = [</span><br><span class="line"><span class="string">&#x27;/Applications/TeamViewer.app/Contents/MacOS/TeamViewer&#x27;</span>,</span><br><span class="line"><span class="string">&#x27;/Applications/TeamViewer.app/Contents/MacOS/TeamViewer_Service&#x27;</span>,</span><br><span class="line"><span class="string">&#x27;/Applications/TeamViewer.app/Contents/MacOS/TeamViewer_Desktop&#x27;</span>,</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> file <span class="keyword">in</span> TMBINARYES:</span><br><span class="line">    <span class="keyword">if</span> os.path.exists(file):</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        print(<span class="string">&quot;File not found: &quot;</span> + file)</span><br><span class="line">        <span class="built_in">print</span> (<span class="string">&quot;Install TeamViewer correctly&quot;</span>)</span><br><span class="line">        sys.exit();</span><br><span class="line"></span><br><span class="line"><span class="comment"># Patch files</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">idpatch</span>(<span class="params">fpath,platf,serial</span>):</span></span><br><span class="line">    file = <span class="built_in">open</span>(fpath, <span class="string">&#x27;r+b&#x27;</span>)</span><br><span class="line">    binary = file.read()</span><br><span class="line">    PlatformPattern = <span class="string">&quot;IOPlatformExpert.&#123;6&#125;&quot;</span></span><br><span class="line">    SerialPattern =  <span class="string">&quot;IOPlatformSerialNumber%s%s%sUUID&quot;</span></span><br><span class="line"></span><br><span class="line">    binary = re.sub(PlatformPattern, platf, binary)</span><br><span class="line">    binary = re.sub(SerialPattern % (<span class="built_in">chr</span>(<span class="number">0</span>), <span class="string">&quot;[0-9a-zA-Z]&#123;8,8&#125;&quot;</span>, <span class="built_in">chr</span>(<span class="number">0</span>)), SerialPattern%(<span class="built_in">chr</span>(<span class="number">0</span>), serial, <span class="built_in">chr</span>(<span class="number">0</span>)), binary)</span><br><span class="line"></span><br><span class="line">    file = <span class="built_in">open</span>(fpath,<span class="string">&#x27;wb&#x27;</span>).write(binary)</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">random_generator</span>(<span class="params">size=<span class="number">8</span>, chars=string.ascii_uppercase + string.digits</span>):</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">&#x27;&#x27;</span>.join(random.choice(chars) <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(size))</span><br><span class="line"></span><br><span class="line">RANDOMSERIAL = random_generator()</span><br><span class="line">RANDOMPLATFORM = <span class="string">&quot;IOPlatformExpert&quot;</span> + random_generator(<span class="number">6</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> file <span class="keyword">in</span> TMBINARYES:</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            idpatch(file,RANDOMPLATFORM,RANDOMSERIAL)</span><br><span class="line">        <span class="keyword">except</span>:</span><br><span class="line">            <span class="built_in">print</span> <span class="string">&quot;Error: can not patch file &quot;</span> + file</span><br><span class="line">            <span class="built_in">print</span> <span class="string">&quot;Wrong version?&quot;</span></span><br><span class="line">            sys.exit();</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span> <span class="string">&quot;PlatformDevice: &quot;</span> + RANDOMPLATFORM</span><br><span class="line"><span class="built_in">print</span> <span class="string">&quot;PlatformSerial: &quot;</span> + RANDOMSERIAL</span><br><span class="line"></span><br><span class="line">print(<span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">ID changed sucessfully.</span></span><br><span class="line"><span class="string">!!! Restart computer before using TeamViewer !!!!</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<pre><code class="python">#!/usr/bin/env python 
+
+#coding:utf-8
+import sys
+import os
+import glob
+import platform
+import re
+import random
+import string
+
+print(&#39;&#39;&#39;
+--------------------------------
+TeamViewer ID Changer for MAC OS
+--------------------------------
+&#39;&#39;&#39;)
+
+if platform.system() != &#39;Darwin&#39;:
+    print(&#39;This script can be run only on MAC OS.&#39;)
+    sys.exit();
+
+if os.geteuid() != 0:
+    print(&#39;This script must be run form root.&#39;)
+    sys.exit();
+
+if os.environ.has_key(&#39;SUDO_USER&#39;):
+    USERNAME = os.environ[&#39;SUDO_USER&#39;]
+    if USERNAME == &#39;root&#39;:
+       print(&#39;Can not find user name. Run this script via sudo from regular user&#39;)
+       sys.exit();
+else:
+    print(&#39;Can not find user name. Run this script via sudo from regular user&#39;)
+    sys.exit();
+
+HOMEDIRLIB = &#39;/Users/&#39; + USERNAME  + &#39;/library/preferences/&#39;
+GLOBALLIB  =  &#39;/library/preferences/&#39;
+
+CONFIGS = []
+
+# Find config files
+
+def listdir_fullpath(d):
+    return [os.path.join(d, f) for f in os.listdir(d)]
+
+for file in listdir_fullpath(HOMEDIRLIB):
+    if &#39;teamviewer&#39;.lower() in file.lower():
+        CONFIGS.append(file)
+
+if not CONFIGS:
+    print (&#39;&#39;&#39;
+There is no TemViewer configs found.
+Maybe you have deleted it manualy or never run TeamViewer after installation.
+Nothing to delete.
+&#39;&#39;&#39;)
+# Delete config files
+else:
+    print(&quot;Configs found:\n&quot;)
+    for file in CONFIGS:
+        print file
+
+    print(&#39;&#39;&#39;
+This files will be DELETED permanently.
+All TeamViewer settings will be lost
+&#39;&#39;&#39;)
+    raw_input(&quot;Press Enter to continue or CTR+C to abort...&quot;)
+
+    for file in CONFIGS:
+        try:
+            os.remove(file)
+        except:
+            print(&quot;Cannot delete config files. Permission denied?&quot;)
+            sys.exit();
+    print(&quot;Done.&quot;)
+
+# Find binaryes
+
+TMBINARYES = [
+&#39;/Applications/TeamViewer.app/Contents/MacOS/TeamViewer&#39;,
+&#39;/Applications/TeamViewer.app/Contents/MacOS/TeamViewer_Service&#39;,
+&#39;/Applications/TeamViewer.app/Contents/MacOS/TeamViewer_Desktop&#39;,
+]
+
+for file in TMBINARYES:
+    if os.path.exists(file):
+        pass
+    else:
+        print(&quot;File not found: &quot; + file)
+        print (&quot;Install TeamViewer correctly&quot;)
+        sys.exit();
+
+# Patch files
+
+def idpatch(fpath,platf,serial):
+    file = open(fpath, &#39;r+b&#39;)
+    binary = file.read()
+    PlatformPattern = &quot;IOPlatformExpert.&#123;6&#125;&quot;
+    SerialPattern =  &quot;IOPlatformSerialNumber%s%s%sUUID&quot;
+
+    binary = re.sub(PlatformPattern, platf, binary)
+    binary = re.sub(SerialPattern % (chr(0), &quot;[0-9a-zA-Z]&#123;8,8&#125;&quot;, chr(0)), SerialPattern%(chr(0), serial, chr(0)), binary)
+
+    file = open(fpath,&#39;wb&#39;).write(binary)
+    return True
+
+def random_generator(size=8, chars=string.ascii_uppercase + string.digits):
+    return &#39;&#39;.join(random.choice(chars) for _ in range(size))
+
+RANDOMSERIAL = random_generator()
+RANDOMPLATFORM = &quot;IOPlatformExpert&quot; + random_generator(6)
+
+
+for file in TMBINARYES:
+        try:
+            idpatch(file,RANDOMPLATFORM,RANDOMSERIAL)
+        except:
+            print &quot;Error: can not patch file &quot; + file
+            print &quot;Wrong version?&quot;
+            sys.exit();
+
+print &quot;PlatformDevice: &quot; + RANDOMPLATFORM
+print &quot;PlatformSerial: &quot; + RANDOMSERIAL
+
+print(&#39;&#39;&#39;
+ID changed sucessfully.
+!!! Restart computer before using TeamViewer !!!!
+&#39;&#39;&#39;)</code></pre>
 </article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/2021/01/30/OllyDbg/" title="OllyDbg初步学习总结与简单实战"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">上一页: OllyDbg初步学习总结与简单实战</span></a><a class="button is-default" href="/2021/01/30/oss-fuzz/" title="OSS-fuzz资料收集"><span class="has-text-weight-semibold">下一页: OSS-fuzz资料收集</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container"><script async repo="Haojen/Claudia-theme-blog" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><a title="twitter" target="_blank" rel="noopener nofollow" href="//twitter.com//"><i class="iconfont icon-twitter"></i></a><!-- Github--><a title="github" target="_blank" rel="noopener nofollow" href="//github.com/haojen"><i class="iconfont icon-github"></i></a><!-- Ins--><a title="instagram" target="_blank" rel="noopener nofollow" href="//www.instagram.com//"><i class="iconfont icon-ins"></i></a><!-- RSS--><!-- 知乎--><!-- 领英--><!-- 脸书--><a title="facebook" target="_blank" rel="noopener nofollow" href="//www.facebook.com//"><i class="iconfont icon-tian7_facebook"></i></a></section><p><span>Copyright ©</span><span> Fstark 2021</span></p><div class="is-flex is-justify-content-center is-flex-wrap-wrap"><p>Powered by Hexo &verbar;&nbsp;</p><p class="is-flex is-justify-content-center"><a title="Hexo theme author" target="_blank" rel="noopener" href="//github.com/haojen">Theme by Haojen&nbsp;</a></p><div style="margin-top: 2px"><a class="github-button" title="github-button" target="_blank" rel="noopener" href="https://github.com/haojen/hexo-theme-Claudia" data-color-scheme="no-preference: light; light: light; dark: dark;" data-show-count="true"></a></div></div></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/post.js"></script></body></html>
