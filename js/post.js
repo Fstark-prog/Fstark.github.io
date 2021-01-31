@@ -1,110 +1,180 @@
-// 锚点滚动
-var scroll = new SmoothScroll('.toc-btn, .toc-link', {
-    speed: 1000,
-    easing: 'easeInOutCubic',
-    speedAsDuration: true,
-    clip: true
-})
-
-// 文章页面顶部进度条
-var postProgressBar = function () {
-    var progressBar = document.querySelector('progress')
-    var header = document.querySelector('.floating-header')
-    var title = document.querySelector('.post-full-title')
-    var lastScrollY = window.scrollY
-    var lastWindowHeight = window.innerHeight
-    var ticking = false
-    function onScroll() {
-        lastScrollY = window.scrollY
-        requestTick()
-    }
-    function requestTick() {
-        if (!ticking) {
-            requestAnimationFrame(update)
+var $posts = {
+    scroller: function () {
+        function Scroller() {
+            this.callbacks = []
+            return this
         }
-        ticking = true
-    }
-    function update() {
-        var rect = title.getBoundingClientRect()
-        var trigger = rect.top + window.scrollY
-        var triggerOffset = title.offsetHeight + 35
-        var lastDocumentHeight = document.body.offsetHeight
-        var progressMax = lastDocumentHeight - lastWindowHeight
+        Scroller.prototype.bindScrollEvent = function () {
+            var _that = this
 
-        if (lastScrollY >= trigger + triggerOffset) {
-            header.classList.add('floating-active')
-        } else {
-            header.classList.remove('floating-active')
-        }
-        progressBar.setAttribute('max', progressMax)
-        progressBar.setAttribute('value', lastScrollY)
-        ticking = false
-    }
-    window.addEventListener('scroll', onScroll, {passive: true})
-    update()
-}
+            window.addEventListener('scroll', function (event) {
+                var wait = false
+                var beforeOffsetY = window.pageYOffset
 
-// Toc
-if (document.querySelector('.toc-bar')) {
-    var tocBar = document.querySelector('.toc-bar ')
-    var tocOpen = document.querySelector('.toc-open')
-    var tocClose = document.querySelector('.toc-close')
-    var tocSwitch = document.querySelector('.toc-switch')
-    var tocMain = document.querySelector('.toc-main')
-    var tocWidth = window.getComputedStyle(tocMain).width.replace("px","")
+                if (wait) return
+                wait = true
 
-    if (document.body.clientWidth >= '768' ) {
-        tocBar.style.right = -tocWidth + 'px'
-    }
+                setTimeout(function () {
+                    var params = {
+                        event: event,
+                        beforeOffsetY: beforeOffsetY,
+                    }
+                    _that.callbacks.forEach(function (func) { func(params) })
 
-    window.addEventListener("resize", function(){
-        var newTocWidth = window.getComputedStyle(tocMain).width.replace("px","")
-        tocBar.removeAttribute("style")
-        if (document.body.clientWidth >= '768' ) {
-            tocBar.style.right = -newTocWidth + 'px'
-        } else {
-            tocBar.style.top = '100%'
-        }
-    });
-
-
-    tocSwitch.addEventListener('click', function(){
-        var newTocWidth = window.getComputedStyle(tocMain).width.replace("px","")
-
-        window.requestAnimationFrame(function () {
-            if (tocOpen.classList.contains('hide')) {
-                if (document.body.clientWidth >= '768' ) {
-                    tocBar.style.right = -newTocWidth + 'px'
-                } else {
-                    // 隐藏 toc
-                    tocBar.style.top = '100%'
-                }
-                tocClose.classList.add('hide')
-                tocOpen.classList.remove('hide')
-            } else {
-                if (document.body.clientWidth >= '768' ) {
-                    tocBar.style.right = 0
-                } else {
-                    // 显示 toc
-                    tocBar.style.top = 0
-                }
-                tocOpen.classList.add('hide')
-                tocClose.classList.remove('hide')
-            }
-        })
-    });
-
-    // 移动设备下，点击关闭书签
-    var tocItem = document.querySelectorAll('.toc-link')
-    tocItem.forEach(function(toc) {
-        toc.addEventListener('click', function(){
-            window.requestAnimationFrame(function () {
-                if (document.body.clientWidth < '768' ) {
-                    tocBar.style.top = '100%'
-                    tocClose.classList.add('hide')
-                    tocOpen.classList.remove('hide')
-                }
+                    wait = false
+                }, 150)
             })
-        })
-    });
+        }
+
+        return Scroller
+    },
+    showTopic: function (evt) {
+        var topicEl = document.getElementById('postTopic')
+        var postTitle = document.getElementById('postTitle')
+
+        var postTitleCoordinate = postTitle.getBoundingClientRect()
+        var threshold = postTitle.offsetTop + postTitleCoordinate.height
+
+        // show title
+        if (window.pageYOffset > threshold) {
+            var beforeOffsetY = evt && evt.beforeOffsetY
+            var isScrollToTop = beforeOffsetY - window.pageYOffset > 0
+
+            topicEl.classList.remove('is-hidden-topic-bar')
+
+            if (beforeOffsetY - window.pageYOffset === 0) {
+                topicEl.classList.remove('is-switch-post-title')
+                topicEl.classList.remove('is-show-post-title')
+                topicEl.classList.remove('immediately-show')
+
+                if (topicEl.classList.contains('is-show-scrollToTop-tips')) {
+                    topicEl.classList.remove('is-show-scrollToTop-tips')
+                    topicEl.classList.add('is-flash-scrollToTop-tips')
+                }
+                else {
+                    topicEl.classList.add('immediately-show')
+                }
+            }
+            // scroll to up👆
+            else if (isScrollToTop) {
+                // show scroll to top tips
+                if (window.pageYOffset > window.innerHeight * 2) {
+                    topicEl.classList.remove('immediately-show')
+                    topicEl.classList.remove('is-show-post-title')
+                    topicEl.classList.remove('is-switch-post-title')
+                    topicEl.classList.remove('is-flash-scrollToTop-tips')
+
+                    topicEl.classList.add('is-show-scrollToTop-tips')
+                }
+                // show post title
+                else {
+                    topicEl.classList.remove('immediately-show')
+                    topicEl.classList.remove('is-show-post-title')
+                    topicEl.classList.remove('is-show-scrollToTop-tips')
+                    topicEl.classList.remove('is-flash-scrollToTop-tips')
+
+                    topicEl.classList.add('is-switch-post-title')
+                }
+            }
+            // scroll to down👇
+            else if (beforeOffsetY - window.pageYOffset !== 0) {
+                topicEl.classList.remove('immediately-show')
+                topicEl.classList.remove('is-switch-post-title')
+                topicEl.classList.remove('is-show-scrollToTop-tips')
+                topicEl.classList.remove('is-flash-scrollToTop-tips')
+                topicEl.classList.add('is-show-post-title')
+            }
+        }
+        else{
+            // hidden all
+            topicEl.classList.remove('is-flash-scrollToTop-tips')
+            topicEl.classList.remove('is-show-scrollToTop-tips')
+            topicEl.classList.remove('is-switch-post-title')
+            topicEl.classList.remove('is-show-post-title')
+            topicEl.classList.remove('immediately-show')
+
+            topicEl.classList.add('is-hidden-topic-bar')
+        }
+    },
+    catalogueHighlight: function () {
+        var directory = document.querySelectorAll('.toc a')
+        if (directory.length === 0) {
+            return false
+        }
+
+        var tocContainer = document.querySelector('.toc')
+        return function () {
+            var contentTocList = []
+            var activeClassName = 'is-active'
+
+            directory.forEach(function (link) {
+                if (!link.href) return
+                var id = decodeURI(link.href).split('#')[1]
+                contentTocList.push(document.getElementById(id))
+            })
+            var spacing = 60
+            var activeTopicEl = null
+            var scrollTop = window.pageYOffset
+            for (var i = 0; i < contentTocList.length; i++) {
+                var currentTopic = contentTocList[i]
+
+                if (currentTopic.offsetTop > scrollTop + spacing / 2) {
+                    // jump to next loop
+                    continue
+                }
+
+                if (!activeTopicEl) {
+                    activeTopicEl = currentTopic
+                } else if (currentTopic.offsetTop + spacing >= activeTopicEl.offsetTop - spacing) {
+                    activeTopicEl = currentTopic
+                }
+
+                var beforeActiveEl = document.querySelector('.toc' + ' .' + activeClassName)
+                beforeActiveEl && beforeActiveEl.classList.remove(activeClassName)
+
+                var selectTarget = '.toc a[href="#' + encodeURI(activeTopicEl.id) + '"]'
+                var direc = document.querySelector(selectTarget)
+                direc.classList.add(activeClassName)
+
+                var tocContainerHeight = tocContainer.getBoundingClientRect().height
+                if (direc.offsetTop >= tocContainerHeight - spacing) {
+                    tocContainer.scrollTo({
+                        // top: direc.offsetTop - spacing,
+                        top: direc.offsetTop + 100 - tocContainerHeight,
+                    })
+                }
+                else {
+                    tocContainer.scrollTo({ top: 0 })
+                }
+            }
+        }
+    },
+    smoothScrollToTop: function() {
+        var Y_TopValve = (window.pageYOffset || document.body.scrollTop || document.documentElement.scrollTop);
+        if (Y_TopValve > 1) {
+            window.requestAnimationFrame($posts.smoothScrollToTop);
+            scrollTo(0, Math.floor(Y_TopValve * 0.85));
+        } else {
+            scrollTo(0, 0);
+        }
+    },
+    mounted: function () {
+        hljs && hljs.initHighlighting()
+
+        var Scroller = this.scroller()
+        var scrollerInstance = new Scroller()
+
+        var catalogueHighlight = this.catalogueHighlight()
+        catalogueHighlight && scrollerInstance.callbacks.push(catalogueHighlight)
+
+        scrollerInstance.callbacks.push(this.showTopic)
+
+        scrollerInstance.bindScrollEvent()
+
+        $claudia.fadeInImage(document.querySelectorAll('.post-content img'))
+
+        document.getElementById('postTopic').addEventListener('click', this.smoothScrollToTop)
+    }
 }
+
+$posts.mounted()
