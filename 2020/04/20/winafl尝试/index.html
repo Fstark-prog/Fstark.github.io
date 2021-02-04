@@ -1,0 +1,195 @@
+<!DOCTYPE html><html class="appearance-auto" lang="zh-CN"><head><meta charset="UTF-8"><title>WinAFL</title><meta name="description" content="May the Force be with you"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><link rel="icon" href="/images/favicon.png"><link rel="stylesheet" href="/style/common/bulma.css"><link rel="stylesheet" href="/style/base.css"><link rel="stylesheet" href="/style/common/helper.css"><script src="/js/common.js"></script><link rel="stylesheet" href="/style/post.css"><link rel="stylesheet" href="/style/themes/highlight-theme-light.css"><script src="/js/highlight.pack.js"></script><meta name="generator" content="Hexo 5.3.0"></head><body class="is-flex is-flex-direction-column"><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-space-between is-hidden-mobile"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/">Fstark's 自留地</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">WinAFL</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">点击返回顶部</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></aside></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#WinAFL"><span class="toc-text">WinAFL</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Fuzz"><span class="toc-text">Fuzz</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-text"></span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Bugid-rash"><span class="toc-text">Bugid  rash</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#-1"><span class="toc-text"></span></a></li></ol></div><div class="column is-9"><header class="my-4"></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">WinAFL</h1><time class="has-text-grey" datetime="2020-04-20T03:24:38.000Z">2020-04-20</time><article class="mt-2 post-content"><pre><code>          inAFL           BC            Fuzz            Fuzz   Crash           ugid  rash   </code></pre>
+<a id="more"></a>
+
+<h3 id="WinAFL"><a href="#WinAFL" class="headerlink" title="WinAFL"></a>WinAFL</h3><p>WinAFL   <a target="_blank" rel="noopener" href="https://twitter.com/ifsecure">Ivan Fratric</a>   <a target="_blank" rel="noopener" href="http://lcamtuf.coredump.cx/afl/">lcumtuf  FL</a>        uzzing        AFL](<a target="_blank" rel="noopener" href="http://lcamtuf.coredump.cx/afl/">http://lcamtuf.coredump.cx/afl/</a>)      indows         Winafl               DynamoRIO                      indows API               </p>
+<p>WinAFL         ttps://github.com/ivanfratric/winafl</p>
+<pre><code>  Windows 10 1809            Windows        ynamoRIO 8.0.0      </code></pre>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge6v611hwzj30pp03btbq.jpg" alt="   2020-04-23    9.52.25"></p>
+<p>   re-compiled ,         </p>
+<p>(1)       DynamoRio              ynamoRio Windows         ([<a target="_blank" rel="noopener" href="https://github.com/DynamoRIO/dynamorio/wiki/Downloads]">https://github.com/DynamoRIO/dynamorio/wiki/Downloads]</a>(<a target="_blank" rel="noopener" href="https://joyceqiqi.wordpress.com/2017/06/02/winafl">https://joyceqiqi.wordpress.com/2017/06/02/winafl</a>      /#))</p>
+<p>(2)    Visual Studio                    4           isual Studio x64                             isual Stdio  isual Studio Tools                 4        uzz        4-bit  inafl.dll                  </p>
+<p>(3)               WinAFL      </p>
+<p>(4)   isual Studio                       inAFL           DDynamoRIO_DIR           ynamoRIO cmake<br>32-bit build:</p>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell"><span class="token function">mkdir</span> build32
+<span class="token builtin class-name">cd</span> build32
+cmake -G<span class="token string">"Visual Studio 16 2019"</span> -A Win32 <span class="token punctuation">..</span> -DDynamoRIO_DIR<span class="token operator">=</span><span class="token punctuation">..</span><span class="token punctuation">\</span>path<span class="token punctuation">\</span>to<span class="token punctuation">\</span>DynamoRIO<span class="token punctuation">\</span>cmake 
+cmake --build <span class="token builtin class-name">.</span> --config Release<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p>64-bit build:</p>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell"><span class="token function">mkdir</span> build64
+<span class="token builtin class-name">cd</span> build64
+cmake -G<span class="token string">"Visual Studio 16 2019"</span> -A x64 <span class="token punctuation">..</span> -DDynamoRIO_DIR<span class="token operator">=</span><span class="token punctuation">..</span><span class="token punctuation">\</span>path<span class="token punctuation">\</span>to<span class="token punctuation">\</span>DynamoRIO<span class="token punctuation">\</span>cmake
+cmake --build <span class="token builtin class-name">.</span> --config Release<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<pre><code>        -G        S16                              </code></pre>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">cmake -G <span class="token string">"Visual Studio 16 2019"</span> -A Win32   <span class="token punctuation">;</span>x32
+cmake -G <span class="token string">"Visual Studio 16 2019"</span> -A x64     <span class="token punctuation">;</span>x64                      in64
+
+cmake -G <span class="token string">"Visual Studio 15 2017"</span>            <span class="token punctuation">;</span>x32                      in32
+cmake -G <span class="token string">"Visual Studio 15 2017 Win64"</span>      <span class="token punctuation">;</span>x64<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>winafl                   ,(afl        ynamoRIO                 </p>
+<ul>
+<li>afl            <ul>
+<li><strong>-i -o</strong>                </li>
+<li><strong>-D</strong>    DynamoRIO       - <strong>-t</strong>                    </li>
+<li><strong>-f</strong> fuzz              - <strong>-M \ -S</strong>           - <strong>-x</strong>      uzz   </li>
+</ul>
+</li>
+<li>dynamRIO            <ul>
+<li><strong>-coverage_module</strong>             </li>
+<li><strong>-fuzz_iterations</strong>                                            - <strong>-target_module</strong>                                            -target_method  target_offset</li>
+<li><strong>-target_method</strong>            xport          - <strong>-target_offset</strong>             target_module        ethod                - <strong>-nargs</strong>                   </li>
+<li><strong>-debug</strong>                                                                </li>
+<li><strong>-logdir</strong>                         -debug        -<br>   uzz           <h3 id="Fuzz"><a href="#Fuzz" class="headerlink" title="Fuzz"></a>Fuzz</h3><pre><code>         BC               tif  pg  ng  co   github      Fuzz                                                        FL              orpus Distillation        fl-cmin  fl-tmin  </code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<ol>
+<li><pre><code>                FL-CMIN</code></pre>
+afl-cmin                                                                                                  2.                     FL-TMIN<pre><code>                                         afl-tmin              </code></pre>
+inafl           winafl-cmin.py                                  WinAFL          </li>
+</ol>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">python winafl<span class="token operator">-</span>cmin<span class="token punctuation">.</span>py <span class="token operator">-</span><span class="token operator">-</span>working<span class="token operator">-</span><span class="token builtin">dir</span> C<span class="token punctuation">:</span>\Users\test\Desktop\winafl<span class="token operator">-</span>master\build32\<span class="token builtin">bin</span>\Release <span class="token operator">-</span>D C<span class="token punctuation">:</span>\Users\test\Desktop\DynamoRIO<span class="token operator">-</span>Windows<span class="token operator">-</span><span class="token number">8.0</span><span class="token number">.0</span><span class="token operator">-</span><span class="token number">1</span>\bin32 <span class="token operator">-</span>t <span class="token number">100000</span> <span class="token operator">-</span>i C<span class="token punctuation">:</span>\Users\test\Desktop\jpg <span class="token operator">-</span>o C<span class="token punctuation">:</span>\Users\test\Desktop\jpg\out <span class="token operator">-</span>coverage_module FreeImage<span class="token punctuation">.</span>dll <span class="token operator">-</span>target_module Project1<span class="token punctuation">.</span>exe <span class="token operator">-</span>target_method main <span class="token operator">-</span>nargs <span class="token number">2</span> <span class="token operator">-</span><span class="token operator">-</span> C<span class="token punctuation">:</span>\Users\test\source\repos\Project1\Release\Project1<span class="token punctuation">.</span>exe @@<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre><code>     [!] Dry-run failed, 2 executions resulted differently:Tuples matching? False     </code></pre>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge6ywxmm5cj30p206iq5z.jpg" alt="   2020-04-24    6.00.34"></p>
+<pre><code>                                                        bash            </code></pre>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">λ <span class="token keyword">for</span> <span class="token for-or-select variable">file</span> <span class="token keyword">in</span> *<span class="token punctuation">;</span> <span class="token keyword">do</span> <span class="token builtin class-name">printf</span> <span class="token string">"==== FILE: <span class="token variable">$file</span> =====<span class="token entity" title="\n">\n</span>"</span><span class="token punctuation">;</span>/c/Users/test/source/repos/Project1/Release/Project1.exe <span class="token variable">$file</span> <span class="token punctuation">;</span><span class="token builtin class-name">echo</span> <span class="token variable">$?</span><span class="token punctuation">;</span> <span class="token keyword">done</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre><code>              0                        </code></pre>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge70jesh5mj30h80at422.jpg" alt="image-20200426113452542"></p>
+<p>![   2020-04-24    6.51.49     (<a target="_blank" rel="noopener" href="https://tva1.sinaimg.cn/large/007S8ZIlly1ge70lh6yrlj30z60ak0xi.jpg">https://tva1.sinaimg.cn/large/007S8ZIlly1ge70lh6yrlj30z60ak0xi.jpg</a>)</p>
+<pre><code>     429         148                              Winafl        Kb                                                   </code></pre>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge70r1i5iaj31cj0lwqrn.jpg" alt="image-20200426114211822"></p>
+<h3 id=""><a href="#" class="headerlink" title=""></a></h3><pre><code>                    ABC         Freeimage.dll                 FreeImage                        FreeImage_LoadU             </code></pre>
+<pre class="line-numbers language-c++" data-language="c++"><code class="language-c++">#define _CRT_SECURE_NO_WARNINGS
+#include &lt;windows.h&gt; 
+#include &lt;tchar.h&gt;
+#include &lt;iostream&gt;
+using namespace std;
+
+extern &quot;C&quot; __declspec(dllexport) int main(int argc, char** argv);
+void test(HINSTANCE hinstLib, wchar_t* PathName);
+wchar_t* charToWChar(const char* text);
+
+typedef DWORD(__stdcall* FreeImage_GetFileTypeU)(const wchar_t* lpszPathName, int flag);
+typedef DWORD(__stdcall* FreeImage_Initialise)(BOOL load_local_plugins_only);
+typedef DWORD(__stdcall* FreeImage_DeInitialise)();
+typedef DWORD(__stdcall* FreeImage_LoadU)(DWORD format, const wchar_t* lpszPathName, int flag);
+typedef DWORD(__stdcall* FreeImage_UnLoad)(DWORD dib);
+
+FreeImage_Initialise Initialise;
+FreeImage_GetFileTypeU LoadFileType;
+FreeImage_LoadU LoadU; DWORD load;
+FreeImage_UnLoad UnLoad;
+FreeImage_DeInitialise DeInitialise;
+
+int main(int argc, char** argv)
+&#123;
+	if (argc &lt; 2) &#123;
+		printf(&quot;Usage: %s &lt; file&gt;\n&quot;, argv[0]);
+		return 0;
+	&#125;
+
+	wchar_t* PathName &#x3D; charToWChar(argv[1]);
+
+	HINSTANCE hinstLib; BOOL fFreeResult, fRunTimeLinkSuccess &#x3D; FALSE; DWORD Error &#x3D; NULL;
+	hinstLib &#x3D; LoadLibrary(TEXT(&quot;C:\\FreeImage.dll&quot;));
+
+	if (hinstLib !&#x3D; NULL)
+	&#123;
+		fRunTimeLinkSuccess &#x3D; TRUE;
+
+		Initialise &#x3D; (FreeImage_Initialise)GetProcAddress(hinstLib, (LPCSTR)163); &#x2F;&#x2F;      FreeImage   		LoadFileType &#x3D; (FreeImage_GetFileTypeU)GetProcAddress(hinstLib, (LPCSTR)126);&#x2F;&#x2F;             
+		LoadU &#x3D; (FreeImage_LoadU)GetProcAddress(hinstLib, (LPCSTR)181);	&#x2F;&#x2F;       
+		UnLoad &#x3D; (FreeImage_UnLoad)GetProcAddress(hinstLib, (LPCSTR)242);&#x2F;&#x2F;       
+		DeInitialise &#x3D; (FreeImage_DeInitialise)GetProcAddress(hinstLib, (LPCSTR)83);&#x2F;&#x2F;    FreeImage   
+		test(hinstLib, PathName);
+		fFreeResult &#x3D; FreeLibrary(hinstLib);
+	&#125;
+
+	if (!fRunTimeLinkSuccess)
+		cout &lt;&lt; &quot;         , Error: &quot; &lt;&lt; Error &lt;&lt; endl;
+	return 0;
+&#125;
+
+void test(HINSTANCE hinstLib, wchar_t* PathName)
+&#123;
+	
+	DWORD FileType &#x3D; (LoadFileType)(PathName, 0);
+	load &#x3D; (LoadU)(FileType, PathName, 0);
+	return;
+
+&#125;
+
+wchar_t* charToWChar(const char* text)
+&#123;
+	size_t size &#x3D; strlen(text) + 1;
+	wchar_t* wa &#x3D; new wchar_t[size];
+	mbstowcs(wa, text, size);
+	return wa;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre><code>                            inAFL               debug                </code></pre>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell"><span class="token punctuation">\</span>winafl<span class="token punctuation">\</span>bin3<span class="token operator"><span class="token file-descriptor important">2</span>></span> C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>DynamoRIO-Windows-8.0.0-1<span class="token punctuation">\</span>bin32<span class="token punctuation">\</span>drrun.exe -c winafl.dll -debug -coverage_module FreeImage.dll -target_module Project1.exe -target_method main -fuzz_iterations <span class="token number">10</span> -nargs <span class="token number">2</span> -- C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>source<span class="token punctuation">\</span>repos<span class="token punctuation">\</span>Project1<span class="token punctuation">\</span>Debug<span class="token punctuation">\</span>Project1.exe C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>jpg<span class="token punctuation">\</span>1x1-low.jpg<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge71bk08znj30u80htk1b.jpg" alt="image-20200426120155981"></p>
+<pre><code>                                        ain                 </code></pre>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">afl-fuzz.exe -i C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>jpg<span class="token punctuation">\</span>out -o C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>jpg<span class="token punctuation">\</span>re -D C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>DynamoRIO-Windows-8.0.0-1<span class="token punctuation">\</span>bin32 -t <span class="token number">9000</span> -- -coverage_module FreeImage.dll -target_module Project1.exe -target_method main -fuzz_iterations <span class="token number">5000</span> -nargs <span class="token number">2</span> -- C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>source<span class="token punctuation">\</span>repos<span class="token punctuation">\</span>Project1<span class="token punctuation">\</span>Debug<span class="token punctuation">\</span>Project1.exe @@<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge71f0ipmzj30lq0kvn4l.jpg" alt="   2020-04-23    5.17.24"></p>
+<pre><code>                                     ain                        load      test              target_method   test      </code></pre>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">afl-fuzz.exe -i C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>jpg<span class="token punctuation">\</span>out -o C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>jpg<span class="token punctuation">\</span>re -D C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>DynamoRIO-Windows-8.0.0-1<span class="token punctuation">\</span>bin32 -t <span class="token number">9000</span> -- -coverage_module FreeImage.dll -target_module Project1.exe -target_method <span class="token builtin class-name">test</span> -fuzz_iterations <span class="token number">5000</span> -nargs <span class="token number">2</span> -- C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>source<span class="token punctuation">\</span>repos<span class="token punctuation">\</span>Project1<span class="token punctuation">\</span>Debug<span class="token punctuation">\</span>Project1.exe @@<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge71j4kjn3j30hd079jsl.jpg" alt="1587641858789_8DC06F32-53EE-4A64-8FD1-45907DC9CF93"></p>
+<pre><code>                         est         vs   test        </code></pre>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge71lacv24j30i90200tk.jpg" alt="image-20200426121116517"></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge71q85ybaj30ko0bkn57.jpg" alt="image-20200426121601823"></p>
+<pre><code> uzz                 pu                       </code></pre>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">afl-fuzz.exe -i C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>jpg<span class="token punctuation">\</span>out -o C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>jpg<span class="token punctuation">\</span>re -M master -D C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>DynamoRIO-Windows-8.0.0-1<span class="token punctuation">\</span>bin32 -t <span class="token number">9000</span> -- -coverage_module FreeImage.dll -target_module Project1.exe -target_method <span class="token builtin class-name">test</span> -fuzz_iterations <span class="token number">5000</span> -nargs <span class="token number">2</span> -- C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>source<span class="token punctuation">\</span>repos<span class="token punctuation">\</span>Project1<span class="token punctuation">\</span>Debug<span class="token punctuation">\</span>Project1.exe @@
+
+afl-fuzz.exe -i C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>jpg<span class="token punctuation">\</span>out -o C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>jpg<span class="token punctuation">\</span>re -S slaver01 -D C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>DynamoRIO-Windows-8.0.0-1<span class="token punctuation">\</span>bin32 -t <span class="token number">9000</span> -- -coverage_module FreeImage.dll -target_module Project1.exe -target_method <span class="token builtin class-name">test</span> -fuzz_iterations <span class="token number">5000</span> -nargs <span class="token number">2</span> -- C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>source<span class="token punctuation">\</span>repos<span class="token punctuation">\</span>Project1<span class="token punctuation">\</span>Debug<span class="token punctuation">\</span>Project1.exe @@
+
+afl-fuzz.exe -i C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>jpg<span class="token punctuation">\</span>out -o C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>jpg<span class="token punctuation">\</span>re -S slaver02 -D C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>DynamoRIO-Windows-8.0.0-1<span class="token punctuation">\</span>bin32 -t <span class="token number">9000</span> -- -coverage_module FreeImage.dll -target_module Project1.exe -target_method <span class="token builtin class-name">test</span> -fuzz_iterations <span class="token number">5000</span> -nargs <span class="token number">2</span> -- C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>source<span class="token punctuation">\</span>repos<span class="token punctuation">\</span>Project1<span class="token punctuation">\</span>Debug<span class="token punctuation">\</span>Project1.exe @@<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre><code>                                                                        ash           </code></pre>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge71vxdm8lj30dx08pn0e.jpg" alt="image-20200426122130582"></p>
+<p>   ABC<br><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge71wm6ez1j30x80mfaec.jpg" alt="   2020-04-25    8.07.03"></p>
+<h3 id="Bugid-rash"><a href="#Bugid-rash" class="headerlink" title="Bugid  rash"></a>Bugid  rash</h3><pre><code>  crash                                                            
+
+       ugID                                 BugID                 </code></pre>
+<ul>
+<li><pre><code> Python 2.7.14](https://www.python.org/downloads/release/python-2715/)</code></pre>
+</li>
+<li><p>[Windows  (<a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/">https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/</a>)   <a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/">      </a></p>
+</li>
+<li><p>   BugId   ](<a target="_blank" rel="noopener" href="https://github.com/SkyLined/BugId/releases">https://github.com/SkyLined/BugId/releases</a>)</p>
+<pre><code>         Windows  ython           ugId                                                   BugId
+
+  ugID                     Crash                  Python           </code></pre>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> sys
+<span class="token keyword">import</span> os
+
+sys<span class="token punctuation">.</span>path<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string">r"C:\Users\test\Desktop\BugId-master"</span><span class="token punctuation">)</span>
+testcases <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+
+<span class="token keyword">for</span> root<span class="token punctuation">,</span> dirs<span class="token punctuation">,</span> files <span class="token keyword">in</span> os<span class="token punctuation">.</span>walk<span class="token punctuation">(</span><span class="token string">r"C:\Users\test\Desktop\jpg\re\slaver01\crashes"</span><span class="token punctuation">,</span> topdown<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">for</span> name <span class="token keyword">in</span> files<span class="token punctuation">:</span>
+        testcase <span class="token operator">=</span>  os<span class="token punctuation">.</span>path<span class="token punctuation">.</span>abspath<span class="token punctuation">(</span>os<span class="token punctuation">.</span>path<span class="token punctuation">.</span>join<span class="token punctuation">(</span>root<span class="token punctuation">,</span> name<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        testcases<span class="token punctuation">.</span>append<span class="token punctuation">(</span>testcase<span class="token punctuation">)</span>
+
+<span class="token keyword">for</span> testcase <span class="token keyword">in</span> testcases<span class="token punctuation">:</span>
+    <span class="token keyword">print</span> <span class="token punctuation">(</span><span class="token string">"[*] Gonna run: "</span><span class="token punctuation">,</span> testcase<span class="token punctuation">)</span>
+    os<span class="token punctuation">.</span>system<span class="token punctuation">(</span><span class="token string">r'PageHeap.cmd "Project1.exe" ON'</span><span class="token punctuation">)</span>
+    os<span class="token punctuation">.</span>system<span class="token punctuation">(</span><span class="token string">r'python C:\Users\test\Desktop\BugId-master\BugId.py C:\Users\test\source\repos\Project1\Debug\Project1.exe --isa= x86 -- %s'</span> <span class="token operator">%</span> testcase<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre><code>              -isa= x86            64         
+
+                    ug        </code></pre>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge72be2rxoj31bn0jw4ok.jpg" alt="image-20200426123621956"></p>
+</li>
+</ul>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge72dqh0v9j30th0epgve.jpg" alt="image-20200426123837430"></p>
+<pre><code>        BugID                                   ugID           </code></pre>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge72fvy3s9j30gd05sn04.jpg" alt="image-20200426124040834"></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge72gxjnipj30w00hkwow.jpg" alt="image-20200426124141616"></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge72hrzcvdj30xn0kqagv.jpg" alt="image-20200426124230545"></p>
+<h3 id="-1"><a href="#-1" class="headerlink" title=""></a></h3><p>winafl    <a target="_blank" rel="noopener" href="http://www.simp1e.site/2020/04/18/winafl/">http://www.simp1e.site/2020/04/18/winafl/</a></p>
+<pre><code>     WinAFL       https://www.freebuf.com/articles/system/216437.html
+
+Fuzzing     WinAFL https://paper.seebug.org/323/</code></pre>
+<p>Fuzz     WinAFL         <a target="_blank" rel="noopener" href="https://bbs.pediy.com/thread-255162.htm">https://bbs.pediy.com/thread-255162.htm</a></p>
+<p>Fuzzing the MSXML6 library with WinAFL <a target="_blank" rel="noopener" href="https://symeonp.github.io/2017/09/17/fuzzing-winafl.html">https://symeonp.github.io/2017/09/17/fuzzing-winafl.html</a></p>
+</article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/2020/05/10/teamview%E5%8E%BB%E9%99%A45%E5%88%86%E9%92%9F/" title="mac系统Teamview去除商业版限制"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">上一页: mac系统Teamview去除商业版限制</span></a><a class="button is-default" href="/2020/04/15/ASX%20to%20MP3%20Converter%E6%9C%AC%E5%9C%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E/" title="ASX to MP3 Converter本地代码执行漏洞"><span class="has-text-weight-semibold">下一页: ASX to MP3 Converter本地代码执行漏洞</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container"><script async repo="Haojen/Claudia-theme-blog" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><a title="twitter" target="_blank" rel="noopener nofollow" href="//twitter.com//"><i class="iconfont icon-twitter"></i></a><!-- Github--><a title="github" target="_blank" rel="noopener nofollow" href="//github.com/haojen"><i class="iconfont icon-github"></i></a><!-- Ins--><a title="instagram" target="_blank" rel="noopener nofollow" href="//www.instagram.com//"><i class="iconfont icon-ins"></i></a><!-- RSS--><!-- 知乎--><!-- 领英--><!-- 脸书--><a title="facebook" target="_blank" rel="noopener nofollow" href="//www.facebook.com//"><i class="iconfont icon-tian7_facebook"></i></a></section><p><span>Copyright ©</span><span> Fstark 2021</span></p><div class="is-flex is-justify-content-center is-flex-wrap-wrap"><p>过好每一天 &verbar;&nbsp;</p><p class="is-flex is-justify-content-center"><a title="Hexo theme author" target="_blank" rel="noopener" href="https://beian.miit.gov.cn/#/Integrated/index">豫ICP备2021000187号&nbsp;</a></p></div></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/post.js"></script></body></html>
