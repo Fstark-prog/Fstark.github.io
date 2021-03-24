@@ -1,0 +1,131 @@
+<!DOCTYPE html><html class="appearance-auto" lang="zh-CN"><head><meta charset="UTF-8"><title>mac系统Teamview去除商业版限制</title><meta name="description" content="May the Force be with you"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><link rel="icon" href="/images/favicon.png"><link rel="stylesheet" href="/style/common/bulma.css"><link rel="stylesheet" href="/style/base.css"><link rel="stylesheet" href="/style/common/helper.css"><script src="/js/common.js"></script><link rel="stylesheet" href="/style/post.css"><link rel="stylesheet" href="/style/themes/highlight-theme-light.css"><script src="/js/highlight.pack.js"></script><meta name="generator" content="Hexo 5.3.0"></head><body class="is-flex is-flex-direction-column"><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-space-between is-hidden-mobile"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/">Fstark's 自留地</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">mac系统Teamview去除商业版限制</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">点击返回顶部</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></aside></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile is-hidden"></div><div class="column is-9"><header class="my-4"><a href="/tags/%E5%B0%8F%E8%84%9A%E6%9C%AC"><i class="tag post-item-tag">小脚本</i></a></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">mac系统Teamview去除商业版限制</h1><time class="has-text-grey" datetime="2020-05-08T03:24:38.000Z">2020-05-08</time><article class="mt-2 post-content"><p>用来去除macos上Teamview的商业版限制</p>
+<a id="more"></a>
+
+<p>最近几个月天天用Teamview，不出所料的被商业版了。扒了扒网上的方法，重装清注册表的，还有就是win下那个换ID的启动器可惜mac用不了，在github上找到一个TeamViewer ID Changer for MAC OS挺长时间没更新了，里面文件的位置都变了也用不了，简单改了改现在的最新版本可以使用，使用root用户运行后重启登陆就可以了。</p>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment">#!/usr/bin/env python </span>
+
+<span class="token comment">#coding:utf-8</span>
+<span class="token keyword">import</span> sys
+<span class="token keyword">import</span> os
+<span class="token keyword">import</span> glob
+<span class="token keyword">import</span> platform
+<span class="token keyword">import</span> re
+<span class="token keyword">import</span> random
+<span class="token keyword">import</span> string
+
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token triple-quoted-string string">'''
+--------------------------------
+TeamViewer ID Changer for MAC OS
+--------------------------------
+'''</span><span class="token punctuation">)</span>
+
+<span class="token keyword">if</span> platform<span class="token punctuation">.</span>system<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token string">'Darwin'</span><span class="token punctuation">:</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'This script can be run only on MAC OS.'</span><span class="token punctuation">)</span>
+    sys<span class="token punctuation">.</span>exit<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">if</span> os<span class="token punctuation">.</span>geteuid<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">:</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'This script must be run form root.'</span><span class="token punctuation">)</span>
+    sys<span class="token punctuation">.</span>exit<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">if</span> os<span class="token punctuation">.</span>environ<span class="token punctuation">.</span>has_key<span class="token punctuation">(</span><span class="token string">'SUDO_USER'</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    USERNAME <span class="token operator">=</span> os<span class="token punctuation">.</span>environ<span class="token punctuation">[</span><span class="token string">'SUDO_USER'</span><span class="token punctuation">]</span>
+    <span class="token keyword">if</span> USERNAME <span class="token operator">==</span> <span class="token string">'root'</span><span class="token punctuation">:</span>
+       <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'Can not find user name. Run this script via sudo from regular user'</span><span class="token punctuation">)</span>
+       sys<span class="token punctuation">.</span>exit<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">else</span><span class="token punctuation">:</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'Can not find user name. Run this script via sudo from regular user'</span><span class="token punctuation">)</span>
+    sys<span class="token punctuation">.</span>exit<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+HOMEDIRLIB <span class="token operator">=</span> <span class="token string">'/Users/'</span> <span class="token operator">+</span> USERNAME  <span class="token operator">+</span> <span class="token string">'/library/preferences/'</span>
+GLOBALLIB  <span class="token operator">=</span>  <span class="token string">'/library/preferences/'</span>
+
+CONFIGS <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+
+<span class="token comment"># Find config files</span>
+
+<span class="token keyword">def</span> <span class="token function">listdir_fullpath</span><span class="token punctuation">(</span>d<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token punctuation">[</span>os<span class="token punctuation">.</span>path<span class="token punctuation">.</span>join<span class="token punctuation">(</span>d<span class="token punctuation">,</span> f<span class="token punctuation">)</span> <span class="token keyword">for</span> f <span class="token keyword">in</span> os<span class="token punctuation">.</span>listdir<span class="token punctuation">(</span>d<span class="token punctuation">)</span><span class="token punctuation">]</span>
+
+<span class="token keyword">for</span> <span class="token builtin">file</span> <span class="token keyword">in</span> listdir_fullpath<span class="token punctuation">(</span>HOMEDIRLIB<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> <span class="token string">'teamviewer'</span><span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">in</span> <span class="token builtin">file</span><span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        CONFIGS<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token builtin">file</span><span class="token punctuation">)</span>
+
+<span class="token keyword">if</span> <span class="token keyword">not</span> CONFIGS<span class="token punctuation">:</span>
+    <span class="token keyword">print</span> <span class="token punctuation">(</span><span class="token triple-quoted-string string">'''
+There is no TemViewer configs found.
+Maybe you have deleted it manualy or never run TeamViewer after installation.
+Nothing to delete.
+'''</span><span class="token punctuation">)</span>
+<span class="token comment"># Delete config files</span>
+<span class="token keyword">else</span><span class="token punctuation">:</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Configs found:\n"</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> <span class="token builtin">file</span> <span class="token keyword">in</span> CONFIGS<span class="token punctuation">:</span>
+        <span class="token keyword">print</span> <span class="token builtin">file</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token triple-quoted-string string">'''
+This files will be DELETED permanently.
+All TeamViewer settings will be lost
+'''</span><span class="token punctuation">)</span>
+    <span class="token builtin">raw_input</span><span class="token punctuation">(</span><span class="token string">"Press Enter to continue or CTR+C to abort..."</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">for</span> <span class="token builtin">file</span> <span class="token keyword">in</span> CONFIGS<span class="token punctuation">:</span>
+        <span class="token keyword">try</span><span class="token punctuation">:</span>
+            os<span class="token punctuation">.</span>remove<span class="token punctuation">(</span><span class="token builtin">file</span><span class="token punctuation">)</span>
+        <span class="token keyword">except</span><span class="token punctuation">:</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Cannot delete config files. Permission denied?"</span><span class="token punctuation">)</span>
+            sys<span class="token punctuation">.</span>exit<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Done."</span><span class="token punctuation">)</span>
+
+<span class="token comment"># Find binaryes</span>
+
+TMBINARYES <span class="token operator">=</span> <span class="token punctuation">[</span>
+<span class="token string">'/Applications/TeamViewer.app/Contents/MacOS/TeamViewer'</span><span class="token punctuation">,</span>
+<span class="token string">'/Applications/TeamViewer.app/Contents/MacOS/TeamViewer_Service'</span><span class="token punctuation">,</span>
+<span class="token string">'/Applications/TeamViewer.app/Contents/MacOS/TeamViewer_Desktop'</span><span class="token punctuation">,</span>
+<span class="token punctuation">]</span>
+
+<span class="token keyword">for</span> <span class="token builtin">file</span> <span class="token keyword">in</span> TMBINARYES<span class="token punctuation">:</span>
+    <span class="token keyword">if</span> os<span class="token punctuation">.</span>path<span class="token punctuation">.</span>exists<span class="token punctuation">(</span><span class="token builtin">file</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">pass</span>
+    <span class="token keyword">else</span><span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"File not found: "</span> <span class="token operator">+</span> <span class="token builtin">file</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span> <span class="token punctuation">(</span><span class="token string">"Install TeamViewer correctly"</span><span class="token punctuation">)</span>
+        sys<span class="token punctuation">.</span>exit<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment"># Patch files</span>
+
+<span class="token keyword">def</span> <span class="token function">idpatch</span><span class="token punctuation">(</span>fpath<span class="token punctuation">,</span>platf<span class="token punctuation">,</span>serial<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token builtin">file</span> <span class="token operator">=</span> <span class="token builtin">open</span><span class="token punctuation">(</span>fpath<span class="token punctuation">,</span> <span class="token string">'r+b'</span><span class="token punctuation">)</span>
+    binary <span class="token operator">=</span> <span class="token builtin">file</span><span class="token punctuation">.</span>read<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    PlatformPattern <span class="token operator">=</span> <span class="token string">"IOPlatformExpert.&#123;6&#125;"</span>
+    SerialPattern <span class="token operator">=</span>  <span class="token string">"IOPlatformSerialNumber%s%s%sUUID"</span>
+
+    binary <span class="token operator">=</span> re<span class="token punctuation">.</span>sub<span class="token punctuation">(</span>PlatformPattern<span class="token punctuation">,</span> platf<span class="token punctuation">,</span> binary<span class="token punctuation">)</span>
+    binary <span class="token operator">=</span> re<span class="token punctuation">.</span>sub<span class="token punctuation">(</span>SerialPattern <span class="token operator">%</span> <span class="token punctuation">(</span><span class="token builtin">chr</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">"[0-9a-zA-Z]&#123;8,8&#125;"</span><span class="token punctuation">,</span> <span class="token builtin">chr</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> SerialPattern<span class="token operator">%</span><span class="token punctuation">(</span><span class="token builtin">chr</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span> serial<span class="token punctuation">,</span> <span class="token builtin">chr</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> binary<span class="token punctuation">)</span>
+
+    <span class="token builtin">file</span> <span class="token operator">=</span> <span class="token builtin">open</span><span class="token punctuation">(</span>fpath<span class="token punctuation">,</span><span class="token string">'wb'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>write<span class="token punctuation">(</span>binary<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token boolean">True</span>
+
+<span class="token keyword">def</span> <span class="token function">random_generator</span><span class="token punctuation">(</span>size<span class="token operator">=</span><span class="token number">8</span><span class="token punctuation">,</span> chars<span class="token operator">=</span>string<span class="token punctuation">.</span>ascii_uppercase <span class="token operator">+</span> string<span class="token punctuation">.</span>digits<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token string">''</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>random<span class="token punctuation">.</span>choice<span class="token punctuation">(</span>chars<span class="token punctuation">)</span> <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>size<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+RANDOMSERIAL <span class="token operator">=</span> random_generator<span class="token punctuation">(</span><span class="token punctuation">)</span>
+RANDOMPLATFORM <span class="token operator">=</span> <span class="token string">"IOPlatformExpert"</span> <span class="token operator">+</span> random_generator<span class="token punctuation">(</span><span class="token number">6</span><span class="token punctuation">)</span>
+
+
+<span class="token keyword">for</span> <span class="token builtin">file</span> <span class="token keyword">in</span> TMBINARYES<span class="token punctuation">:</span>
+        <span class="token keyword">try</span><span class="token punctuation">:</span>
+            idpatch<span class="token punctuation">(</span><span class="token builtin">file</span><span class="token punctuation">,</span>RANDOMPLATFORM<span class="token punctuation">,</span>RANDOMSERIAL<span class="token punctuation">)</span>
+        <span class="token keyword">except</span><span class="token punctuation">:</span>
+            <span class="token keyword">print</span> <span class="token string">"Error: can not patch file "</span> <span class="token operator">+</span> <span class="token builtin">file</span>
+            <span class="token keyword">print</span> <span class="token string">"Wrong version?"</span>
+            sys<span class="token punctuation">.</span>exit<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">print</span> <span class="token string">"PlatformDevice: "</span> <span class="token operator">+</span> RANDOMPLATFORM
+<span class="token keyword">print</span> <span class="token string">"PlatformSerial: "</span> <span class="token operator">+</span> RANDOMSERIAL
+
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token triple-quoted-string string">'''
+ID changed sucessfully.
+!!! Restart computer before using TeamViewer !!!!
+'''</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+</article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/2020/05/15/clusterfuzz%E8%B8%A9%E5%9D%91%E6%8C%87%E5%8D%97/" title="clusterfuzz踩坑指南"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">上一页: clusterfuzz踩坑指南</span></a><a class="button is-default" href="/2020/04/30/MEDIACODER%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BC%8F%E6%B4%9E/" title="MEDIACODER .M3U缓冲区溢出漏洞（CVE-2017-8869）"><span class="has-text-weight-semibold">下一页: MEDIACODER .M3U缓冲区溢出漏洞（CVE-2017-8869）</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container"><script async repo="Haojen/Claudia-theme-blog" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><a title="twitter" target="_blank" rel="noopener nofollow" href="//twitter.com//"><i class="iconfont icon-twitter"></i></a><!-- Github--><a title="github" target="_blank" rel="noopener nofollow" href="//github.com/haojen"><i class="iconfont icon-github"></i></a><!-- Ins--><a title="instagram" target="_blank" rel="noopener nofollow" href="//www.instagram.com//"><i class="iconfont icon-ins"></i></a><!-- RSS--><!-- 知乎--><!-- 领英--><!-- 脸书--><a title="facebook" target="_blank" rel="noopener nofollow" href="//www.facebook.com//"><i class="iconfont icon-tian7_facebook"></i></a></section><p><span>Copyright ©</span><span> Fstark 2021</span></p><div class="is-flex is-justify-content-center is-flex-wrap-wrap"><p>过好每一天 &verbar;&nbsp;</p><p class="is-flex is-justify-content-center"><a title="Hexo theme author" target="_blank" rel="noopener" href="https://beian.miit.gov.cn/#/Integrated/index">豫ICP备2021000187号&nbsp;</a></p></div></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/post.js"></script></body></html>
