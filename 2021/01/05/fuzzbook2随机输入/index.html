@@ -1,0 +1,381 @@
+<!DOCTYPE html><html class="appearance-dark" lang="zh-CN"><head><meta charset="UTF-8"><title>Fuzzbook2——使用随机输入测试程序</title><meta name="description" content="Winter is coming"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><!-- Google Analytics --><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q || []).push(arguments)},i[r].l=1 * new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', '', 'auto');
+ga('send', 'pageview');</script><!-- End Google Analytics -->
+<!-- Baidu Analytics --><!-- End Baidu Analytics --><link rel="icon" href="/source/favicon.png"><link rel="stylesheet" href="/style/common/bulma.css"><link rel="stylesheet" href="/style/base.css"><link rel="stylesheet" href="/style/common/helper.css"><script src="/js/common.js"></script><link rel="stylesheet" href="/style/post.css"><link rel="stylesheet" href="/style/themes/highlight-theme-light.css"><script src="/js/highlight.pack.js"></script><meta name="generator" content="Hexo 5.3.0"></head><body class="is-flex is-flex-direction-column"><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-space-between is-hidden-mobile"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/">Fstark's blog</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">Fuzzbook2——使用随机输入测试程序</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">点击返回顶部</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about/">关于</a></h3><h3 class="is-inline-block"><a href="/archives/">归档</a></h3></aside></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about/">关于</a></h3><h3 class="is-inline-block"><a href="/archives/">归档</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95%E5%8E%86%E5%8F%B2"><span class="toc-text">模糊测试历史</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84Fuzzer"><span class="toc-text">创建一个简单的Fuzzer</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E5%A4%96%E9%83%A8%E7%A8%8B%E5%BA%8F%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95"><span class="toc-text">对外部程序进行模糊测试</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E8%BE%93%E5%85%A5%E6%96%87%E4%BB%B6"><span class="toc-text">创建输入文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%B0%83%E7%94%A8%E5%A4%96%E9%83%A8%E7%A8%8B%E5%BA%8F"><span class="toc-text">调用外部程序</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%95%BF%E6%97%B6%E9%97%B4%E7%9A%84%E8%BF%90%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95"><span class="toc-text">长时间的运行模糊测试</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%A9%E7%94%A8Fuzzers%E6%9F%A5%E6%89%BEBug"><span class="toc-text">利用Fuzzers查找Bug</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA"><span class="toc-text">缓冲区溢出</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%BC%BA%E5%B0%91%E9%94%99%E8%AF%AF%E6%A3%80%E6%9F%A5"><span class="toc-text">缺少错误检查</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%95%8F%E6%84%9F%E6%95%B0%E5%80%BC"><span class="toc-text">敏感数值</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8D%95%E8%8E%B7%E9%94%99%E8%AF%AF"><span class="toc-text">捕获错误</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%80%9A%E7%94%A8%E6%A3%80%E6%9F%A5%E5%99%A8"><span class="toc-text">通用检查器</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E6%A3%80%E6%9F%A5%E5%AD%98%E5%82%A8%E5%99%A8%E8%AE%BF%E9%97%AE"><span class="toc-text">检查存储器访问</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E4%BF%A1%E6%81%AF%E6%B3%84%E9%9C%B2"><span class="toc-text">信息泄露</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%8F%E9%AA%8C%E6%95%99%E8%AE%AD"><span class="toc-text">经验教训</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%8B%E4%B8%80%E6%AD%A5"><span class="toc-text">下一步</span></a></li></ol></div><div class="column is-9"><header class="my-4"><a href="/tags/fuzz"><i class="tag post-item-tag">fuzz</i></a><a href="/tags/%E6%96%B0%E8%B6%8B%E5%8A%BF"><i class="tag post-item-tag">新趋势</i></a><a href="/tags/Fuzzbook"><i class="tag post-item-tag">Fuzzbook</i></a></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">Fuzzbook2——使用随机输入测试程序</h1><time class="has-text-grey" datetime="2021-01-05T09:45:00.000Z">2021-01-05</time><article class="mt-2 post-content"><p><img src="https://image.3001.net/images/20210111/1610358571_5ffc1f2b95e569df29bae.png!small" alt="image-20201005165901975"></p>
+<p>在本章中，我们将从介绍最简单的测试生成技术开始—随机文本生成（也称为<em>模糊测试）</em>，其关键思想就是将*一串<strong>随机字符</strong>输入到程序中，以期发现故障。</p>
+<a id="more"></a>
+
+<p><strong>先决条件</strong></p>
+<ul>
+<li>您应该了解软件测试的基础知识；即先学习<a target="_blank" rel="noopener" href="https://www.freebuf.com/articles/security-management/255626.html">Fuzzbook系列（1）：软件的安全性测试</a>。</li>
+<li>您应该对Python有一定的了解。</li>
+</ul>
+<h3 id="模糊测试历史"><a href="#模糊测试历史" class="headerlink" title="模糊测试历史"></a><strong>模糊测试历史</strong></h3><p>模糊测试诞生于1988年秋季的一个黑暗暴风雨之夜 [<a target="_blank" rel="noopener" href="http://us.artechhouse.com/Fuzzing-for-Software-Security-Testing-and-Quality-Assurance-Second-Edition-P1930.aspx">Takanen <em>et al</em>, 2008.</a>]。巴顿·米勒教授坐在麦迪逊威斯康星州的公寓里，通过一条1200波特的电话线连接到他所属大学的计算机。阵阵的雷暴在线路上造成噪音，这些噪音又导致两端的UNIX命令获得错误的输入，并导致崩溃。频繁的崩溃使他感到惊讶—我们编写的程序不是应该十分强大吗？作为一名科学家，他想探究该问题的严重程度及其原因。因此，他为威斯康星大学麦迪逊分校的学生<em>编写</em>了一个<em>编程练习</em>，而该练习将使他的学生创建第一个模糊测试器。</p>
+<p>这项作业的原文描述是这样的：</p>
+<blockquote>
+<p> The goal of this project is to evaluate the robustness of various UNIX utility programs, given an unpredictable input stream. […] First, you will build a <em>fuzz generator</em>. This is a program that will output a random character stream. Second, you will take the fuzz generator and use it to attack as many UNIX utilities as possible, with the goal of trying to break them.</p>
+<p>该项目的目标是在给定不可预测的输入流的情况下评估各种UNIX实用程序的健壮性。[…]首先，您将构建一个<em>模糊发生器</em>。这是一个将输出随机字符流的程序。其次，您将使用模糊发生器，并使用它来攻击尽可能多的UNIX实用程序，以试图破坏它们。</p>
+</blockquote>
+<p>这个作业在不经意间抓住了模糊测试的本质：创建随机的输入，并持续性观察它是否会破坏目标应用程序，理论上只要运行足够长的时间，我们就会看到错误的发生。</p>
+<h3 id="创建一个简单的Fuzzer"><a href="#创建一个简单的Fuzzer" class="headerlink" title="创建一个简单的Fuzzer"></a>创建一个简单的Fuzzer</h3><p>让我们尝试完成上面这项作业，并用python构建一个模糊生成器。这个想法就是产生随机的字符，并将它们添加到缓冲区字符串变量（out）里，最后返回字符串。</p>
+<p>要实现该功能可能会用到python的以下功能函数：</p>
+<ul>
+<li><code>random.randrange(start, end)</code> –从start到end的范围里返回一个随机数</li>
+<li><code>range(start, end)</code> –创建一个start到end范围内为整数的列表，通常在迭代中使用</li>
+<li><code>for elem in list: body</code>–从list列表中获取每个值，带入<code>body</code>循环执行</li>
+<li><code>for i in range(start, end): body</code>–使用 i 循环执行body函数，i 的范围为从start到end-1</li>
+<li><code>chr(n)</code> –返回带有ASCII码的字符 <code>n</code></li>
+</ul>
+<p>要使用随机数，我们必须导入相应的模块：</p>
+<pre><code>import random</code></pre>
+<p>下面是实际<code>fuzzer()</code>功能：</p>
+<pre><code class="python">def fuzzer(max_length=100, char_start=32, char_range=32):
+    &quot;&quot;&quot;一个字符串最多有`max_length`个字符，
+       随机生成字符的ASCII码范围为 [`char_start`, `char_start` + `char_range`]&quot;&quot;&quot;
+    string_length = random.randrange(0, max_length + 1)
+    out = &quot;&quot;
+    for i in range(0, string_length):
+        out += chr(random.randrange(char_start, char_start + char_range))
+    return out</code></pre>
+<p>如果使用默认参数，该fuzzer（）函数会返回遗传随机字符：</p>
+<pre><code class="python">fuzzer()
+
+返回：
+&#39;!7#%&quot;*#0=)$;%6*;&gt;638:*&gt;80&quot;=&lt;/&gt;(/*:-(2&lt;4 !:5*6856&amp;?&quot;&quot;11&lt;7+%&lt;%7,4.8,*+&amp;,,$,.&quot;&#39;</code></pre>
+<p>巴特·米勒（Bart Miller）为此类随机创造了“模糊”一词。现在，假设此“模糊”字符串正是所期望特定输入格式的程序输入-例如：用逗号分隔的值列表或电子邮件地址，以此检验程序是否可以处理此类输入而不会出现任何问题？</p>
+<p>如果上述模糊输入已经ok，请考虑可以轻松设置模糊以产生其他各种类型的输入。例如，我们还可以<code>fuzzer()</code>产生一系列小写字母。我们<code>ord(c)</code>用来返回字符c的ASCII码。</p>
+<pre><code class="python">fuzzer(1000, ord(&#39;a&#39;), 26)
+
+返回：
+&#39;zskscocrxllosagkvaszlngpysurezehvcqcghygphnhonehczraznkibltfmocxddoxcmrvatcleysksodzlwmzdndoxrjfqigjhqjxkblyrtoaydlwwisrvxtxsejhfbnforvlfisojqaktcxpmjqsfsycisoexjctydzxzzutukdztxvdpqbjuqmsectwjvylvbixzfmqiabdnihqagsvlyxwxxconminadcaqjdzcnzfjlwccyudmdfceiepwvyggepjxoeqaqbjzvmjdlebxqvehkmlevoofjlilegieeihmetjappbisqgrjhglzgffqrdqcwfmmwqecxlqfpvgtvcddvmwkplmwadgiyckrfjddxnegvmxravaunzwhpfpyzuyyavwwtgykwfszasvlbwojetvcygectelwkputfczgsfsbclnkzzcjfywitooygjwqujseflqyvqgyzpvknddzemkegrjjrshbouqxcmixnqhgsgdwgzwzmgzfajymbcfezqxndbmzwnxjeevgtpjtcwgbzptozflrwvuopohbvpmpaifnyyfvbzzdsdlznusarkmmtazptbjbqdkrsnrpgdffemnpehoapiiudokczwrvpsonybfpaeyorrgjdmgvkvupdtkrequicexqkoikygepawmwsdcrhivoegynnhodfhryeqbebtbqnwhogdfrsrksntqjbocvislhgrgchkhpaiugpbdygwkhrtyniufabdnqhtnwreiascfvmuhettfpbowbjadfxnbtzhobnxsnf&#39;</code></pre>
+<p>假设程序需要一个标识符作为其输入。它会期望这么长的标识符吗？</p>
+<h3 id="对外部程序进行模糊测试"><a href="#对外部程序进行模糊测试" class="headerlink" title="对外部程序进行模糊测试"></a>对外部程序进行模糊测试</h3><h4 id="创建输入文件"><a href="#创建输入文件" class="headerlink" title="创建输入文件"></a>创建输入文件</h4><p>让我们引入一个临时文件模块，以避免使文件系统混乱。</p>
+<pre><code class="python">import os
+import tempfile</code></pre>
+<pre><code class="python">basename = &quot;input.txt&quot;
+tempdir = tempfile.mkdtemp()
+FILE = os.path.join(tempdir, basename)
+print(FILE)</code></pre>
+<pre><code class="python">/var/folders/n2/xd9445p97rb3xh7m1dfx8_4h0006ts/T/tmpjx6ywfdu/input.txt</code></pre>
+<p>现在，我们可以打开该文件进行写入。Python的<code>open()</code>函数打开一个文件，我们可以在其中写入任意内容。它通常与<code>with</code>语句一起使用，以确保不再需要该文件时就将其关闭。</p>
+<pre><code class="python">data = fuzzer()
+with open(FILE, &quot;w&quot;) as f:
+    f.write(data)</code></pre>
+<p>我们可以通过读取其内容来验证该文件是否真的实际创建：</p>
+<pre><code class="python">contents = open(FILE).read()
+print(contents)
+assert(contents == data)</code></pre>
+<pre><code class="python">!6&quot;*-2,$994,%*:&quot;$25!2=!+!2#&#39;&#39;6/3&#39;4!6%7056&#39;??2#7;75&gt;27&#39;15#-4.?*&lt;?6&amp;&quot; !3&#39;7-5&gt;18%</code></pre>
+<h4 id="调用外部程序"><a href="#调用外部程序" class="headerlink" title="调用外部程序"></a>调用外部程序</h4><p>现在我们有一个输入的文件了，让我们来测试一个有趣的程序—bc计算器（<code>bc</code> calculator program），该程序采取算术表达式对其求值。</p>
+<p>要调用bc，我们可以使用Python的 <code>subprocess</code>模块：</p>
+<pre><code class="python">import os
+import subprocess</code></pre>
+<pre><code class="python">program = &quot;bc&quot;
+with open(FILE, &quot;w&quot;) as f:
+    f.write(&quot;2 + 2\n&quot;)
+result = subprocess.run([program, FILE],
+                        stdin=subprocess.DEVNULL,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                        universal_newlines=True)  # Will be &quot;text&quot; in Python 3.7</code></pre>
+<p>从result，我们可以检查程序的输出。对于bc计算器，以下是对算术表达式求解的结果：</p>
+<pre><code class="python">result.stdout</code></pre>
+<pre><code class="python">&#39;4\n&#39;</code></pre>
+<p>我们还可以检查返回的状态值，为0表示程序正确终止。</p>
+<pre><code>result.returncode</code></pre>
+<pre><code>0</code></pre>
+<p>任何错误消息都可以在中找到<code>results.stderr</code>：</p>
+<pre><code>result.stderr</code></pre>
+<pre><code>&#39;&#39;</code></pre>
+<p>除了<code>bc</code>，您实际上可以放入您喜欢的任何程序。但是请注意，如果您的程序能够更改甚至损坏系统，则模糊输入很可能包含执行此操作的数据或命令。</p>
+<p>只是为了好玩，想象一下您将测试一个文件删除程序，模糊器产生有效文件名的机会有多少？</p>
+<h4 id="长时间的运行模糊测试"><a href="#长时间的运行模糊测试" class="headerlink" title="长时间的运行模糊测试"></a>长时间的运行模糊测试</h4><p>现在让我们将大量输入提供给我们的测试程序，以查看它是否可能在某些程序上崩溃。我们将所有结果存储在<code>runs</code>变量中，作为输入数据和实际结果对。（注意：运行此程序可能需要一段时间。）</p>
+<pre><code class="python">trials = 100
+program = &quot;bc&quot;
+
+runs = []
+
+for i in range(trials):
+    data = fuzzer()
+    with open(FILE, &quot;w&quot;) as f:
+        f.write(data)
+    result = subprocess.run([program, FILE],
+                            stdin=subprocess.DEVNULL,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE,
+                            universal_newlines=True)
+    runs.append((data, result))</code></pre>
+<p>现在通过<code>runs</code>列表，我们可以查询一些统计的信息。例如，我们可以查询实际有多少次运行。我们使用<code>sum()</code> 汇总列表中的所有元素。</p>
+<pre><code class="python">sum(1 for (data, result) in runs if result.stderr == &quot;&quot;)</code></pre>
+<pre><code>4</code></pre>
+<p>显然，大多数输入都是无效的，这不足为奇，毕竟随机输入不太可能包含有效的算术表达式。</p>
+<p>让我们看一下第一个返回的错误：</p>
+<pre><code class="python">errors = [(data, result) for (data, result) in runs if result.stderr != &quot;&quot;]
+(first_data, first_result) = errors[0]
+
+print(repr(first_data))
+print(first_result.stderr)</code></pre>
+<pre><code class="python">&#39;5*,55&amp;8&gt;&quot;86,?&quot;/7!1%5-**&amp;-$&amp;)$91;&quot;21(\&#39;8&quot;(%$&#39;
+/var/folders/n2/xd9445p97rb3xh7m1dfx8_4h0006ts/T/tmpjx6ywfdu/input.txt 1: parse error
+/var/folders/n2/xd9445p97rb3xh7m1dfx8_4h0006ts/T/tmpjx6ywfdu/input.txt 1: illegal character: &amp;
+/var/folders/n2/xd9445p97rb3xh7m1dfx8_4h0006ts/T/tmpjx6ywfdu/input.txt 1: parse error
+/var/folders/n2/xd9445p97rb3xh7m1dfx8_4h0006ts/T/tmpjx6ywfdu/input.txt 1: illegal character: &amp;
+/var/folders/n2/xd9445p97rb3xh7m1dfx8_4h0006ts/T/tmpjx6ywfdu/input.txt 1: illegal character: $
+/var/folders/n2/xd9445p97rb3xh7m1dfx8_4h0006ts/T/tmpjx6ywfdu/input.txt 1: illegal character: &amp;
+/var/folders/n2/xd9445p97rb3xh7m1dfx8_4h0006ts/T/tmpjx6ywfdu/input.txt 1: illegal character: $
+/var/folders/n2/xd9445p97rb3xh7m1dfx8_4h0006ts/T/tmpjx6ywfdu/input.txt 1: parse error
+/var/folders/n2/xd9445p97rb3xh7m1dfx8_4h0006ts/T/tmpjx6ywfdu/input.txt 1: illegal character: $</code></pre>
+<p>除了非法字符，解析错误或语法错误外，是否还有其他错误消息？ （比如说崩溃或致命错误？）似乎不是很多，我们简单过滤一下看看：</p>
+<pre><code class="python">[result.stderr for (data, result) in runs if
+ result.stderr != &quot;&quot;
+ and &quot;illegal character&quot; not in result.stderr
+ and &quot;parse error&quot; not in result.stderr
+ and &quot;syntax error&quot; not in result.stderr]</code></pre>
+<pre><code>[]</code></pre>
+<p>也许bc程序的奔溃由程序自己捕捉。不幸的是，返回码似乎永远都不会为0.</p>
+<pre><code class="python">sum(1 for (data, result) in runs if result.returncode != 0)</code></pre>
+<pre><code>0</code></pre>
+<p>我们再让上面的<code>bc</code>测试运行怎么样？当它运行时，让我们看一下1989年的技术水平能做到哪一步。</p>
+<h4 id="利用Fuzzers查找Bug"><a href="#利用Fuzzers查找Bug" class="headerlink" title="利用Fuzzers查找Bug"></a>利用Fuzzers查找Bug</h4><p>当Miller和他的学生在1989年运行他们的第一个模糊器时，他们发现了一个令人震惊的结果：大约1/3的UNIX实用程序遇到了问题—它们在模糊测试输入时崩溃、挂起或以其他方式失败[ <a target="_blank" rel="noopener" href="https://doi.org/10.1145/96267.96279">Miller，1990</a> ]。这也包括上面的<code>bc</code>程序。（当然，这些错误现已修复！）</p>
+<p>考虑到这些UNIX实用程序中有许多都是在脚本中使用的，这些脚本也将处理网络输入，因此这是一个令人震惊的结果。程序员迅速构建并运行了自己的模糊器，急于修复所报告的错误，并学会了不再信任外部输入。</p>
+<p>米勒的模糊测试实验发现了什么问题？事实证明，程序员在1990年犯的错误在今天我们仍然在不断地重犯。</p>
+<h5 id="缓冲区溢出"><a href="#缓冲区溢出" class="headerlink" title="缓冲区溢出"></a>缓冲区溢出</h5><p>许多程序具有输入和输入元素的内置最大长度。在像C这样的语言中，很容易超出这些长度，而不会被程序（或程序员）甚至注意到，我们称之为<strong>缓冲区溢出</strong>。例如，以下代码即使有八个以上的字符，也会将<code>input</code>字符串复制到字符串中：</p>
+<pre><code class="python">char weekday[9]; // 8 characters + trailing &#39;\0&#39; terminator
+strcpy (weekday, input);</code></pre>
+<p>比如<code>input</code>是<code>&quot;Wednesday&quot;</code>（9个字符），则该操作已经失败；任何多余的字符（此处<code>&#39;y&#39;</code>以及后面的<code>&#39;\0&#39;</code>字符串终止符）都将被简单地复制到after之后的内存中<code>weekday</code>，从而触发任意行为；可能是一些布尔字符变量，将<code>&#39;n&#39;</code>变为<code>&#39;y&#39;</code>。使用模糊测试，很容易产生任意长的输入和输入元素。</p>
+<p>我们可以在Python函数中轻松模拟这种缓冲区溢出行为：</p>
+<pre><code class="python">def crash_if_too_long(s):
+    buffer = &quot;Thursday&quot;
+    if len(s) &gt; len(buffer):
+        raise ValueError</code></pre>
+<p>不出所料，它很快就崩溃了。</p>
+<pre><code class="python">from ExpectError import ExpectError</code></pre>
+<pre><code class="python">trials = 100
+with ExpectError():
+    for i in range(trials):
+        s = fuzzer()
+        crash_if_too_long(s)</code></pre>
+<pre><code class="python">Traceback (most recent call last):
+  File &quot;&lt;ipython-input-23-f83db3d59a06&gt;&quot;, line 5, in &lt;module&gt;
+    crash_if_too_long(s)
+  File &quot;&lt;ipython-input-21-928c2d2de976&gt;&quot;, line 4, in crash_if_too_long
+    raise ValueError
+ValueError (expected)</code></pre>
+<p>上面代码中的with ExpectError（）行可确保打印错误消息，但继续执行； 这是为了将其他代码示例中的“意外”错误与“意外”错误区分开。</p>
+<h5 id="缺少错误检查"><a href="#缺少错误检查" class="headerlink" title="缺少错误检查"></a>缺少错误检查</h5><p>许多编程语言没有exceptions，但是在异常情况下，函数会返回特殊的<strong>错误代码</strong>。比如<code>getchar()</code>，C函数通常从标准输入返回一个字符；如果没有可用的输入，它将返回特殊值<code>EOF</code>（end of file）。现在假设程序员正在扫描输入中的下一个字符，以读取字符，<code>getchar()</code>直到读取空格为止：</p>
+<pre><code class="python">while (getchar() != &#39; &#39;) &#123;
+&#125;</code></pre>
+<p>猜想如果输入在预想之前结束（模糊测试完全可能生成这种结果），会发生什么情况？好吧，<code>getchar()</code>会返回 <code>EOF</code>，并在再次调用时继续返回<code>EOF</code>；因此，上面的代码将会进入一个无限循环。</p>
+<p>同样，我们可以模拟这种丢失的错误检查。如果输入中没有空格，此函数将有效挂起：</p>
+<pre><code class="python">def hang_if_no_space(s):
+    i = 0
+    while True:
+        if i &lt; len(s):
+            if s[i] == &#39; &#39;:
+                break
+        i += 1</code></pre>
+<p>使用我们从在第一篇文章介绍的超时机制，我们可以在一段时间后中断此功能。实测，经过一些模糊的输入后，它确实会挂起。</p>
+<pre><code>from ExpectError import ExpectTimeout</code></pre>
+<pre><code class="python">trials = 100
+with ExpectTimeout(2):
+    for i in range(trials):
+        s = fuzzer()
+        hang_if_no_space(s)</code></pre>
+<pre><code class="python">Traceback (most recent call last):
+  File &quot;&lt;ipython-input-26-8e40f7d62a1b&gt;&quot;, line 5, in &lt;module&gt;
+    hang_if_no_space(s)
+  File &quot;&lt;ipython-input-24-5f437edacff4&gt;&quot;, line 7, in hang_if_no_space
+    i += 1
+  File &quot;&lt;ipython-input-24-5f437edacff4&gt;&quot;, line 7, in hang_if_no_space
+    i += 1
+  File &quot;ExpectError.ipynb&quot;, line 59, in check_time
+TimeoutError (expected)</code></pre>
+<p>上面代码中的with ExpectTimeout（）行可确保在两秒钟后中断内含代码的执行，并显示错误消息。</p>
+<h5 id="敏感数值"><a href="#敏感数值" class="headerlink" title="敏感数值"></a>敏感数值</h5><p>使用模糊测试，很容易在输入中生成不常见的值，从而引起各种有趣的行为。 再次考虑下面的C语言代码，该代码首先从输入中读取缓冲区大小，然后分配给定大小的缓冲区。</p>
+<pre><code class="c">char *read_input() &#123;
+    size_t size = read_buffer_size();
+    char *buffer = (char *)malloc(size);
+    // fill buffer
+    return (buffer);
+&#125;</code></pre>
+<p>如果size很大，超过了程序内存，会发生什么？如果size小于以下字符数，会发生什么？如果size为负数会怎样？通过在此处提供随机数，模糊处理可以造成各种损害。</p>
+<p>同样，我们可以轻松地在Python中模拟此类流氓数字。如果传递的值（字符串）在转换为整数后过大，则函数crash_if_too_large（）将失败。</p>
+<pre><code class="python">def collapse_if_too_large(s):
+    if int(s) &gt; 1000:
+        raise ValueError</code></pre>
+<p>我们可以让fuzzer（）创建一个数字字符串：</p>
+<pre><code>long_number = fuzzer(100, ord(&#39;0&#39;), 10)
+print(long_number)</code></pre>
+<pre><code>7056414967099541967374507745748918952640135045</code></pre>
+<p>如果我们将这些数字输入collapse_if_too_large（），它将很快崩溃。</p>
+<pre><code>with ExpectError():
+    collapse_if_too_large(long_number)</code></pre>
+<pre><code>Traceback (most recent call last):
+  File &quot;&lt;ipython-input-29-7a1817f3dbfc&gt;&quot;, line 2, in &lt;module&gt;
+    collapse_if_too_large(long_number)
+  File &quot;&lt;ipython-input-27-2c22a83a4dca&gt;&quot;, line 3, in collapse_if_too_large
+    raise ValueError
+ValueError (expected)</code></pre>
+<p>如果我们真的想在系统上分配那么多的内存，那么如上所述使它快速故障实际上是更好的选择。 但实际上，内存的不足可能会极大地降低系统的速度，甚至导致系统完全无响应，并且重启是唯一的选择。</p>
+<p>有人可能会说，这些都是不良编程或不良编程语言的问题。但是，每天都有成千上万的人开始编程，甚至在今天，所有人都一次又一次地犯同样的错误。</p>
+<h4 id="捕获错误"><a href="#捕获错误" class="headerlink" title="捕获错误"></a>捕获错误</h4><p>当Miller和他的学生建造第一个模糊器时，他们可以仅仅因为程序崩溃或挂起就能识别错误-这两个条件很容易识别。但是，如果故障更加微妙，我们需要进行其他检查。</p>
+<h5 id="通用检查器"><a href="#通用检查器" class="headerlink" title="通用检查器"></a>通用检查器</h5><p>如上一部分所述那样，缓冲区溢出是普遍问题实例：在C和C ++之类的语言中，程序可以访问其内存的任意部分，甚至是那些未初始化，已经释放或根本不属于数据部分的部分。如果要编写一个操作系统，这是必需的；如果要获得最大的性能或控制，这是非常好的；但是，如果要避免错误，这是很糟糕的。幸运的是，有一些工具可在运行时帮助捕获此类问题，与模糊测试结合使用时，它们非常有用。</p>
+<h6 id="检查存储器访问"><a href="#检查存储器访问" class="headerlink" title="检查存储器访问"></a>检查存储器访问</h6><p>为了在测试期间捕获有问题的内存访问，可以在特殊的<em>内存检查</em>环境中运行C程序。在运行时，它们检查每个内存操作是否访问有效和初始化的内存。一个流行的例子是<a target="_blank" rel="noopener" href="https://clang.llvm.org/docs/AddressSanitizer.html">LLVM Address Sanitizer</a>，它检测整套潜在的危险内存安全违规行为。在下面的示例中，我们将使用该工具编译一个相当简单的C程序，并通过读取内存的已分配部分来引发越界读取。</p>
+<pre><code class="c">with open(&quot;program.c&quot;, &quot;w&quot;) as f:
+    f.write(&quot;&quot;&quot;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+
+int main(int argc, char** argv) &#123;
+    /* Create an array with 100 bytes, initialized with 42 */
+    char *buf = malloc(100);
+    memset(buf, 42, 100);
+
+    /* Read the N-th element, with N being the first command-line argument */
+    int index = atoi(argv[1]);
+    char val = buf[index];
+
+    /* Clean up memory so we don&#39;t leak */
+    free(buf);
+    return val;
+&#125;
+    &quot;&quot;&quot;)</code></pre>
+<pre><code>from bookutils import print_file</code></pre>
+<pre><code>print_file(&quot;program.c&quot;)</code></pre>
+<pre><code class="c">#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+
+int main(int argc, char** argv) &#123;
+    /* Create an array with 100 bytes, initialized with 42 */
+    char *buf = malloc(100);
+    memset(buf, 42, 100);
+
+    /* Read the N-th element, with N being the first command-line argument */
+    int index = atoi(argv[1]);
+    char val = buf[index];
+
+    /* Clean up memory so we don&#39;t leak */
+    free(buf);
+    return val;
+&#125;</code></pre>
+<p>我们在启用ASAN的情况下编译此C程序：</p>
+<pre><code>!clang -fsanitize=address -g -o program program.c</code></pre>
+<p>如果运行参数为的程序<code>99</code>，则返回<code>buf[99]</code>，即42。</p>
+<pre><code>!./program 99; echo $?</code></pre>
+<pre><code>42</code></pre>
+<p>但是，访问buf [110]会导致AddressSanitizer中出现越界错误。</p>
+<pre><code>!./program 110</code></pre>
+<pre><code class="powershell">=================================================================
+==9753==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x60b0000000ae at pc 0x000104078ef0 bp 0x7ffeebb87390 sp 0x7ffeebb87388
+READ of size 1 at 0x60b0000000ae thread T0
+    #0 0x104078eef in main program.c:12
+    #1 0x7fff6a25acc8 in start (libdyld.dylib:x86_64+0x1acc8)
+
+0x60b0000000ae is located 10 bytes to the right of 100-byte region [0x60b000000040,0x60b0000000a4)
+allocated by thread T0 here:
+    #0 0x1040df793 in wrap_malloc (libclang_rt.asan_osx_dynamic.dylib:x86_64h+0x61793)
+    #1 0x104078e3f in main program.c:7
+    #2 0x7fff6a25acc8 in start (libdyld.dylib:x86_64+0x1acc8)
+
+SUMMARY: AddressSanitizer: heap-buffer-overflow program.c:12 in main
+Shadow bytes around the buggy address:
+  0x1c15ffffffc0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x1c15ffffffd0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x1c15ffffffe0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x1c15fffffff0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x1c1600000000: fa fa fa fa fa fa fa fa 00 00 00 00 00 00 00 00
+=&gt;0x1c1600000010: 00 00 00 00 04[fa]fa fa fa fa fa fa fa fa fa fa
+  0x1c1600000020: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x1c1600000030: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x1c1600000040: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x1c1600000050: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x1c1600000060: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07 
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+  Shadow gap:              cc
+==9753==ABORTING</code></pre>
+<p>如果您想在C程序中发现错误，则为模糊测试打开此类检查相当容易。根据工具的不同，它会将执行速度降低一定的因素（对于AddressSanitizer，通常为2××），并且消耗更多的内存，但是与发现这些错误所需的人工相比，CPU周期实在是太便宜了。</p>
+<p>对内存的越界访问具有很大的安全风险，因为它们可能使攻击者访问甚至修改并非针对他们的信息。作为一个著名的例子，<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Heartbleed">HeartBleed错误</a>是OpenSSL库中的一个安全错误，它实现了加密协议，该协议提供了计算机网络上的通信安全性。（如果您在浏览器中阅读此文本，则可能已使用这些协议对其进行了加密。）</p>
+<p>通过向SSL<em>心跳</em>服务发送特制命令来利用HeartBleed错误。心跳服务用于检查另一端的服务器是否仍在运行。客户端会向服务发送一个字符串，例如</p>
+<pre><code>BIRD (4 letters)</code></pre>
+<p>服务器将向其回复<code>BIRD</code>，并且客户端将知道服务器仍在运行。</p>
+<p>不幸的是，这种服务可以通过要求服务器回复利用指定的一组字母。下面的<a target="_blank" rel="noopener" href="https://xkcd.com/1354/">XKCD漫画</a>很好地解释了这一点：</p>
+<p><img src="https://i.loli.net/2021/01/04/Izm9Elg1HbvxQ8h.png" alt="xkcd_heartbleed_1"></p>
+<p><img src="https://i.loli.net/2021/01/04/2HRqkTLYBXpAtCm.png" alt="xkcd_heartbleed_2"></p>
+<p><img src="https://i.loli.net/2021/01/04/3gl26iKmMDWTVkG.png" alt="xkcd_heartbleed_3"></p>
+<p>在OpenSSL实现中，这些内存内容可能涉及加密证书，私钥等，而且更糟的是，没有人会注意到刚刚访问了该内存。发现HeartBleed错误后，它已经存在了很多年，没有人会知道是否泄漏了哪些秘密；哪些秘密已经泄漏。HeartBleed公告页面说明](<a target="_blank" rel="noopener" href="http://heartbleed.com/)%E4%BA%86%E4%B8%80%E5%88%87%E3%80%82">http://heartbleed.com/)了一切。</a></p>
+<p>但是如何发现HeartBleed？非常简单。Codenomicon公司以及Google的研究人员都使用内存清理器编译了OpenSSL库，然后用模糊的命令很快将其触发。然后，内存清理程序会注意到是否发生了越界内存访问-实际上，它将很快发现这一点。</p>
+<p>内存检查器只是众多检查器之一，可在模糊检查期间运行该检查器以检测运行时错误。在后续章节我们将学习更多有关如何定义通用检查器的信息。</p>
+<p>我们已经完成了<code>program</code>，所以我们进行清理：</p>
+<pre><code>!rm -fr program program.*</code></pre>
+<h6 id="信息泄露"><a href="#信息泄露" class="headerlink" title="信息泄露"></a>信息泄露</h6><p>信息泄漏不仅可能通过非法的内存访问而发生；它们也可能出现在“有效”内存中-如果此“有效”内存包含不应泄漏的敏感信息。让我们在Python程序中说明此问题。首先，让我们创建一些程序存储器，其中填充了实际数据和随机数据：</p>
+<pre><code>secrets = (&quot;&lt;space for reply&gt;&quot; + fuzzer(100)
+     + &quot;&lt;secret-certificate&gt;&quot; + fuzzer(100)
+     + &quot;&lt;secret-key&gt;&quot; + fuzzer(100) + &quot;&lt;other-secrets&gt;&quot;)</code></pre>
+<p>我们向中添加了更多的“内存”字符<code>secrets</code>，并用它们<code>&quot;deadbeef&quot;</code>作为未初始化内存的标记：</p>
+<pre><code>uninitialized_memory_marker = &quot;deadbeef&quot;
+while len(secrets) &lt; 2048:
+    secrets += uninitialized_memory_marker</code></pre>
+<p>我们定义了一个服务（类似于上面讨论的心跳服务），该服务将接收答复并发送回一个长度。它会将要发送的回复存储在内存中，然后以给定的长度发送回去。</p>
+<pre><code class="python">def heartbeat(reply, length, memory):
+    # Store reply in memory
+    memory = reply + memory[len(reply):]
+
+    # Send back heartbeat
+    s = &quot;&quot;
+    for i in range(length):
+        s += memory[i]
+    return s</code></pre>
+<p>这非常适合标准字符串：</p>
+<pre><code>heartbeat(&quot;potato&quot;, 6, memory=secrets)</code></pre>
+<pre><code>&#39;potato&#39;</code></pre>
+<pre><code>heartbeat(&quot;bird&quot;, 4, memory=secrets)</code></pre>
+<pre><code>&#39;bird&#39;</code></pre>
+<p>但是，如果该长度大于应答字符串的长度，则会溢出其他内存内容。请注意，所有这些仍然在常规数组范围内发生，因此不会触发地址清理器：</p>
+<pre><code>heartbeat(&quot;hat&quot;, 500, memory=secrets)</code></pre>
+<pre><code>&#39;hatace for reply&gt;#,,!3?30&gt;#61)$4--8=&lt;7)4 )03/%,5+! &quot;4)0?.9+?3();&lt;42?=?0&lt;secret-certificate&gt;7(+/+((1)#/0\&#39;4!&gt;/&lt;#=78%6$!!$&lt;-&quot;3&quot;\&#39;-?1?85!05629%/); *)1\&#39;/=9%&lt;secret-key&gt;.(#.4%&lt;other-secrets&gt;deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadb&#39;</code></pre>
+<p>一个人如何发现这种问题？这个想法是要识别不应该泄漏的信息，例如给定的机密，以及未初始化的内存。我们可以在一个小的Python示例中模拟这种检查：</p>
+<pre><code>from ExpectError import ExpectError</code></pre>
+<pre><code>with ExpectError():
+    for i in range(10):
+        s = heartbeat(fuzzer(), random.randint(1, 500), memory=secrets)
+        assert not s.find(uninitialized_memory_marker)
+        assert not s.find(&quot;secret&quot;)</code></pre>
+<pre><code>Traceback (most recent call last):
+  File &quot;&lt;ipython-input-44-b7e8a1210599&gt;&quot;, line 4, in &lt;module&gt;
+    assert not s.find(uninitialized_memory_marker)
+AssertionError (expected)</code></pre>
+<p>通过这种检查，我们发现机密和/或未初始化的内存确实泄漏了。在以后有关信息流的章节中，我们将讨论如何自动执行此操作，“污染”敏感信息及其衍生的值，并确保“污染”的值不会泄漏出去。</p>
+<p>根据经验，在模糊测试期间，应始终<em>启用尽可能多的自动检查器</em>。CPU周期便宜，错误也很昂贵。如果仅执行该程序而没有实际检测错误的选项，那么您将失去几个发现漏洞机会。</p>
+<h3 id="经验教训"><a href="#经验教训" class="headerlink" title="经验教训"></a>经验教训</h3><ul>
+<li>随机生成输入（“模糊测试”）是一种简单，经济高效的方法，可以快速测试任意程序的健壮性。</li>
+<li>模糊器发现的错误主要是由于<em>输入处理中的</em>错误和不足。</li>
+<li>要捕获错误，请具有尽可能多的<em>一致性检查</em></li>
+</ul>
+<h3 id="下一步"><a href="#下一步" class="headerlink" title="下一步"></a>下一步</h3><ul>
+<li>在现有输入上使用<em>变异</em>以获得更多有效输入</li>
+<li>使用<em>语法</em>指定输入格式，从而获得更多有效输入</li>
+<li>减少<em>失败的输入</em>以进行有效的调试</li>
+</ul>
+</article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/2021/01/20/fuzzbook3%20fuzz%E6%A1%86%E6%9E%B6/" title="Fuzzbook3——一种Fuzz的框架结构"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">上一页: Fuzzbook3——一种Fuzz的框架结构</span></a><a class="button is-default" href="/2020/12/02/fuzzbook1%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95/" title="Fuzzbook1——软件的安全性测试"><span class="has-text-weight-semibold">下一页: Fuzzbook1——软件的安全性测试</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container"><script async repo="F-ZhaoYang/F-ZhaoYang.github.io" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><a title="twitter" target="_blank" rel="noopener nofollow" href="//twitter.com/FstarkFZY"><i class="iconfont icon-twitter"></i></a><!-- Github--><a title="github" target="_blank" rel="noopener nofollow" href="//github.com/F-ZhaoYang"><i class="iconfont icon-github"></i></a><!-- Ins--><a title="instagram" target="_blank" rel="noopener nofollow" href="//www.instagram.com//"><i class="iconfont icon-ins"></i></a><!-- RSS--><!-- 知乎--><!-- 领英--><!-- 脸书--><a title="facebook" target="_blank" rel="noopener nofollow" href="//www.facebook.com/fstark123"><i class="iconfont icon-tian7_facebook"></i></a></section><p><span>Copyright ©</span><span> Fstark 2021</span><span></span></p></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/post.js"></script></body></html>

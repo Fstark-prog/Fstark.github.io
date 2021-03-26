@@ -1,0 +1,175 @@
+<!DOCTYPE html><html class="appearance-dark" lang="zh-CN"><head><meta charset="UTF-8"><title>Fuzzbook3——一种Fuzz的框架结构</title><meta name="description" content="Winter is coming"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><!-- Google Analytics --><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q || []).push(arguments)},i[r].l=1 * new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', '', 'auto');
+ga('send', 'pageview');</script><!-- End Google Analytics -->
+<!-- Baidu Analytics --><!-- End Baidu Analytics --><link rel="icon" href="/source/favicon.png"><link rel="stylesheet" href="/style/common/bulma.css"><link rel="stylesheet" href="/style/base.css"><link rel="stylesheet" href="/style/common/helper.css"><script src="/js/common.js"></script><link rel="stylesheet" href="/style/post.css"><link rel="stylesheet" href="/style/themes/highlight-theme-light.css"><script src="/js/highlight.pack.js"></script><meta name="generator" content="Hexo 5.3.0"></head><body class="is-flex is-flex-direction-column"><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-space-between is-hidden-mobile"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/">Fstark's blog</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">Fuzzbook3——一种Fuzz的框架结构</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">点击返回顶部</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about/">关于</a></h3><h3 class="is-inline-block"><a href="/archives/">归档</a></h3></aside></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about/">关于</a></h3><h3 class="is-inline-block"><a href="/archives/">归档</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9B%E5%BB%BARunner%E7%9A%84%E7%B1%BB%EF%BC%9A"><span class="toc-text">创建Runner的类：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9B%E5%BB%BAFuzzer%E7%9A%84%E7%B1%BB%EF%BC%9A"><span class="toc-text">创建Fuzzer的类：</span></a></li></ol></div><div class="column is-9"><header class="my-4"><a href="/tags/fuzz"><i class="tag post-item-tag">fuzz</i></a><a href="/tags/%E6%96%B0%E8%B6%8B%E5%8A%BF"><i class="tag post-item-tag">新趋势</i></a><a href="/tags/Fuzzbook"><i class="tag post-item-tag">Fuzzbook</i></a></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">Fuzzbook3——一种Fuzz的框架结构</h1><time class="has-text-grey" datetime="2021-01-20T09:45:00.000Z">2021-01-20</time><article class="mt-2 post-content"><p><img src="https://image.3001.net/images/20210111/1610358571_5ffc1f2b95e569df29bae.png!small" alt="image-20201005165901975"></p>
+<p>由于之后的章节中我们会常常用到第二部分所提到的Fuzzer与Runner思路结构，因此创建一种易于重复使用、后期易于拓展的Fuzz框架结构就显得十分重要。为此我们引入Python中类的概念，来逐步封装之前所提到的功能，为后面的章节做准备。</p>
+<a id="more"></a>
+
+<h3 id="创建Runner的类："><a href="#创建Runner的类：" class="headerlink" title="创建Runner的类："></a>创建Runner的类：</h3><p>我么首先需要介绍的是Runner的概念：使用给定的输入来执行某些特定的程序，特定的程序通常是指要接受测试的某些程序或函数。</p>
+<p>Runner本质上提供了一种run（input）方法：用于将input（字符串）传递给程序运行。run（）会返回一对值（result，outcome），这里的result是run运行后结果的返回值，提供了run运行的细节供我们参考；outcome是将结果分为三类值：</p>
+<ul>
+<li><code>Runner.PASS</code>—测试<em>通过</em>。运行产生正确的结果。</li>
+<li><code>Runner.FAIL</code>—测试<em>失败</em>。运行产生不正确的结果。</li>
+<li><code>Runner.UNRESOLVED</code>—测试既没有通过也没有失败。如果无法进行运行（例如输入无效），则会发生这种情况。</li>
+</ul>
+<pre><code class="python">class Runner(object):
+    # Test outcomes
+    PASS = &quot;PASS&quot;
+    FAIL = &quot;FAIL&quot;
+    UNRESOLVED = &quot;UNRESOLVED&quot;
+
+    def __init__(self):
+        &quot;&quot;&quot;Initialize&quot;&quot;&quot;
+        pass
+
+    def run(self, inp):
+        &quot;&quot;&quot;Run the runner with the given input&quot;&quot;&quot;
+        return (inp, Runner.UNRESOLVED)</code></pre>
+<p>这里的Runner类是后续的一个基类，仅仅是一个基础的框架。后续要根据自己的需求继承该基类并用额外的函数重写。</p>
+<p>这里举一个简单的例子：PrintRunner会打印出所有传递给自身的值，它就是基于Runner继承并修改的：</p>
+<pre><code class="python">class PrintRunner(Runner):
+    def run(self, inp):
+        &quot;&quot;&quot;Print the given input&quot;&quot;&quot;
+        print(inp)
+        return (inp, Runner.UNRESOLVED)</code></pre>
+<pre><code class="python">p = PrintRunner()
+(result, outcome) = p.run(&quot;Some input&quot;)</code></pre>
+<p>结果就是我们作为输入传递的字符串：</p>
+<pre><code class="python">result：
+&#39;Some input&#39;</code></pre>
+<p>但是到目前为止，我们仍无法对程序行为进行分类：</p>
+<pre><code class="python">outcome：
+&#39;UNRESOLVED&#39;</code></pre>
+<p>下面的<code>ProgramRunner</code>类将输入传送到程序，并根据运行结果分类：</p>
+<pre><code class="python">class ProgramRunner(Runner):
+    def __init__(self, program):
+        &quot;&quot;&quot;Initialize.  `program` is a program spec as passed to `subprocess.run()`&quot;&quot;&quot;
+        self.program = program
+
+    def run_process(self, inp=&quot;&quot;):
+        &quot;&quot;&quot;Run the program with `inp` as input.  Return result of `subprocess.run()`.&quot;&quot;&quot;
+        return subprocess.run(self.program,
+                              input=inp,
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE,
+                              universal_newlines=True)
+
+    def run(self, inp=&quot;&quot;):
+        &quot;&quot;&quot;Run the program with `inp` as input.  Return test outcome based on result of `subprocess.run()`.&quot;&quot;&quot;
+        result = self.run_process(inp)
+
+        if result.returncode == 0:
+            outcome = self.PASS
+        elif result.returncode &lt; 0:
+            outcome = self.FAIL
+        else:
+            outcome = self.UNRESOLVED
+
+        return (result, outcome)</code></pre>
+<p>如果是针对二进制程序文件，可能还要小改一下：</p>
+<pre><code class="python">class BinaryProgramRunner(ProgramRunner):
+    def run_process(self, inp=&quot;&quot;):
+        &quot;&quot;&quot;Run the program with `inp` as input.  Return result of `subprocess.run()`.&quot;&quot;&quot;
+        return subprocess.run(self.program,
+                              input=inp.encode(),
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE)</code></pre>
+<p>让我们演示一个<code>ProgramRunner</code>使用<code>cat</code>程序的实际例子：cat程序将其输入复制到其输出。</p>
+<p>我们看到标准的调用<code>cat</code>简单地完成了这项工作，其输出<code>cat</code>与其输入相同：</p>
+<pre><code class="python">cat = ProgramRunner(program=&quot;cat&quot;)
+cat.run(&quot;hello&quot;)</code></pre>
+<pre><code class="python">输出：
+(CompletedProcess(args=&#39;cat&#39;, returncode=0, stdout=&#39;hello&#39;, stderr=&#39;&#39;), &#39;PASS&#39;)</code></pre>
+<p>是不是封装后使用起来更方便了。</p>
+<h3 id="创建Fuzzer的类："><a href="#创建Fuzzer的类：" class="headerlink" title="创建Fuzzer的类："></a>创建Fuzzer的类：</h3><p>现在我们来一起定义一个fuzzer类，fuzzer的主要作用其实就是生成数据并送至runner.</p>
+<p>Fuzzer的基类提供了一些创建输入的核心方法，随后run（）将这些数据传送至Runner并返回结果；runs()可以设定发送的次数（trials）</p>
+<pre><code class="python">class Fuzzer(object):
+    def __init__(self):
+        pass
+
+    def fuzz(self):
+        &quot;&quot;&quot;Return fuzz input&quot;&quot;&quot;
+        return &quot;&quot;
+
+    def run(self, runner=Runner()):
+        &quot;&quot;&quot;Run `runner` with fuzz input&quot;&quot;&quot;
+        return runner.run(self.fuzz())
+
+    def runs(self, runner=PrintRunner(), trials=10):
+        &quot;&quot;&quot;Run `runner` with fuzz input, `trials` times&quot;&quot;&quot;
+        # Note: the list comprehension below does not invoke self.run() for subclasses
+        # return [self.run(runner) for i in range(trials)]
+        outcomes = []
+        for i in range(trials):
+            outcomes.append(self.run(runner))
+        return outcomes</code></pre>
+<p>默认情况下，<code>Fuzzer</code>对象不执行任何操作。但在<code>RandomFuzzer</code>中，子类实现了上述功能的<code>fuzzer()</code>功能，并增加了一个附加参数<code>min_length</code>以指定生成数据的最小长度。</p>
+<pre><code class="python">class RandomFuzzer(Fuzzer):
+    def __init__(self, min_length=10, max_length=100,
+                 char_start=32, char_range=32):
+        &quot;&quot;&quot;Produce strings of `min_length` to `max_length` characters
+           in the range [`char_start`, `char_start` + `char_range`]&quot;&quot;&quot;
+        self.min_length = min_length
+        self.max_length = max_length
+        self.char_start = char_start
+        self.char_range = char_range
+
+    def fuzz(self):
+        string_length = random.randrange(self.min_length, self.max_length + 1)
+        out = &quot;&quot;
+        for i in range(0, string_length):
+            out += chr(random.randrange(self.char_start,
+                                        self.char_start + self.char_range))
+        return out</code></pre>
+<p>使用<code>RandomFuzzer</code>，我们现在可以创建一个模糊器，在创建模糊器时只需配置一次即可。</p>
+<pre><code class="python">random_fuzzer = RandomFuzzer(min_length=20, max_length=20)
+for i in range(10):
+    print(random_fuzzer.fuzz())</code></pre>
+<pre><code class="python">&#39;&gt;23&gt;33)(&amp;&quot;09.377.*3
+*+:5 ? (?1$4&lt;&gt;!?3&gt;.&#39;
+4+3/(3 (0%!&gt;!(+9%,#$
+/51$2964&gt;;)2417&lt;9&quot;2&amp;
+907.. !7:&amp;--&quot;=$7&#39;,7*
+(5=5&#39;.!*+&amp;&gt;&quot;)6%9)=,/
+?:&amp;5) &quot;;.0!=6&gt;3+&gt;)=,
+6&amp;,?:!#2))- ?:)=63&#39;-
+,)9#839%)?&amp;(0&lt;6(&quot;*;)
+4?!(49+8=-&#39;&amp;499%?&lt; &#39;</code></pre>
+<p>下面我们仍然以cat应用程序为例，将这样生成的输入发送到我们先前定义的cat<code>，验证是否</code>cat确实确实将其（模糊的）输入复制到其输出中。</p>
+<pre><code class="python">for i in range(10):
+    inp = random_fuzzer.fuzz()
+    result, outcome = cat.run(inp)
+    assert result.stdout == inp
+    assert outcome == Runner.PASS</code></pre>
+<p>最后，将Fuzzer与Runner结合十分的普遍</p>
+<pre><code class="python">random_fuzzer.run(cat)</code></pre>
+<pre><code class="python">(CompletedProcess(args=&#39;cat&#39;, returncode=0, stdout=&#39;?:+= % &lt;1&lt;6$:(&gt;=:9)5&#39;, stderr=&#39;&#39;),
+ &#39;PASS&#39;)</code></pre>
+<p>使用<code>runs()</code>，我们可以重复执行模糊测试多次，以获得结果列表。</p>
+<pre><code>random_fuzzer.runs(cat, 10)</code></pre>
+<pre><code class="python">[(CompletedProcess(args=&#39;cat&#39;, returncode=0, stdout=&#39;3976%%&amp;+%6=(1)3&amp;3:&lt;9&#39;, stderr=&#39;&#39;),
+  &#39;PASS&#39;),
+ (CompletedProcess(args=&#39;cat&#39;, returncode=0, stdout=&#39;33$#42$ 11=*%$20=&lt;.-&#39;, stderr=&#39;&#39;),
+  &#39;PASS&#39;),
+ (CompletedProcess(args=&#39;cat&#39;, returncode=0, stdout=&#39;&quot;?&lt;\&#39;#8 &lt;/:*%9.--\&#39;97!&#39;, stderr=&#39;&#39;),
+  &#39;PASS&#39;),
+ (CompletedProcess(args=&#39;cat&#39;, returncode=0, stdout=&quot;/0-#(03/!#60&#39;+6&gt;&amp;&amp;72&quot;, stderr=&#39;&#39;),
+  &#39;PASS&#39;),
+ (CompletedProcess(args=&#39;cat&#39;, returncode=0, stdout=&quot;=,+:,6&#39;5:950+&gt;&lt;3(*()&quot;, stderr=&#39;&#39;),
+  &#39;PASS&#39;),
+ (CompletedProcess(args=&#39;cat&#39;, returncode=0, stdout=&quot; 379+0?&#39;%3137=2:4605&quot;, stderr=&#39;&#39;),
+  &#39;PASS&#39;),
+ (CompletedProcess(args=&#39;cat&#39;, returncode=0, stdout=&quot;02&gt;!$&lt;/&#39;*81.#&lt;/22&gt;+:&quot;, stderr=&#39;&#39;),
+  &#39;PASS&#39;),
+ (CompletedProcess(args=&#39;cat&#39;, returncode=0, stdout=&quot;=-&lt;&#39;3-#88*%&amp;*9&lt; +1&amp;&amp;&quot;, stderr=&#39;&#39;),
+  &#39;PASS&#39;),
+ (CompletedProcess(args=&#39;cat&#39;, returncode=0, stdout=&#39;2;;0=3&amp;6=8&amp;30&amp;&lt;-;?*;&#39;, stderr=&#39;&#39;),
+  &#39;PASS&#39;),
+ (CompletedProcess(args=&#39;cat&#39;, returncode=0, stdout=&#39;/#05=*3($&gt;::#7!0=12+&#39;, stderr=&#39;&#39;),
+  &#39;PASS&#39;)]</code></pre>
+<p>有了这些类，我们就可以创建更多更复杂的模糊器了。</p>
+</article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/2021/03/01/Fuzzing%20and%20vulnerabilities/" title="模糊测试与寻找漏洞概述个人总结"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">上一页: 模糊测试与寻找漏洞概述个人总结</span></a><a class="button is-default" href="/2021/01/05/fuzzbook2%E9%9A%8F%E6%9C%BA%E8%BE%93%E5%85%A5/" title="Fuzzbook2——使用随机输入测试程序"><span class="has-text-weight-semibold">下一页: Fuzzbook2——使用随机输入测试程序</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container"><script async repo="F-ZhaoYang/F-ZhaoYang.github.io" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><a title="twitter" target="_blank" rel="noopener nofollow" href="//twitter.com/FstarkFZY"><i class="iconfont icon-twitter"></i></a><!-- Github--><a title="github" target="_blank" rel="noopener nofollow" href="//github.com/F-ZhaoYang"><i class="iconfont icon-github"></i></a><!-- Ins--><a title="instagram" target="_blank" rel="noopener nofollow" href="//www.instagram.com//"><i class="iconfont icon-ins"></i></a><!-- RSS--><!-- 知乎--><!-- 领英--><!-- 脸书--><a title="facebook" target="_blank" rel="noopener nofollow" href="//www.facebook.com/fstark123"><i class="iconfont icon-tian7_facebook"></i></a></section><p><span>Copyright ©</span><span> Fstark 2021</span><span></span></p></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/post.js"></script></body></html>
