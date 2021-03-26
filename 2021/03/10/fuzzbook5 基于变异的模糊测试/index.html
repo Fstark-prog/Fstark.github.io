@@ -1,0 +1,431 @@
+<!DOCTYPE html><html class="appearance-dark" lang="zh-CN"><head><meta charset="UTF-8"><title>Fuzzbook5——基于变异的模糊测试</title><meta name="description" content="Winter is coming"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><!-- Google Analytics --><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q || []).push(arguments)},i[r].l=1 * new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', '', 'auto');
+ga('send', 'pageview');</script><!-- End Google Analytics -->
+<!-- Baidu Analytics --><!-- End Baidu Analytics --><link rel="icon" href="/source/favicon.png"><link rel="stylesheet" href="/style/common/bulma.css"><link rel="stylesheet" href="/style/base.css"><link rel="stylesheet" href="/style/common/helper.css"><script src="/js/common.js"></script><link rel="stylesheet" href="/style/post.css"><link rel="stylesheet" href="/style/themes/highlight-theme-light.css"><script src="/js/highlight.pack.js"></script><script src="//unpkg.com/valine/dist/Valine.min.js"></script><meta name="generator" content="Hexo 5.3.0"></head><body class="is-flex is-flex-direction-column"><header class="header-widget is-flex-shrink-0 is-hidden-mobile"><div class="container is-fullhd is-flex is-justify-content-space-between is-align-items-center is-full-height"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/">Fstark's blog</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">Fuzzbook5——基于变异的模糊测试</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">点击返回顶部</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about/">关于</a></h3><h3 class="is-inline-block"><a href="/archives/">归档</a></h3></aside></div></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about/">关于</a></h3><h3 class="is-inline-block"><a href="/archives/">归档</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%88%E5%86%B3%E6%9D%A1%E4%BB%B6"><span class="toc-text">先决条件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8E%E5%8F%98%E5%BC%82%E7%9A%84%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95%E5%BC%95%E6%93%8E"><span class="toc-text">基于变异的模糊测试引擎</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9URL%E8%A7%A3%E6%9E%90%E5%99%A8%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95"><span class="toc-text">对URL解析器进行模糊测试</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%98%E5%BC%82%E7%9A%84%E8%BE%93%E5%85%A5"><span class="toc-text">变异的输入</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#URLs%E5%8F%98%E5%BC%82"><span class="toc-text">URLs变异</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%9A%E7%A7%8D%E5%8F%98%E5%BC%82"><span class="toc-text">多种变异</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E8%A6%86%E7%9B%96%E7%8E%87%E5%BC%95%E5%AF%BC"><span class="toc-text">使用覆盖率引导</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-text">总结</span></a></li></ol></div><div class="column is-9"><header class="my-4"><a href="/tags/fuzz"><i class="tag post-item-tag">fuzz</i></a><a href="/tags/%E6%96%B0%E8%B6%8B%E5%8A%BF"><i class="tag post-item-tag">新趋势</i></a><a href="/tags/Fuzzbook"><i class="tag post-item-tag">Fuzzbook</i></a></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">Fuzzbook5——基于变异的模糊测试</h1><time class="has-text-grey" datetime="2021-03-10T09:45:00.000Z">2021-03-10</time><article class="mt-2 post-content"><p><img src="https://image.3001.net/images/20210111/1610358571_5ffc1f2b95e569df29bae.png!small" alt="image-20201005165901975"></p>
+<p>随机生成的输入虽好，但是大多数在语法上是不成立的，因此很快就会被处理程序拒绝掉。为了能让模糊测试有效的进行下去，我们必须增加获得有效输入的几率。基于变异的模糊测试就是这样的一种方法，即对现有输入进行小的更改，这些更改可能仍使输入保持有效，但仍会表现出某些新的行为。在本节中我们一起学习如何创建此类变异，以及如何使用流行的AFL核心概念来引导它们发现新的路径。</p>
+<a id="more"></a>
+<h3 id="先决条件"><a href="#先决条件" class="headerlink" title="先决条件"></a>先决条件</h3><ul>
+<li>读者需要对基本的模糊测试结构与过程有所了解（可向前翻看第二章）</li>
+</ul>
+<h3 id="基于变异的模糊测试引擎"><a href="#基于变异的模糊测试引擎" class="headerlink" title="基于变异的模糊测试引擎"></a>基于变异的模糊测试引擎</h3><p>2013年11月，发布了第一版的<a target="_blank" rel="noopener" href="http://lcamtuf.coredump.cx/afl/">American Fuzzy Lop</a>（AFL）。从那时起，AFL已成为最成功的模糊测试工具之一，并具有很多分支，例如<a target="_blank" rel="noopener" href="https://github.com/mboehme/aflfast">AFLFast</a>，<a target="_blank" rel="noopener" href="https://github.com/aflgo/aflgo">AFLGo</a>和<a target="_blank" rel="noopener" href="https://github.com/aflsmart/aflsmart">AFLSmart</a>（以后将进行讨论）。AFL使模糊测试成为自动漏洞检测的流行选择，它也是第一个被证明可以在许多对安全性要求很高的真实应用程序中，能够自动检测到漏洞的方法。</p>
+<p><img src="https://i.loli.net/2021/03/19/Ajt2dm6KBwaqkcF.png" alt="image-20210319184733073"></p>
+<p>在本章中，我们将介绍变异模糊测试的基础，接下来的下一章将进一步展示如何将模糊测试引导到特定的代码目标。（定向型模糊测试）</p>
+<h3 id="对URL解析器进行模糊测试"><a href="#对URL解析器进行模糊测试" class="headerlink" title="对URL解析器进行模糊测试"></a>对URL解析器进行模糊测试</h3><p>许多应用程序限定其输入用非常固定的格式，这样才能正常执行后面的功能。例如让我们考虑一个接受URL地址（Web地址）的程序，其接受的url必定要采取有效的格式（即合规的url），以便程序可以正常的处理它。但如果我们采用前几章创建的完全随机生成输入的模糊测试引擎，我们能生成有效url的可能性有多大？</p>
+<p>为了深入探讨这个问题，让我们一起探讨一下正常url的组成：</p>
+<pre><code>scheme://netloc/path?query#fragment</code></pre>
+<ul>
+<li><code>scheme</code> ：指的是所使用的协议，常见的包括<code>http</code>, <code>https</code>, <code>ftp</code>, <code>file</code>…</li>
+<li><code>netloc</code> ：是要连接的主机的名称，例如 <code>www.google.com</code></li>
+<li><code>path</code> ：是在目标主机上的路径，例如 <code>search</code></li>
+<li><code>query</code> ：是键/值对的列表，例如 <code>q=fuzzing</code></li>
+<li><code>fragment</code> ：是检索到的文档中某个位置的标记，例如 <code>#result</code></li>
+</ul>
+<p>在Python中，我们可以使用该<code>urlparse()</code>函数来解析URL并将其分解为各个部分。</p>
+<pre><code class="python">import bookutils</code></pre>
+<pre><code class="python">try:
+    from urlparse import urlparse      # Python 2
+except ImportError:
+    from urllib.parse import urlparse  # Python 3
+
+urlparse(&quot;http://www.google.com/search?q=fuzzing&quot;)</code></pre>
+<pre><code class="python">ParseResult(scheme=&#39;http&#39;, netloc=&#39;www.google.com&#39;, path=&#39;/search&#39;, params=&#39;&#39;, query=&#39;q=fuzzing&#39;, fragment=&#39;&#39;)</code></pre>
+<p>我们将看到结果如何将URL的各个部分编码为不同的属性。</p>
+<p>现在让我们假设有一个使用URL作为输入的程序。为简化起见，我们不会让它有太多功能。我们只是让它检查传递的URL的有效性。如果URL有效，则返回True；否则，将引发异常。</p>
+<pre><code class="python">def http_program(url):
+    supported_schemes = [&quot;http&quot;, &quot;https&quot;]
+    result = urlparse(url)
+    if result.scheme not in supported_schemes:
+        raise ValueError(&quot;Scheme must be one of &quot; + repr(supported_schemes))
+    if result.netloc == &#39;&#39;:
+        raise ValueError(&quot;Host must be non-empty&quot;)
+
+    # Do something with the URL
+    return True</code></pre>
+<p>现在让我们开始对<code>http_program()</code>进行模糊测试。为了模糊，我们使用全系打印的ASCII字符，这样<code>:</code>，<code>/</code>和小写字母都包括在内。</p>
+<pre><code class="python">from Fuzzer import fuzzer</code></pre>
+<pre><code class="python">fuzzer(char_start=32, char_range=96)</code></pre>
+<pre><code class="python">&#39;&quot;N&amp;+slk%h\x7fyp5o\&#39;@[3(rW*M5W]tMFPU4\\P@tz%[X?uo\\1?b4T;1bDeYtHx #UJ5w&#125;pMmPodJM,_&#39;</code></pre>
+<p>让我们尝试对1000个随机输入进行模糊测试，看看我们能否取得成功。</p>
+<pre><code class="python">for i in range(1000):
+    try:
+        url = fuzzer()
+        result = http_program(url)
+        print(&quot;Success!&quot;)
+    except ValueError:
+        pass</code></pre>
+<p>获取实际有效的url概率有多大？我们需要以<code>http://</code>或者<code>https://</code>开头的字符串。先来看一下<code>http://</code>的情况：这是七个确定的字符，随机产生这七个字符（字符范围为96个不同字符）的概率是96的7次方分之一，或者表示成</p>
+<pre><code>96 ** 7</code></pre>
+<pre><code>75144747810816</code></pre>
+<p>产生<code>https://</code>的概率更加糟糕，是96的8次方分之一：</p>
+<pre><code>96 ** 8</code></pre>
+<pre><code>7213895789838336</code></pre>
+<p>这样综合一下可能性就是</p>
+<pre><code>likelihood = 1 / (96 ** 7) + 1 / (96 ** 8)
+likelihood</code></pre>
+<pre><code>1.344627131107667e-14</code></pre>
+<p>那我们平均每产生一条符合上述条件的合格的url所需运行次数就是</p>
+<pre><code>1 / likelihood</code></pre>
+<pre><code>74370059689055.02</code></pre>
+<p>我们来简单衡量一下运行<code>http_program()</code>一次需要多长时间</p>
+<pre><code class="python">from Timer import Timer</code></pre>
+<pre><code class="python">trials = 1000
+with Timer() as t:
+    for i in range(trials):
+        try:
+            url = fuzzer()
+            result = http_program(url)
+            print(&quot;Success!&quot;)
+        except ValueError:
+            pass
+
+duration_per_run_in_seconds = t.elapsed_time() / trials
+duration_per_run_in_seconds</code></pre>
+<pre><code class="python">6.241764600008537e-05</code></pre>
+<p>看起来非常的快，不是吗？不幸的是，算上可能的运行次数，结果就比较惊人了。</p>
+<pre><code class="python">seconds_until_success = duration_per_run_in_seconds * (1 / likelihood)
+seconds_until_success</code></pre>
+<pre><code>4642004058.676655</code></pre>
+<p>转化为</p>
+<pre><code class="python">hours_until_success = seconds_until_success / 3600
+days_until_success = hours_until_success / 24
+years_until_success = days_until_success / 365.25
+years_until_success</code></pre>
+<pre><code class="python">147.09623224442464</code></pre>
+<p>即使我们并行并发，我们仍需要等待数月至数年的时间，就为获得一次成功的样例生成，这基本上和空跑没什么区别。</p>
+<p>只要我们不能产生有效的输入，我们就无法达到任何更深层次的功能，也更谈不上测试功能性和安全性了。</p>
+<h3 id="变异的输入"><a href="#变异的输入" class="headerlink" title="变异的输入"></a>变异的输入</h3><p>与从头开始生成随机字符串的方法不同，变异是指从给定的<strong>有效</strong>输入开始，然后对其进行<strong>变异</strong>操作（突变）。一个<em>突变，</em>在这种情况下是一个简单的字符串操作：比如，插入一个（随机）字符、删除字符，或一个字符的表示翻转了一下。这被称为*<strong>变异模糊测试**<em>-与之前讨论的</em></strong>生成模糊测试***技术相反。</p>
+<p>以下是一些可以帮助入门的变异方法：</p>
+<pre><code class="python">import random</code></pre>
+<pre><code class="python">def delete_random_character(s):
+    &quot;&quot;&quot;Returns s with a random character deleted&quot;&quot;&quot;
+    if s == &quot;&quot;:
+        return s
+
+    pos = random.randint(0, len(s) - 1)
+    # print(&quot;Deleting&quot;, repr(s[pos]), &quot;at&quot;, pos)
+    return s[:pos] + s[pos + 1:]</code></pre>
+<pre><code class="python">seed_input = &quot;A quick brown fox&quot;
+for i in range(10):
+    x = delete_random_character(seed_input)
+    print(repr(x))</code></pre>
+<pre><code class="python">&#39;A uick brown fox&#39;
+&#39;A quic brown fox&#39;
+&#39;A quick brown fo&#39;
+&#39;A quic brown fox&#39;
+&#39;A quick bown fox&#39;
+&#39;A quick bown fox&#39;
+&#39;A quick brown fx&#39;
+&#39;A quick brown ox&#39;
+&#39;A quick brow fox&#39;
+&#39;A quic brown fox&#39;</code></pre>
+<pre><code class="python">def insert_random_character(s):
+    &quot;&quot;&quot;Returns s with a random character inserted&quot;&quot;&quot;
+    pos = random.randint(0, len(s))
+    random_character = chr(random.randrange(32, 127))
+    # print(&quot;Inserting&quot;, repr(random_character), &quot;at&quot;, pos)
+    return s[:pos] + random_character + s[pos:]</code></pre>
+<pre><code class="python">for i in range(10):
+    print(repr(insert_random_character(seed_input)))</code></pre>
+<pre><code class="python">&#39;A quick brvown fox&#39;
+&#39;A quwick brown fox&#39;
+&#39;A qBuick brown fox&#39;
+&#39;A quick broSwn fox&#39;
+&#39;A quick brown fvox&#39;
+&#39;A quick brown 3fox&#39;
+&#39;A quick brNown fox&#39;
+&#39;A quick brow4n fox&#39;
+&#39;A quick brown fox8&#39;
+&#39;A equick brown fox&#39;</code></pre>
+<pre><code class="python">def flip_random_character(s):
+    &quot;&quot;&quot;Returns s with a random bit flipped in a random position&quot;&quot;&quot;
+    if s == &quot;&quot;:
+        return s
+
+    pos = random.randint(0, len(s) - 1)
+    c = s[pos]
+    bit = 1 &lt;&lt; random.randint(0, 6)
+    new_c = chr(ord(c) ^ bit)
+    # print(&quot;Flipping&quot;, bit, &quot;in&quot;, repr(c) + &quot;, giving&quot;, repr(new_c))
+    return s[:pos] + new_c + s[pos + 1:]</code></pre>
+<pre><code class="python">for i in range(10):
+    print(repr(flip_random_character(seed_input)))</code></pre>
+<pre><code class="python">&#39;A quick bRown fox&#39;
+&#39;A quici brown fox&#39;
+&#39;A&quot;quick brown fox&#39;
+&#39;A quick brown$fox&#39;
+&#39;A quick bpown fox&#39;
+&#39;A quick brown!fox&#39;
+&#39;A 1uick brown fox&#39;
+&#39;@ quick brown fox&#39;
+&#39;A quic+ brown fox&#39;
+&#39;A quick bsown fox&#39;</code></pre>
+<p>现在让我们创建一个随机变异器，它随机选择要应用的变异规则：</p>
+<pre><code class="python">def mutate(s):
+    &quot;&quot;&quot;Return s with a random mutation applied&quot;&quot;&quot;
+    mutators = [
+        delete_random_character,
+        insert_random_character,
+        flip_random_character
+    ]
+    mutator = random.choice(mutators)
+    # print(mutator)
+    return mutator(s)</code></pre>
+<pre><code class="python">for i in range(10):
+    print(repr(mutate(&quot;A quick brown fox&quot;)))</code></pre>
+<pre><code class="python">&#39;A qzuick brown fox&#39;
+&#39; quick brown fox&#39;
+&#39;A quick Brown fox&#39;
+&#39;A qMuick brown fox&#39;
+&#39;A qu_ick brown fox&#39;
+&#39;A quick bXrown fox&#39;
+&#39;A quick brown fx&#39;
+&#39;A quick!brown fox&#39;
+&#39;A! quick brown fox&#39;
+&#39;A quick brownfox&#39;</code></pre>
+<p>现在的想法是，只要开始时有一些有效输入，则可以通过应用上述突变之一来创建更多输入候选，让我们回到URL上。</p>
+<h3 id="URLs变异"><a href="#URLs变异" class="headerlink" title="URLs变异"></a>URLs变异</h3><p>现在让我们回到我们的URL解析问题，创建一个函数<code>is_valid_url()</code>来检查<code>http_program()</code>是否接受输入。</p>
+<pre><code class="python">def is_valid_url(url):
+    try:
+        result = http_program(url)
+        return True
+    except ValueError:
+        return False</code></pre>
+<pre><code class="python">assert is_valid_url(&quot;http://www.google.com/search?q=fuzzing&quot;)
+assert not is_valid_url(&quot;xyzzy&quot;)</code></pre>
+<p>现在让我们在给定的URL上应用该函数<code>mutate()</code>，并查看获得了多少有效输入。</p>
+<pre><code class="python">seed_input = &quot;http://www.google.com/search?q=fuzzing&quot;
+valid_inputs = set()
+trials = 20
+
+for i in range(trials):
+    inp = mutate(seed_input)
+    if is_valid_url(inp):
+        valid_inputs.add(inp)</code></pre>
+<p>现在我们可以观察到，通过对原始输入进行<em>变异</em>可以得到很大一部分的有效输入：</p>
+<pre><code class="python">len(valid_inputs) / trials</code></pre>
+<pre><code>0.8</code></pre>
+<p>通过变异<code>http:</code>样本种子输入来产生<code>https:</code>    前缀的几率是多少？我们必须在正确的位置(1:l)插入 (1:3）正确的字符‘s’(1:96)，平均下来概率需要运行的次数应该是</p>
+<pre><code>trials = 3 * 96 * len(seed_input)
+trials</code></pre>
+<pre><code>10944</code></pre>
+<p>这个运行的量级我们应该可以承担，我们试试吧：</p>
+<pre><code class="python">from Timer import Timer</code></pre>
+<pre><code class="python">trials = 0
+with Timer() as t:
+    while True:
+        trials += 1
+        inp = mutate(seed_input)
+        if inp.startswith(&quot;https://&quot;):
+            print(
+                &quot;Success after&quot;,
+                trials,
+                &quot;trials in&quot;,
+                t.elapsed_time(),
+                &quot;seconds&quot;)
+            break</code></pre>
+<pre><code class="python">Success after 3656 trials in 0.011846093000258406 seconds</code></pre>
+<p>当然，如果我们想获得一个<code>&quot;ftp://&quot;</code>前缀，我们将需要更多的变异和更多的运行次数—但最重要的还是需要应用<em>多个</em>变异。</p>
+<h3 id="多种变异"><a href="#多种变异" class="headerlink" title="多种变异"></a>多种变异</h3><p>到目前为止，我们仅对样本字符串应用了一个突变。但是，我们也可以应用<em>多个</em>突变，以进一步对其进行更改。例如，如果我们在样本字符串上应用20个突变，会发生什么情况？</p>
+<pre><code class="python">seed_input = &quot;http://www.google.com/search?q=fuzzing&quot;
+mutations = 50</code></pre>
+<pre><code class="python">inp = seed_input
+for i in range(mutations):
+    if i % 5 == 0:
+        print(i, &quot;mutations:&quot;, repr(inp))
+    inp = mutate(inp)</code></pre>
+<pre><code class="python">0 mutations: &#39;http://www.google.com/search?q=fuzzing&#39;
+5 mutations: &#39;http:/L/www.googlej.com/seaRchq=fuz:ing&#39;
+10 mutations: &#39;http:/L/www.ggoWglej.com/seaRchqfu:in&#39;
+15 mutations: &#39;http:/L/wwggoWglej.com/seaR3hqf,u:in&#39;
+20 mutations: &#39;htt://wwggoVgle&quot;j.som/seaR3hqf,u:in&#39;
+25 mutations: &#39;htt://fwggoVgle&quot;j.som/eaRd3hqf,u^:in&#39;
+30 mutations: &#39;htv://&gt;fwggoVgle&quot;j.qom/ea0Rd3hqf,u^:i&#39;
+35 mutations: &#39;htv://&gt;fwggozVle&quot;Bj.qom/eapRd[3hqf,u^:i&#39;
+40 mutations: &#39;htv://&gt;fwgeo6zTle&quot;Bj.\&#39;qom/eapRd[3hqf,tu^:i&#39;
+45 mutations: &#39;htv://&gt;fwgeo]6zTle&quot;BjM.\&#39;qom/eaR[3hqf,tu^:i&#39;</code></pre>
+<p>如您所见，原始种子输入几乎无法识别。通过一次又一次地改变输入，我们得到了更高的输入多样性。</p>
+<p>为了在单个程序包中实现这样的多个变异，让我们建一个<code>MutationFuzzer</code>类。它需要种子（字符串列表）以及最小和最大数量的突变。</p>
+<pre><code class="python">from Fuzzer import Fuzzer</code></pre>
+<pre><code class="python">class MutationFuzzer(Fuzzer):
+    def __init__(self, seed, min_mutations=2, max_mutations=10):
+        self.seed = seed
+        self.min_mutations = min_mutations
+        self.max_mutations = max_mutations
+        self.reset()
+
+    def reset(self):
+        self.population = self.seed
+        self.seed_index = 0</code></pre>
+<p>下面让我们通过添加更多方法来进一步开发<code>MutationFuzzer</code>。Python语言要求我们将整个方法定义为单个连续单元；但是，我们想介绍一种方法，每当我们想向某个类引入新方法C时，我们都使用构造：</p>
+<pre><code class="python">class C(C):
+    def new_method(self, args):
+        pass</code></pre>
+<p>这使我们得到的是<code>C</code>带有<code>new_method()</code>方法的类，这正是我们想要的。</p>
+<p>使用此技巧，我们现在可以添加一个<code>mutate()</code></p>
+<pre><code class="python">class MutationFuzzer(MutationFuzzer):
+    def mutate(self, inp):
+        return mutate(inp)</code></pre>
+<p>让我们回到我们的策略，最大程度地<em>扩大</em>我们样例的<em>覆盖范围</em>。首先，让我们创建一个方法<code>create_candidate()</code>，该方法从当前（<code>self.population</code>）中随机选择一些输入，然后在<code>min_mutations</code>和<code>max_mutations</code>之间变异步骤应用，返回最终结果：</p>
+<pre><code class="python">class MutationFuzzer(MutationFuzzer):
+    def create_candidate(self):
+        candidate = random.choice(self.population)
+        trials = random.randint(self.min_mutations, self.max_mutations)
+        for i in range(trials):
+            candidate = self.mutate(candidate)
+        return candidate</code></pre>
+<p>该<code>fuzz()</code>方法设置为首先使用seed；当这些用完后，我们进行变异：</p>
+<pre><code class="python">class MutationFuzzer(MutationFuzzer):
+    def fuzz(self):
+        if self.seed_index &lt; len(self.seed):
+            # Still seeding
+            self.inp = self.seed[self.seed_index]
+            self.seed_index += 1
+        else:
+            # Mutating
+            self.inp = self.create_candidate()
+        return self.inp</code></pre>
+<pre><code class="python">seed_input = &quot;http://www.google.com/search?q=fuzzing&quot;
+mutation_fuzzer = MutationFuzzer(seed=[seed_input])
+mutation_fuzzer.fuzz()</code></pre>
+<pre><code>&#39;http://www.google.com/search?q=fuzzing&#39;</code></pre>
+<pre><code>mutation_fuzzer.fuzz()</code></pre>
+<pre><code>&#39;http://www.gogl9ecom/earch?qfuzzing&#39;</code></pre>
+<pre><code>mutation_fuzzer.fuzz()</code></pre>
+<pre><code>&#39;htotq:/www.googleom/yseach?q=fzzijg&#39;</code></pre>
+<p>每次调用新的<code>fuzz()</code>，我们都会得到另一个不同的应用了多个变异的变体样本。但是，输入的多样性变高同时也会增加输入无效的风险。成功的关键在于<em>指导</em>这些变异的想法，即如何<em>保持那些特别有价值的</em>变异<em>。</em></p>
+<h3 id="使用覆盖率引导"><a href="#使用覆盖率引导" class="headerlink" title="使用覆盖率引导"></a>使用覆盖率引导</h3><p>为了覆盖尽可能多的功能，可以依靠之前覆盖率一章中讨论的功能。现在，我们<em>将</em>假设待测试的程序可以利用其结构来指导新测试样例的生成。</p>
+<p>问题是：<em>我们如何利用覆盖率来指导测试样例的产生？</em></p>
+<p>在著名模糊器中一种特别成功的想法实现了，该<a target="_blank" rel="noopener" href="http://lcamtuf.coredump.cx/afl/">模糊</a>器名为<a target="_blank" rel="noopener" href="http://lcamtuf.coredump.cx/afl/">American Fuzzy lop</a>，简称<em>AFL</em>。就像上面的示例一样，AFL会生成有效的测试用例—但是对于AFL而言，“有效”意味着<em>在程序执行过程中寻找新的途径</em>。这样，AFL可以继续变异到目前为止已经找到新路径的输入；如果输入找到另一条路径，它也会保留该路径。</p>
+<p>让我们来尝试一下，首先介绍一个<code>Runner</code>类，该类捕获给定功能的覆盖范围。第一步。<code>FunctionRunner</code>的类：</p>
+<pre><code>from Fuzzer import Runner</code></pre>
+<pre><code class="python">class FunctionRunner(Runner):
+    def __init__(self, function):
+        &quot;&quot;&quot;Initialize.  `function` is a function to be executed&quot;&quot;&quot;
+        self.function = function
+
+    def run_function(self, inp):
+        return self.function(inp)
+
+    def run(self, inp):
+        try:
+            result = self.run_function(inp)
+            outcome = self.PASS
+        except Exception:
+            result = None
+            outcome = self.FAIL
+
+        return result, outcome</code></pre>
+<pre><code class="python">http_runner = FunctionRunner(http_program)
+http_runner.run(&quot;https://foo.bar/&quot;)</code></pre>
+<pre><code class="python">(True, &#39;PASS&#39;)</code></pre>
+<p>现在，我们可以扩展<code>FunctionRunner</code>该类，以便它也可以测量覆盖率。调用<code>run()</code>之后，该<code>coverage()</code>方法将返回上次运行时获得的覆盖率。</p>
+<pre><code class="python">from Coverage import Coverage, population_coverage</code></pre>
+<pre><code class="python">class FunctionCoverageRunner(FunctionRunner):
+    def run_function(self, inp):
+        with Coverage() as cov:
+            try:
+                result = super().run_function(inp)
+            except Exception as exc:
+                self._coverage = cov.coverage()
+                raise exc
+
+        self._coverage = cov.coverage()
+        return result
+
+    def coverage(self):
+        return self._coverage</code></pre>
+<pre><code class="python">http_runner = FunctionCoverageRunner(http_program)
+http_runner.run(&quot;https://foo.bar/&quot;)</code></pre>
+<pre><code class="python">(True, &#39;PASS&#39;)</code></pre>
+<p>以下是前五个被覆盖到的位置：</p>
+<pre><code class="python">print(list(http_runner.coverage())[:5])</code></pre>
+<pre><code class="python">[(&#39;http_program&#39;, 2), (&#39;__new__&#39;, 14), (&#39;urlparse&#39;, 368), (&#39;_coerce_args&#39;, 119), (&#39;urlsplit&#39;, 421)]</code></pre>
+<p>现在是主要的class类了。我们维护了数量，并且已经实现了一系列覆盖范围（<code>coverages_seen</code>）。该<code>fuzz()</code>辅助函数接受一个输入和运行给定的<code>function()</code>就可以了。如果其覆盖范围是新的（即，不在中<code>coverages_seen</code>），则将输入添加到<code>population</code>，并将覆盖范围添加到<code>coverages_seen</code>。</p>
+<pre><code class="python">class MutationCoverageFuzzer(MutationFuzzer):
+    def reset(self):
+        super().reset()
+        self.coverages_seen = set()
+        # Now empty; we fill this with seed in the first fuzz runs
+        self.population = []
+
+    def run(self, runner):
+        &quot;&quot;&quot;Run function(inp) while tracking coverage.
+           If we reach new coverage,
+           add inp to population and its coverage to population_coverage
+        &quot;&quot;&quot;
+        result, outcome = super().run(runner)
+        new_coverage = frozenset(runner.coverage())
+        if outcome == Runner.PASS and new_coverage not in self.coverages_seen:
+            # We have new coverage
+            self.population.append(self.inp)
+            self.coverages_seen.add(new_coverage)
+
+        return result</code></pre>
+<p>现在让我们使用它：</p>
+<pre><code class="python">seed_input = &quot;http://www.google.com/search?q=fuzzing&quot;
+mutation_fuzzer = MutationCoverageFuzzer(seed=[seed_input])
+mutation_fuzzer.runs(http_runner, trials=10000)
+mutation_fuzzer.population</code></pre>
+<pre><code class="python">[&#39;http://www.google.com/search?q=fuzzing&#39;,
+ &#39;http://www.goog.com/search;q=fuzzilng&#39;,
+ &#39;http://ww.6goog\x0eoomosearch;/q=f&#125;zzilng&#39;,
+ &#39;http://uv.Lboo.comoseakrch;q=fuzilng&#39;,
+ &quot;http://www.oogle.com/search?q=fuzzin&#39;&quot;,
+ &#39;http://ww.6goog\x0eo/mosarch;/q=f&#125;z&#123;il~g&#39;,
+ &#39;Http://www.g/ogle.com/earchq=fuzzing&#39;,
+ &quot;httP://www.o/gle.coM-search?q=fuzzin&#39;&quot;,
+ &#39;Http://wwv.gogle.com/kea;rchzq=fuzz&#39;,
+ &#39;Http://wwv.wogle.comkea;rahzq=fuzz&#39;,
+ &#39;Http://wwv.wgle.#omke;rahzq=fuzz&#39;,
+ &#39;hTtp://ww.6gogg\x0eo/mksarch;/u=f&#125;zshl|g&#39;,
+ &#39;htTP://www.o/gle.coMR$search?q=fuzrin#&#39;,
+ &#39;hTtp://ww.6eogg\x0eo/mksarch;/u=fzsl|g&#39;,
+ &#39;htTP://ww.o/gle.hcoMR$search?q=fuzrin#&#39;,
+ &#39;http://ww.6goo#f\x0eo/mosarch;/q=f&#125;z&#123;il~g&#39;,
+ &#39;Http://w7wBv.wogle.comkea;rahq=uzz&#39;,
+ &#39;http://fww.6go\x0eo\x7f/mosrch;/q=f&#125;z&#123;cil~g&#39;,
+ &#39;htTP://www.o/gle.coMR$sear#h?q=fuzrij#&#39;,
+ &#39;http://www.goog.comll/search;Jq=fuzzi,g&#39;,
+ &#39;http://www.goog\x0eom/sea7rch;#q=fuezzi-mog&#39;,
+ &#39;http://ww.6googC\x0eoomos@earch;/q=f&#125;zzilng&#39;,
+ &quot;hTtp://2ww.6eogg\x0eo/mks\\ach\x1b&#39;u=fzsl|g&quot;,
+ &#39;http://ww.6g8mo#\x0eo/m%osarch;/q=f&#125;z&#123;il~g&#39;,
+ &quot;httP://ww(wao/gleR.coM-search?q=uz)n&#39;T&quot;,
+ &#39;http://fww6go\x0eo\x7f/moqsrsh;/q&lt;fx&#125;z&#123;ci?~g&#39;,
+ &#39;http://fw6go\x0eo\x7f/oqs\\rsh;Ea&lt;fx&#125;z&#123;ci?~g&#39;,
+ &#39;htTp://www./gle.coMR$se;a&gt;rchq=fuzrin#&#39;,
+ &#39;http://fww6go\x0eo\x7f/m/qsrs;oq&lt;fx&#125;z&#123;ci?~g&#39;,
+ &#39;http://wwgoog\x0eom/sea7rch;#q=fuezzi-mog&#39;,
+ &#39;hTtp://ww.6ggogg\x0eo/mksach;/u=f&#125;?zshl|g&#39;,
+ &#39;htTp://www./gle.co$se;a&gt;rkhq=fuzrin#&#39;,
+ &#39;hTtp://ww.6gog\x0eo/mksrch;e=fzshl|g&#39;,
+ &#39;hTtp://ww.6ggoPgg\x0eo/m0ksach;+u9&#125;?zshl|g&#39;,
+ &#39;hTtp://ww.6ggogg\x0eo/msch;/u=f&#125;?zshth|g&#39;,
+ &#39;http://fw36go\x0eo/moqsRZh;/q&lt;fx&#125;~[ci?~g&#39;,
+ &#39;http://www.kgle.com/serch?q=fOuzzi#&#39;,
+ &#39;http://wwgoo\x0eoM/se7rch;/#q=ruezzi-mog&#39;,
+ &#39;http://ww.6oog\x0eoomos@garch;2q=f&#125;zzilng&#39;,
+ &#39;hTtp://ww.6ggoPgge\x0eo/m9ksacoh;+u9&#125;?zshl|g&#39;,
+ &#39;htTp://www./gle.wco$se;?a&gt;rkhq=buzrin#&#39;,
+ &#39;htTp://www./g,e.wco$s;?sa&gt;rkhqbuzri.#&#39;,
+ &#39;hTtp://ww.6gogg\x0eo/mksarh;/u=v&#125;zsh#l|g&#39;,
+ &quot;hTtp://ww.6gogg\x0eo/mks&#39;arh;/u=v&gt;s`#l|g&quot;]</code></pre>
+<p>成功！在我们的数量中，<em>每个输入</em>现在都是有效的，并且覆盖范围不同，覆盖范围来自各种组合。</p>
+<pre><code class="python">all_coverage, cumulative_coverage = population_coverage(
+    mutation_fuzzer.population, http_program)</code></pre>
+<pre><code class="python">import matplotlib.pyplot as plt</code></pre>
+<pre><code class="python">plt.plot(cumulative_coverage)
+plt.title(&#39;Coverage of urlparse() with random inputs&#39;)
+plt.xlabel(&#39;# of inputs&#39;)
+plt.ylabel(&#39;lines covered&#39;);</code></pre>
+<p><img src="https://i.loli.net/2021/03/19/u72rwWiApkNfTz3.png" alt="image-20210319205621075"></p>
+<p>这种策略的好处是，将其应用于较大的程序后，将很乐于探索路径，即一条接一条地进行。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
+<li>随机生成的输入通常是无效的，因此需要输入处理功能。</li>
+<li>在有效输入上的变异具有较高的成功概率。</li>
+</ul>
+</article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/2021/03/16/symcc+afl/" title="符号执行Symcc与模糊测试AFL结合实践"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">上一页: 符号执行Symcc与模糊测试AFL结合实践</span></a><a class="button is-default" href="/2021/03/04/AFL/" title="模糊测试之AFL总结"><span class="has-text-weight-semibold">下一页: 模糊测试之AFL总结</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container" id="vcomments" data-comment_valine_id="gFcW43aIrI0SECFbJUKuX8Kd-gzGzoHsz" data-comment_valine_key="wRmrKhtHo1BipWydKE2EVHq6"></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><a title="twitter" target="_blank" rel="noopener nofollow" href="//twitter.com/FstarkFZY"><i class="iconfont icon-twitter"></i></a><!-- Github--><a title="github" target="_blank" rel="noopener nofollow" href="//github.com/F-ZhaoYang"><i class="iconfont icon-github"></i></a><!-- Ins--><a title="instagram" target="_blank" rel="noopener nofollow" href="//www.instagram.com//"><i class="iconfont icon-ins"></i></a><!-- RSS--><!-- 知乎--><!-- 领英--><!-- 脸书--><a title="facebook" target="_blank" rel="noopener nofollow" href="//www.facebook.com/fstark123"><i class="iconfont icon-tian7_facebook"></i></a></section><p><span>Copyright ©</span><span> Fstark 2021</span><span></span></p></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/post.js"></script></body></html>
