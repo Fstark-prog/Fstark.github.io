@@ -1,0 +1,314 @@
+<!DOCTYPE html><html class="appearance-dark" lang="zh-CN"><head><meta charset="UTF-8"><title>模糊测试之AFL总结</title><meta name="description" content="Winter is coming"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><!-- Google Analytics --><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q || []).push(arguments)},i[r].l=1 * new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', '', 'auto');
+ga('send', 'pageview');</script><!-- End Google Analytics -->
+<!-- Baidu Analytics --><!-- End Baidu Analytics --><link rel="icon" href="/source/favicon.png"><link rel="stylesheet" href="/style/common/bulma.css"><link rel="stylesheet" href="/style/base.css"><link rel="stylesheet" href="/style/common/helper.css"><script src="/js/common.js"></script><link rel="stylesheet" href="/style/post.css"><link rel="stylesheet" href="/style/themes/highlight-theme-light.css"><script src="/js/highlight.pack.js"></script><meta name="generator" content="Hexo 5.3.0"></head><body class="is-flex is-flex-direction-column"><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-space-between is-hidden-mobile"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/">Fstark's blog</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">模糊测试之AFL总结</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">点击返回顶部</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about/">关于</a></h3><h3 class="is-inline-block"><a href="/archives/">归档</a></h3></aside></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about/">关于</a></h3><h3 class="is-inline-block"><a href="/archives/">归档</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Part-2-%E6%80%BB%E8%A7%88"><span class="toc-text">Part 2 总览</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFAFL%EF%BC%9F"><span class="toc-text">什么是AFL？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%83%E6%98%AF%E5%A6%82%E4%BD%95%E5%B7%A5%E4%BD%9C%E7%9A%84%EF%BC%9F"><span class="toc-text">它是如何工作的？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Fork-%E6%A8%A1%E5%BC%8F-VS-%E6%8C%81%E4%B9%85%E6%80%A7%EF%BC%88Persistent%EF%BC%89%E6%A8%A1%E5%BC%8F"><span class="toc-text">Fork 模式 VS 持久性（Persistent）模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95%E7%AD%96%E7%95%A5"><span class="toc-text">模糊测试策略</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Sanitizers%EF%BC%88%E6%B6%88%E6%AF%92%E5%89%82%EF%BC%9F%EF%BC%89"><span class="toc-text">Sanitizers（消毒剂？）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ASAN%EF%BC%88Address-Sanitizer%EF%BC%89"><span class="toc-text">ASAN（Address Sanitizer）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#UBSAN%EF%BC%88UndefinedBehavior-Sanitizer%EF%BC%89"><span class="toc-text">UBSAN（UndefinedBehavior Sanitizer）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Memory-Sanitizer-MSAN"><span class="toc-text">Memory Sanitizer(MSAN)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Thread-Sanitizer-TSAN"><span class="toc-text">Thread Sanitizer(TSAN)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8AFL%EF%BC%88%E7%BB%83%E4%B9%A0%EF%BC%89"><span class="toc-text">使用AFL（练习）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BC%96%E8%AF%91%E5%B9%B6%E5%AE%89%E8%A3%85AFL"><span class="toc-text">编译并安装AFL</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E7%94%A8AFL%E7%BC%96%E8%AF%91%E4%B8%80%E4%B8%AA%E7%A8%8B%E5%BA%8F%EF%BC%9F"><span class="toc-text">如何用AFL编译一个程序？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8AFL%E5%BC%80%E5%A7%8B%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95"><span class="toc-text">使用AFL开始模糊测试</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B9%E6%9C%AC%E5%8E%9F%E5%9B%A0%E5%88%86%E6%9E%90%EF%BC%88RCA%EF%BC%89"><span class="toc-text">根本原因分析（RCA）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B4%A9%E6%BA%83%EF%BC%88Crash%EF%BC%89%E5%88%86%E7%B1%BB"><span class="toc-text">崩溃（Crash）分类</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8AFL%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95%E4%B8%80%E4%B8%AA%E5%BC%80%E6%BA%90%E8%BD%AF%E4%BB%B6"><span class="toc-text">使用AFL模糊测试一个开源软件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Fuzz-tcpdump"><span class="toc-text">Fuzz tcpdump</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Fuzz-libtiff"><span class="toc-text">Fuzz libtiff</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-text">总结</span></a></li></ol></div><div class="column is-9"><header class="my-4"><a href="/tags/%E4%B8%AA%E4%BA%BA%E6%80%BB%E7%BB%93"><i class="tag post-item-tag">个人总结</i></a><a href="/tags/fuzz"><i class="tag post-item-tag">fuzz</i></a><a href="/tags/afl"><i class="tag post-item-tag">afl</i></a></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">模糊测试之AFL总结</h1><time class="has-text-grey" datetime="2020-03-04T09:45:00.000Z">2020-03-04</time><article class="mt-2 post-content"><h2 id="Part-2-总览"><a href="#Part-2-总览" class="headerlink" title="Part 2 总览"></a>Part 2 总览</h2><ul>
+<li><p>什么是AFL</p>
+</li>
+<li><p>它是如何工作的？</p>
+</li>
+<li><p>Fork 模式 VS 持久性（Persistent）模式</p>
+</li>
+<li><p>模糊测试策略</p>
+</li>
+<li><p>Sanitizers（消毒剂？）—— ASAN,UBSAN, MSAN,TSAN</p>
+</li>
+<li><p>使用AFL（练习）</p>
+<ul>
+<li>如何编译一个简单的C程序？</li>
+<li>对一个简单的C程序进行AFL模糊测试</li>
+<li>RCA 根本原因分析</li>
+<li>崩溃（Crash）分类</li>
+</ul>
+</li>
+<li><p>使用AFL模糊测试真实世界的程序</p>
+<ul>
+<li>使用AFL模糊测试一个开源软件</li>
+</ul>
+</li>
+<li><p>总结</p>
+</li>
+</ul>
+<h2 id="什么是AFL？"><a href="#什么是AFL？" class="headerlink" title="什么是AFL？"></a>什么是AFL？</h2><ul>
+<li>American Fuzzy Lop</li>
+<li>由Michael Zelwaski创建的</li>
+<li>一种由插桩后覆盖率引导的Fuzzer</li>
+<li>编译后附带一套实用程序：<ul>
+<li><u><strong>afl-fuzz, afl-cmin</strong></u>, afl-tmin, afl-showmapetc..</li>
+</ul>
+</li>
+<li>Fork server模式/Persistent mode模式<ul>
+<li>Fork server mode —— 不断创建进程的副本</li>
+<li>Persistentmode —— 着重于一个程序疯狂循环</li>
+</ul>
+</li>
+<li>根据各种策略对文件进行突变<ul>
+<li>Bitflip, byteflip, havoc, splice etc.</li>
+</ul>
+</li>
+</ul>
+<h2 id="它是如何工作的？"><a href="#它是如何工作的？" class="headerlink" title="它是如何工作的？"></a>它是如何工作的？</h2><ul>
+<li><p>在编译时使用特殊的方法插桩</p>
+</li>
+<li><p>它提供自带的编译器包装器（wrapper）</p>
+<ul>
+<li>afl-gcc,afl-g++, afl-clang, afl-clang++, afl-clang-fast, afl-clang-fast++</li>
+</ul>
+</li>
+<li><p>使用二进制重写技术</p>
+<ul>
+<li>在每个基础块（BB块）上进行插桩<ul>
+<li>每个基本块都有一个唯一的随机ID</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>其插桩可以由以下伪代码所表示：</p>
+</li>
+</ul>
+<p><img src="https://i.loli.net/2021/03/05/dNFBDXAwOotbkiI.png" alt="image-20210305150453876"></p>
+<ul>
+<li>A → B →C → D→ E 与 A → B → D → C→ E</li>
+</ul>
+<p><img src="https://i.loli.net/2021/03/05/xGfhsMRTHWivyLJ.png" alt="image-20210305150532627"></p>
+<h2 id="Fork-模式-VS-持久性（Persistent）模式"><a href="#Fork-模式-VS-持久性（Persistent）模式" class="headerlink" title="Fork 模式 VS 持久性（Persistent）模式"></a>Fork 模式 VS 持久性（Persistent）模式</h2><ul>
+<li><p>Fork 模式 </p>
+<ul>
+<li>在main（）函数处停止</li>
+<li>使用fork创建程序的克隆</li>
+<li>处理输入input 并创建另一个克隆</li>
+<li>节省初始化程序的时间，从而提高速度</li>
+<li>Ref: <a target="_blank" rel="noopener" href="https://lcamtuf.blogspot.com/2014/10/fuzzing-binaries-without-execve.html">https://lcamtuf.blogspot.com/2014/10/fuzzing-binaries-without-execve.html</a></li>
+</ul>
+</li>
+<li><p>持久性（Persistent）模式</p>
+<ul>
+<li>不断使用fork仍然消耗很大</li>
+<li>每次运行后并不需要杀死子进程</li>
+<li>使用 <strong><u>in process</u></strong> 模糊测试 （类似libfuzzer？）</li>
+<li>需要编写一个线束（harness）程序</li>
+</ul>
+<p><img src="https://i.loli.net/2021/03/05/i6rfZ13CcBNQFoW.png" alt="image-20210305151351134"></p>
+<ul>
+<li>Ref: <a target="_blank" rel="noopener" href="https://lcamtuf.blogspot.com/2015/06/new-in-afl-persistent-mode.html">https://lcamtuf.blogspot.com/2015/06/new-in-afl-persistent-mode.html</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="模糊测试策略"><a href="#模糊测试策略" class="headerlink" title="模糊测试策略"></a>模糊测试策略</h2><ul>
+<li>bitflip，按位翻转，1变为0，0变为1<ul>
+<li>1/1,2/1,4/1,8/8 ….32/8<ul>
+<li><code>STAGE_FLIP1</code> 每次翻转一位(<code>1 bit</code>)，按一位步长从头开始。<br><code>STAGE_FLIP2</code> 每次翻转相邻两位(<code>2 bit</code>)，按一位步长从头开始。<br><code>STAGE_FLIP4</code> 每次翻转相邻四位(<code>4 bit</code>)，按一位步长从头开始。<br><code>STAGE_FLIP8</code> 每次翻转相邻八位(<code>8 bit</code>)，按八位步长从头开始，也就是说，每次对一个byte做翻转变化。<br><code>STAGE_FLIP16</code>每次翻转相邻十六位(<code>16 bit</code>)，按八位步长从头开始，每次对一个word做翻转变化。<br><code>STAGE_FLIP32</code>每次翻转相邻三十二位(<code>32 bit</code>)，按八位步长从头开始，每次对一个dword做翻转变化。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>arithmetic，整数加/减算术运算</li>
+<li>interest，把一些特殊内容替换到原文件中</li>
+<li>dictionary，把自动生成或用户提供的token替换/插入到原文件中</li>
+<li>havoc，中文意思是“大破坏”，此阶段会对原文件进行大量变异</li>
+<li>splice，中文意思是“绞接”，此阶段会将两个文件拼接起来得到一个新的文件</li>
+</ul>
+<p>其中，前四项bitflip, arithmetic, interest, dictionary是非dumb mode（<code>-d</code>）和主fuzzer（<code>-M</code>）会进行的操作，由于其变异方式没有随机性，所以也称为deterministic fuzzing；havoc和splice则存在随机性，是所有状况的fuzzer（是否dumb mode、主从fuzzer）都会执行的变异。</p>
+<ul>
+<li>Ref: <a target="_blank" rel="noopener" href="https://github.com/google/AFL/blob/master/docs/technical_details.txt">https://github.com/google/AFL/blob/master/docs/technical_details.txt</a></li>
+</ul>
+<h2 id="Sanitizers（消毒剂？）"><a href="#Sanitizers（消毒剂？）" class="headerlink" title="Sanitizers（消毒剂？）"></a>Sanitizers（消毒剂？）</h2><ul>
+<li>基于编译器的检测工具</li>
+<li>有助于发现BUGs</li>
+<li>可以发现一些正常模式不好检出的错误，例如大内存分配，堆溢出，UAF等</li>
+<li>不同类型的Sanitizers<ul>
+<li>ASAN</li>
+<li>MSAN</li>
+<li>UBSAN</li>
+<li>TSAN</li>
+</ul>
+</li>
+</ul>
+<h3 id="ASAN（Address-Sanitizer）"><a href="#ASAN（Address-Sanitizer）" class="headerlink" title="ASAN（Address Sanitizer）"></a>ASAN（Address Sanitizer）</h3><ul>
+<li><p>编译时指令： <strong><u>-fsanitize=address</u></strong></p>
+</li>
+<li><p>可以检测各种问题，例如UAF，堆缓冲区溢出，内存泄漏等</p>
+</li>
+<li><p>ASAN + Fuzzer = More bugs!</p>
+</li>
+<li><p>有大牛表示：“AFL Fuzzing without ASAN is just a waste of CPU”</p>
+</li>
+<li><p>Ref:<a target="_blank" rel="noopener" href="https://clang.llvm.org/docs/AddressSanitizer.html">https://clang.llvm.org/docs/AddressSanitizer.html</a></p>
+</li>
+</ul>
+<p><img src="https://i.loli.net/2021/03/05/3htM1aizckY7C6o.png" alt="image-20210305153545094"></p>
+<h3 id="UBSAN（UndefinedBehavior-Sanitizer）"><a href="#UBSAN（UndefinedBehavior-Sanitizer）" class="headerlink" title="UBSAN（UndefinedBehavior Sanitizer）"></a>UBSAN（UndefinedBehavior Sanitizer）</h3><ul>
+<li><p>编译时指令： <strong><u>-fsanitize=undefined</u></strong></p>
+</li>
+<li><p>检测程序中未定义的行为</p>
+<ul>
+<li>除零漏洞，整数溢出，非法的读取等</li>
+</ul>
+</li>
+<li><p>提升的发现错误的概率</p>
+</li>
+<li><p>Ref: <a target="_blank" rel="noopener" href="https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html">https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html</a></p>
+</li>
+</ul>
+<p><img src="https://i.loli.net/2021/03/05/1seZ3OUxwpIA5cQ.png" alt="image-20210305153956345"></p>
+<h3 id="Memory-Sanitizer-MSAN"><a href="#Memory-Sanitizer-MSAN" class="headerlink" title="Memory Sanitizer(MSAN)"></a>Memory Sanitizer(MSAN)</h3><ul>
+<li>编译时指令： <strong><u>-fsanitize=memory</u></strong></li>
+<li>检测未初始化的读取等</li>
+<li>Ref：<a target="_blank" rel="noopener" href="https://clang.llvm.org/docs/MemorySanitizer.html">https://clang.llvm.org/docs/MemorySanitizer.html</a></li>
+</ul>
+<h3 id="Thread-Sanitizer-TSAN"><a href="#Thread-Sanitizer-TSAN" class="headerlink" title="Thread Sanitizer(TSAN)"></a>Thread Sanitizer(TSAN)</h3><ul>
+<li>编译时指令： <strong><u>-fsanitize=thread</u></strong></li>
+<li>检测数据竞争等</li>
+<li>Ref：<a target="_blank" rel="noopener" href="https://clang.llvm.org/docs/ThreadSanitizer.html">https://clang.llvm.org/docs/ThreadSanitizer.html</a></li>
+</ul>
+<h2 id="使用AFL（练习）"><a href="#使用AFL（练习）" class="headerlink" title="使用AFL（练习）"></a>使用AFL（练习）</h2><h3 id="编译并安装AFL"><a href="#编译并安装AFL" class="headerlink" title="编译并安装AFL"></a>编译并安装AFL</h3><ul>
+<li>git clone <a target="_blank" rel="noopener" href="https://github.com/google/AFL.git">https://github.com/google/AFL.git</a></li>
+<li>make</li>
+<li>cd llvm_mode</li>
+<li>make   （这步可能需要clang）</li>
+<li>cd ..</li>
+<li>sudo make install</li>
+</ul>
+<p>如果安的是AFL++，直接用带的脚本一键安装完事儿</p>
+<h3 id="如何用AFL编译一个程序？"><a href="#如何用AFL编译一个程序？" class="headerlink" title="如何用AFL编译一个程序？"></a>如何用AFL编译一个程序？</h3><p><img src="https://i.loli.net/2021/03/06/FewfK4O1kAyac7p.png" alt="image-20210306101946651"></p>
+<ul>
+<li>afl-clang ： gcc的编译器包装器，它将编译并插桩二进制文件</li>
+<li>-fsanitize=address ： 开启ASAN （ 用AFL_USE_ASAN=1也行）</li>
+<li>-g :  调试符号支持</li>
+<li>imgRead.c : 源文件</li>
+<li>imgReadafl ：生成可被模糊测试的可执行文件</li>
+</ul>
+<h3 id="使用AFL开始模糊测试"><a href="#使用AFL开始模糊测试" class="headerlink" title="使用AFL开始模糊测试"></a>使用AFL开始模糊测试</h3><ul>
+<li>生成一个初始输入<ul>
+<li>echo “IMG” &gt; input/1.img</li>
+</ul>
+</li>
+<li>afl-fuzz –iinput –o output –m none –./imgRead@@<ul>
+<li>afl-fuzz ： fuzzer的二进制程序</li>
+<li>-i :  包含输入种子文件的目录</li>
+<li>-o : Fuzzer的输出数据的目录<ul>
+<li>Crashes : 包含使目标程序崩溃的输入文件</li>
+<li>Hangs : 包含导致目标程序挂起(hang)的输入文件</li>
+</ul>
+</li>
+<li>-m : 内存限制，如果为ASAN和64位，则将其设置为none<ul>
+<li>否则使用编译器标志–m32将其编译为32位</li>
+<li>将内存限制设置为–m 800</li>
+<li>查找更多crashes</li>
+</ul>
+</li>
+<li>-M : 主实例Master模式（如果您具有多个CPU内核）</li>
+<li>-S ： 从实例Slaver，可以为任意n数，具体取决于您拥有的内核数</li>
+</ul>
+</li>
+</ul>
+<h3 id="根本原因分析（RCA）"><a href="#根本原因分析（RCA）" class="headerlink" title="根本原因分析（RCA）"></a>根本原因分析（RCA）</h3><ul>
+<li>使用GDB对Crashes进行分析</li>
+<li>常用命令：<ul>
+<li>Gdb  <exe file name></li>
+<li>r  -&gt;  开始运行目标程序</li>
+<li>s -&gt; 步步运行程序</li>
+<li>Next/fi-&gt; 一直运行到return</li>
+<li>b  <a href="filename.c:linenumber">filename.c:linenumber</a> -&gt; 在对应filename.c中的 linenumber行数打断点（break）</li>
+</ul>
+</li>
+<li>在我们的例子中：<ul>
+<li>r  &lt;output/crashes/filename&gt;</li>
+</ul>
+</li>
+</ul>
+<h3 id="崩溃（Crash）分类"><a href="#崩溃（Crash）分类" class="headerlink" title="崩溃（Crash）分类"></a>崩溃（Crash）分类</h3><ul>
+<li><p>如果遇到很多崩溃，Crashwalk是一个有用的工具，可以对崩溃进行分类</p>
+</li>
+<li><p>安装Crashwalk</p>
+<ul>
+<li>sudo apt-get install golang</li>
+<li>go get -u github.com/bnagy/crashwalk/cmd/…</li>
+<li>~/go/bin</li>
+</ul>
+</li>
+<li><p>安装 exploitable</p>
+<ul>
+<li>~/src/exploitable/exploitable/exploitable.py</li>
+<li>mkdir~/src</li>
+<li>cd ~/src</li>
+<li>git clone <a target="_blank" rel="noopener" href="https://github.com/jfoote/exploitable.git">https://github.com/jfoote/exploitable.git</a></li>
+</ul>
+</li>
+<li><p>Cwtriage——分类崩溃的实用程序</p>
+<ul>
+<li><u><strong>ASAN_OPTIONS=”abort_on_error=1:symbolize=0”</strong></u>  Cwtriage –afl –root output</li>
+<li>分析每个崩溃文件并将结果保存在crashwalk.db中</li>
+<li>使用ASAN运行，否则崩溃将无法复现</li>
+</ul>
+</li>
+<li><p>Cwdump——从crashwalk.db转储崩溃信息的实用程序</p>
+<ul>
+<li>Cwdump  crashwalk.db</li>
+</ul>
+</li>
+</ul>
+<h2 id="使用AFL模糊测试一个开源软件"><a href="#使用AFL模糊测试一个开源软件" class="headerlink" title="使用AFL模糊测试一个开源软件"></a>使用AFL模糊测试一个开源软件</h2><h3 id="Fuzz-tcpdump"><a href="#Fuzz-tcpdump" class="headerlink" title="Fuzz tcpdump"></a>Fuzz tcpdump</h3><ul>
+<li>先把tcpdump和libcap的源码dump下来<ul>
+<li>git clone <a target="_blank" rel="noopener" href="https://github.com/the-tcpdump-group/tcpdump.git">https://github.com/the-tcpdump-group/tcpdump.git</a></li>
+<li>cd tcpdump</li>
+<li>git clone <a target="_blank" rel="noopener" href="https://github.com/the-tcpdump-group/libpcap.git">https://github.com/the-tcpdump-group/libpcap.git</a></li>
+<li>cd libpcap</li>
+</ul>
+</li>
+<li>使用AFL对其进行编译<ul>
+<li>CC=afl-gccCFLAGS=”-g -fsanitize=address -fno-omit-frame-pointer” LDFLAGS=”-g -fsanitize=address -fno-omit-frame-pointer” ./configure</li>
+<li>sudo make &amp;&amp; make install</li>
+</ul>
+</li>
+<li>语料库从哪来？？<ul>
+<li>查看一下项目自带的test文件夹</li>
+<li>收集别的符合条件的文件，比如issue页面</li>
+<li>精简它们：afl-cmin–itests –o mincorpus–m none –./tcpdump–vv–ee–nnr@@</li>
+</ul>
+</li>
+<li>Fuzz 它<ul>
+<li>afl-fuzz –I mincorpus–o fuzzoutput–m none –./tcpdump–vv–ee–nnr@@</li>
+</ul>
+</li>
+</ul>
+<h3 id="Fuzz-libtiff"><a href="#Fuzz-libtiff" class="headerlink" title="Fuzz libtiff"></a>Fuzz libtiff</h3><ul>
+<li>获取源码：<ul>
+<li><a target="_blank" rel="noopener" href="https://gitlab.com/libtiff/libtiff">https://gitlab.com/libtiff/libtiff</a></li>
+</ul>
+</li>
+<li>用AFL编译<ul>
+<li>./autogen.sh</li>
+<li>CC=afl-gcc CXX=afl-g++ CFLAGS=”-g -fsanitize=address -fno-omit-frame-pointer” CXXFLAGS=”-g -fsanitize=address -fno-omit-frame-pointer” LDFLAGS=” -g  -fsanitize=address -fno-omit-frame-pointer” ./configure </li>
+<li>sudo make &amp;&amp; make install</li>
+</ul>
+</li>
+<li>收集语料库<ul>
+<li><a target="_blank" rel="noopener" href="https://lcamtuf.coredump.cx/afl/demo/">https://lcamtuf.coredump.cx/afl/demo/</a></li>
+</ul>
+</li>
+<li>精简它们<ul>
+<li>afl-cmin–itiff –o mintiff–./tiff2rgba @@ test.tiff</li>
+</ul>
+</li>
+<li>Fuzz 它们<ul>
+<li>afl-fuzz –i <input> -o fuzzoutput –m none – tiff2rgba @@ test.tiff</li>
+</ul>
+</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>使用AFL在linux上fuzz开源软件十分简单</li>
+<li>大多数的lib/开源软件的源代码都是可以获取的</li>
+<li>在编译时插桩是可行的</li>
+<li>在Fuzz时要用ASAN,MSAN,UBSAN</li>
+<li>有时最需要花费时间的过程是项目编译<ul>
+<li>缺失引用的第三方库（lib）</li>
+<li>编译过程中的各种错误</li>
+<li>不同项目不同的编译方法与各种选项</li>
+</ul>
+</li>
+</ul>
+</article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/2020/03/16/symcc+afl/" title="符号执行Symcc与模糊测试AFL结合实践"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">上一页: 符号执行Symcc与模糊测试AFL结合实践</span></a><a class="button is-default" href="/2020/03/01/Fuzzing%20and%20vulnerabilities/" title="模糊测试与寻找漏洞概述个人总结"><span class="has-text-weight-semibold">下一页: 模糊测试与寻找漏洞概述个人总结</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container"><script async repo="F-ZhaoYang/F-ZhaoYang.github.io" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><a title="twitter" target="_blank" rel="noopener nofollow" href="//twitter.com/FstarkFZY"><i class="iconfont icon-twitter"></i></a><!-- Github--><a title="github" target="_blank" rel="noopener nofollow" href="//github.com/F-ZhaoYang"><i class="iconfont icon-github"></i></a><!-- Ins--><a title="instagram" target="_blank" rel="noopener nofollow" href="//www.instagram.com//"><i class="iconfont icon-ins"></i></a><!-- RSS--><!-- 知乎--><!-- 领英--><!-- 脸书--><a title="facebook" target="_blank" rel="noopener nofollow" href="//www.facebook.com/fstark123"><i class="iconfont icon-tian7_facebook"></i></a></section><p><span>Copyright ©</span><span> Fstark 2021</span><span></span></p></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/post.js"></script></body></html>
