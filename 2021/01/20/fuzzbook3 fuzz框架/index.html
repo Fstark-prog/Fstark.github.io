@@ -150,7 +150,7 @@ for i in range(10):
 <pre><code class="python">(CompletedProcess(args=&#39;cat&#39;, returncode=0, stdout=&#39;?:+= % &lt;1&lt;6$:(&gt;=:9)5&#39;, stderr=&#39;&#39;),
  &#39;PASS&#39;)</code></pre>
 <p>使用<code>runs()</code>，我们可以重复执行模糊测试多次，以获得结果列表。</p>
-<pre><code>random_fuzzer.runs(cat, 10)</code></pre>
+<pre><code class="python">random_fuzzer.runs(cat, 10)</code></pre>
 <pre><code class="python">[(CompletedProcess(args=&#39;cat&#39;, returncode=0, stdout=&#39;3976%%&amp;+%6=(1)3&amp;3:&lt;9&#39;, stderr=&#39;&#39;),
   &#39;PASS&#39;),
  (CompletedProcess(args=&#39;cat&#39;, returncode=0, stdout=&#39;33$#42$ 11=*%$20=&lt;.-&#39;, stderr=&#39;&#39;),

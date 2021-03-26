@@ -27,11 +27,11 @@ ga('send', 'pageview');</script><!-- End Google Analytics -->
 </ol>
 <p>就这样，你已经可以理解上面的代码做什么：用开始<code>guess</code>的<code>x / 2</code>，它计算好近似<code>approx</code>直到值<code>approx</code>不再改变。这是最终返回的值。</p>
 <h3 id="运行功能函数"><a href="#运行功能函数" class="headerlink" title="运行功能函数"></a>运行功能函数</h3><p>为了确定是否<code>my_sqrt()</code>正常工作，我们可以使用一些值对其进行<em>测试</em>。例如<code>x = 4</code>，对于，它将产生正确的值：</p>
-<pre><code>my_sqrt （4 ）
+<pre><code class="python">my_sqrt （4 ）
 2.0</code></pre>
 <p>上面的上部<code>my_sqrt(4)</code>是Python解释器的输入，默认情况下对它进行运行。下部（<code>2.0</code>）是其输出。我们可以看到<code>my_sqrt(4)</code>产生正确的值。</p>
 <p>这同样适用于<code>x = 2.0</code>：</p>
-<pre><code>my_sqrt （2 ）
+<pre><code class="python">my_sqrt （2 ）
 1.414213562373095</code></pre>
 <h3 id="调试功能函数"><a href="#调试功能函数" class="headerlink" title="调试功能函数"></a>调试功能函数</h3><p>为了解<code>my_sqrt()</code>操作方式，一种简单的策略是<code>print()</code>在关键位置插入语句。例如，您可以记录的值<code>approx</code>，以查看每次循环迭代如何接近实际值：</p>
 <pre><code class="python">def my_sqrt_with_log(x):
@@ -43,7 +43,7 @@ ga('send', 'pageview');</script><!-- End Google Analytics -->
         approx = guess
         guess = (approx + x / approx) / 2
     return approx</code></pre>
-<pre><code>my_sqrt_with_log(9)</code></pre>
+<pre><code class="python">my_sqrt_with_log(9)</code></pre>
 <pre><code class="python">approx = None
 approx = 4.5
 approx = 3.25
@@ -53,8 +53,8 @@ approx = 3.0000000000393214
 3.0</code></pre>
 <p>这样我们就可以观察到每次运行时的内部细节，以排查问题。</p>
 <h3 id="检查功能函数"><a href="#检查功能函数" class="headerlink" title="检查功能函数"></a>检查功能函数</h3><p>让我们回到测试。我们可以阅读并运行代码，但是上面的值<code>my_sqrt(2)</code>实际上正确吗？我们可以通过利用<br>$$<br>\begin{align*}\sqrt {x} * \sqrt {x} = x\end{align*}<br>$$<br>。让我们来看看：</p>
-<pre><code>my_sqrt （2 ） *  my_sqrt （2 ）</code></pre>
-<pre><code>1.9999999999999996</code></pre>
+<pre><code class="python">my_sqrt （2 ） *  my_sqrt （2 ）</code></pre>
+<pre><code class="python">1.9999999999999996</code></pre>
 <p>看起来确实有一些四舍五入上的错误出现了</p>
 <p>现在，我们已经<em>测试</em>了上面的程序：我们已经在给定的输入上<em>执行了</em>该程序，并<em>检查了</em>其结果是否正确。在程序投入生产之前，这种测试是质量保证的最低限度。</p>
 <h3 id="自动化测试执行"><a href="#自动化测试执行" class="headerlink" title="自动化测试执行"></a>自动化测试执行</h3><p>到目前为止，我们已经<em>手动</em>测试了上述程序，即，<em>手动</em>运行它并手动检查其结果。这是一种非常灵活的测试方法，但是从长远来看，它效率很低：</p>
@@ -70,7 +70,7 @@ if result == expected_result:
     print(&quot;Test passed&quot;)
 else:
     print(&quot;Test failed&quot;)</code></pre>
-<pre><code>Test passed</code></pre>
+<pre><code class="python">Test passed</code></pre>
 <p>这个测试的好处是我们可以一次又一次地运行它，从而确保至少正确计算了4的平方根。但是，仍然存在许多问题：</p>
 <ol>
 <li>单个测试需要<em>五行代码</em></li>
@@ -80,10 +80,10 @@ else:
 <p>让我们一一解决这些问题。首先，让我们使测试更加紧凑。几乎所有的编程语言都可以自动检查条件是否成立，如果条件不成立则停止执行。这称为<em>断言</em>，对于测试非常有用。</p>
 <p>在Python中，我们使用<code>assert</code>语句，如果条件为true，则什么也不会发生。（如果一切正常，则不应该出问题。）但是，如果条件评估为false，<code>assert</code>则会引发异常，表明测试刚刚失败。</p>
 <p>在我们的示例中，我们可以<code>assert</code>轻松地检查是否<code>my_sqrt()</code>产生了上述预期结果：</p>
-<pre><code>assert my_sqrt(4) == 2</code></pre>
+<pre><code class="python">assert my_sqrt(4) == 2</code></pre>
 <p>当您执行此行代码时，什么都不会发生：我们证明（或断言）我们确认了<br>$$<br>\begin{align*}\sqrt {4}= 2\end{align*}<br>$$<br>但是请记住，浮点计算可能会导致舍入误差。因此，我们不能简单地比较两个浮点数是否相等。因此，我们将确保它们之间的绝对差保持在某个阈值以下，通常表示为$\epsilon$或<code>epsilon</code>。这是我们可以做到的：</p>
-<pre><code>EPSILON = 1e-8</code></pre>
-<pre><code>assert abs(my_sqrt(4) - 2) &lt; EPSILON</code></pre>
+<pre><code class="python">EPSILON = 1e-8</code></pre>
+<pre><code class="python">assert abs(my_sqrt(4) - 2) &lt; EPSILON</code></pre>
 <p>P.S. abs（）求绝对值</p>
 <p>我们还可以为此目的引入一个特殊功能，现在对具体值进行更多测试：</p>
 <pre><code class="python">def assertEquals(x, y, epsilon=1e-8):
@@ -93,7 +93,7 @@ assertEquals(my_sqrt(9), 3)
 assertEquals(my_sqrt(100), 10)</code></pre>
 <p>似乎可以工作，对吧？如果我们知道计算的预期结果，则可以一次又一次地使用此类断言，以确保我们的程序正确运行。</p>
 <h3 id="进一步生成测试"><a href="#进一步生成测试" class="headerlink" title="进一步生成测试"></a>进一步生成测试</h3><p>还记得<br>$$<br>\begin{align*}\sqrt {x} * \sqrt {x} = x\end{align*}<br>$$<br>普遍恒成立吗？我们还可以使用一些值来明确地测试它：</p>
-<pre><code>assertEquals(my_sqrt(2) * my_sqrt(2), 2)
+<pre><code class="python">assertEquals(my_sqrt(2) * my_sqrt(2), 2)
 assertEquals(my_sqrt(3) * my_sqrt(3), 3)
 assertEquals(my_sqrt(42.11) * my_sqrt(42.11), 42.11)</code></pre>
 <p>似乎仍然有效，对不对？最重要的是通过 $\begin{align*}\sqrt {x} * \sqrt {x} = x\end{align*}$我们可以测试成千上万的值：</p>
@@ -101,22 +101,22 @@ assertEquals(my_sqrt(42.11) * my_sqrt(42.11), 42.11)</code></pre>
     assertEquals(my_sqrt(n) * my_sqrt(n), n)</code></pre>
 <p><code>my_sqrt()</code>用100个值测试需要多少时间？让我们来看看。</p>
 <p>我们使用自己的<a target="_blank" rel="noopener" href="https://www.fuzzingbook.org/beta/html/Timer.html"><code>Timer</code>模块</a>来测量经过时间。为了能够使用<code>Timer</code>，我们首先导入我们自己的实用程序模块。</p>
-<pre><code>import bookutils</code></pre>
-<pre><code>from Timer import Timer</code></pre>
-<pre><code>with Timer() as t:
+<pre><code class="python">import bookutils</code></pre>
+<pre><code class="python">from Timer import Timer</code></pre>
+<pre><code class="python">with Timer() as t:
     for n in range(1, 10000):
         assertEquals(my_sqrt(n) * my_sqrt(n), n)
 print(t.elapsed_time())</code></pre>
-<pre><code>0.022911809000106587</code></pre>
+<pre><code class="python">0.022911809000106587</code></pre>
 <p>10,000个值大约需要百分之一秒，因此单次执行<code>my_sqrt()</code>需要1/1000000秒或大约1微秒。</p>
 <p>让我们重复随机选择10,000个值。Python<code>random.random()</code>函数返回0.0到1.0之间的随机值：</p>
-<pre><code>import random</code></pre>
+<pre><code class="python">import random</code></pre>
 <pre><code class="python">with Timer() as t:
     for i in range(10000):
         x = 1 + random.random() * 1000000
         assertEquals(my_sqrt(x) * my_sqrt(x), x)
 print(t.elapsed_time())</code></pre>
-<pre><code>0.02770466199990551</code></pre>
+<pre><code class="python">0.02770466199990551</code></pre>
 <p>一秒钟之内，我们现在测试了10,000个随机值，并且每次实际上都正确计算了平方根。只要对进行任何更改<code>my_sqrt()</code>，我们就可以重复进行此测试，每次都可以增强我们<code>my_sqrt()</code>没有隐患的信心。但是请注意，尽管随机函数在产生随机值方面没有<em>偏见</em>，但不太可能生成会极大改变程序行为的特殊值。我们将在下面稍后讨论。</p>
 <h3 id="在运行时验证"><a href="#在运行时验证" class="headerlink" title="在运行时验证"></a>在运行时验证</h3><p>除了为编写和运行测试外<code>my_sqrt()</code>，我们还可以<em>将检查权限集成到实现中。</em> 这样，将自动检查<em>每次</em>调用<code>my_sqrt()</code>。</p>
 <p>这样的<em>自动运行时检查</em>非常容易实现：</p>
@@ -125,8 +125,8 @@ print(t.elapsed_time())</code></pre>
     assertEquals(root * root, x)
     return root</code></pre>
 <p>现在，无论何时我们用 <code>my_sqrt_checked()</code>…</p>
-<pre><code>my_sqrt_checked(2.0)</code></pre>
-<pre><code>1.414213562373095</code></pre>
+<pre><code class="python">my_sqrt_checked(2.0)</code></pre>
+<pre><code class="python">1.414213562373095</code></pre>
 <p>我们已经知道结果是正确的，并且对于每次新的成功计算都是如此。</p>
 <p>如上所述，自动运行时检查假设有两件事：</p>
 <ul>
@@ -139,15 +139,15 @@ print(t.elapsed_time())</code></pre>
     x = int(arg)
     print(&#39;The root of&#39;, x, &#39;is&#39;, my_sqrt(x))</code></pre>
 <p>我们假设这<code>sqrt_program</code>是一个接受命令行输入的程序，如下所示：</p>
-<pre><code>$ sqrt_program 4
+<pre><code class="python">$ sqrt_program 4
 2</code></pre>
 <p>我们可以对<code>sqrt_program()</code>通过一些系统输入进行调用：</p>
-<pre><code>sqrt_program(&quot;4&quot;)</code></pre>
-<pre><code>The root of 4 is 2.0</code></pre>
+<pre><code class="python">sqrt_program(&quot;4&quot;)</code></pre>
+<pre><code class="python">The root of 4 is 2.0</code></pre>
 <p>这有什么问题？好吧，问题在于我们不检查外部输入的有效性。例如<code>sqrt_program(-1)</code>尝试调用。怎么办？</p>
 <p>实际上，如果您<code>my_sqrt()</code>使用负数调用，它将进入无限循环。由于技术原因，本章不能有无限循环（除非我们希望代码永远运行）。因此，我们使用一种特殊的<code>with ExpectTimeOut(1)</code>构造在一秒钟后中断执行。</p>
-<pre><code>from ExpectError import ExpectTimeout</code></pre>
-<pre><code>with ExpectTimeout(1):
+<pre><code class="python">from ExpectError import ExpectTimeout</code></pre>
+<pre><code class="python">with ExpectTimeout(1):
     sqrt_program(&quot;-1&quot;)</code></pre>
 <pre><code class="python">Traceback (most recent call last):
   File &quot;&lt;ipython-input-25-add01711282b&gt;&quot;, line 2, in &lt;module&gt;
@@ -169,11 +169,11 @@ TimeoutError (expected)</code></pre>
     else:
         print(&#39;The root of&#39;, x, &#39;is&#39;, my_sqrt(x))</code></pre>
 <p>然后我们可以确保<code>my_sqrt()</code>仅根据其规范进行调用。</p>
-<pre><code>sqrt_program （“ -1” ）</code></pre>
-<pre><code>Illegal Input</code></pre>
+<pre><code class="python">sqrt_program （“ -1” ）</code></pre>
+<pre><code class="python">Illegal Input</code></pre>
 <p>可是等等！如果<code>sqrt_program()</code>不使用数字调用怎么办？然后，我们将尝试转换非数字字符串，这也会导致运行时错误：</p>
-<pre><code>from ExpectError import ExpectError</code></pre>
-<pre><code>with ExpectError():
+<pre><code class="python">from ExpectError import ExpectError</code></pre>
+<pre><code class="python">with ExpectError():
     sqrt_program(&quot;xyzzy&quot;)</code></pre>
 <pre><code class="python">Traceback (most recent call last):
   File &quot;&lt;ipython-input-29-8c5aae65a938&gt;&quot;, line 2, in &lt;module&gt;
@@ -201,9 +201,9 @@ Illegal Input</code></pre>
 <p>现在我们已经看到，在系统级别，程序必须能够优雅地处理任何类型的输入，而永远不会进入不受控制的状态。当然，这对于程序员来说是负担，他们必须努力使自己的程序在所有情况下都健壮起来。但是，这种负担在生成软件测试时会成为一个<em>好处</em>：如果程序可以处理任何类型的输入（可能带有定义良好的错误消息），我们也可以<em>将其发送给任何类型的输入</em>。但是，当使用生成的值调用函数时，我们必须<em>知道</em>其精确的先决条件。</p>
 <h3 id="测试的极限"><a href="#测试的极限" class="headerlink" title="测试的极限"></a>测试的极限</h3><p>尽管在测试方面付出了最大的努力，但请记住，您始终在检查功能是否有一组<em>有限</em>的输入。因此，可能总是存在<em>未经测试的</em>输入，其功能可能仍会失败。</p>
 <p>在的情况下<code>my_sqrt()</code>，例如，计算 $\begin{align*}\sqrt {0}\end{align*}$：</p>
-<pre><code>with ExpectError():
+<pre><code class="python">with ExpectError():
     root = my_sqrt(0)</code></pre>
-<pre><code>Traceback (most recent call last):
+<pre><code class="python">Traceback (most recent call last):
   File &quot;&lt;ipython-input-34-24ede1f53910&gt;&quot;, line 2, in &lt;module&gt;
     root = my_sqrt(0)
   File &quot;&lt;ipython-input-1-47185ad159a1&gt;&quot;, line 7, in my_sqrt
@@ -217,11 +217,11 @@ ZeroDivisionError: float division by zero (expected)</code></pre>
         return 0
     return my_sqrt(x)</code></pre>
 <p>这样，我们现在可以正确地计算  $\begin{align*}\sqrt {0}=0\end{align*}$</p>
-<pre><code>assert my_sqrt_fixed(0) == 0</code></pre>
+<pre><code class="python">assert my_sqrt_fixed(0) == 0</code></pre>
 <p>非法值现在导致异常：</p>
-<pre><code>with ExpectError():
+<pre><code class="python">with ExpectError():
     root = my_sqrt_fixed(-1)</code></pre>
-<pre><code>Traceback (most recent call last):
+<pre><code class="python">Traceback (most recent call last):
   File &quot;&lt;ipython-input-37-55b1caf1586a&gt;&quot;, line 2, in &lt;module&gt;
     root = my_sqrt_fixed(-1)
   File &quot;&lt;ipython-input-35-f3e21e80ddfb&gt;&quot;, line 2, in my_sqrt_fixed

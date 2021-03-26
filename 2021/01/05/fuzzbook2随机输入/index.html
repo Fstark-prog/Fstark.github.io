@@ -31,7 +31,7 @@ ga('send', 'pageview');</script><!-- End Google Analytics -->
 <li><code>chr(n)</code> –返回带有ASCII码的字符 <code>n</code></li>
 </ul>
 <p>要使用随机数，我们必须导入相应的模块：</p>
-<pre><code>import random</code></pre>
+<pre><code class="python">import random</code></pre>
 <p>下面是实际<code>fuzzer()</code>功能：</p>
 <pre><code class="python">def fuzzer(max_length=100, char_start=32, char_range=32):
     &quot;&quot;&quot;一个字符串最多有`max_length`个字符，
@@ -86,11 +86,11 @@ result = subprocess.run([program, FILE],
 <pre><code class="python">result.stdout</code></pre>
 <pre><code class="python">&#39;4\n&#39;</code></pre>
 <p>我们还可以检查返回的状态值，为0表示程序正确终止。</p>
-<pre><code>result.returncode</code></pre>
-<pre><code>0</code></pre>
+<pre><code class="python">result.returncode</code></pre>
+<pre><code class="python">0</code></pre>
 <p>任何错误消息都可以在中找到<code>results.stderr</code>：</p>
-<pre><code>result.stderr</code></pre>
-<pre><code>&#39;&#39;</code></pre>
+<pre><code class="python">result.stderr</code></pre>
+<pre><code class="python">&#39;&#39;</code></pre>
 <p>除了<code>bc</code>，您实际上可以放入您喜欢的任何程序。但是请注意，如果您的程序能够更改甚至损坏系统，则模糊输入很可能包含执行此操作的数据或命令。</p>
 <p>只是为了好玩，想象一下您将测试一个文件删除程序，模糊器产生有效文件名的机会有多少？</p>
 <h4 id="长时间的运行模糊测试"><a href="#长时间的运行模糊测试" class="headerlink" title="长时间的运行模糊测试"></a>长时间的运行模糊测试</h4><p>现在让我们将大量输入提供给我们的测试程序，以查看它是否可能在某些程序上崩溃。我们将所有结果存储在<code>runs</code>变量中，作为输入数据和实际结果对。（注意：运行此程序可能需要一段时间。）</p>
@@ -111,7 +111,7 @@ for i in range(trials):
     runs.append((data, result))</code></pre>
 <p>现在通过<code>runs</code>列表，我们可以查询一些统计的信息。例如，我们可以查询实际有多少次运行。我们使用<code>sum()</code> 汇总列表中的所有元素。</p>
 <pre><code class="python">sum(1 for (data, result) in runs if result.stderr == &quot;&quot;)</code></pre>
-<pre><code>4</code></pre>
+<pre><code class="python">4</code></pre>
 <p>显然，大多数输入都是无效的，这不足为奇，毕竟随机输入不太可能包含有效的算术表达式。</p>
 <p>让我们看一下第一个返回的错误：</p>
 <pre><code class="python">errors = [(data, result) for (data, result) in runs if result.stderr != &quot;&quot;]
@@ -135,10 +135,10 @@ print(first_result.stderr)</code></pre>
  and &quot;illegal character&quot; not in result.stderr
  and &quot;parse error&quot; not in result.stderr
  and &quot;syntax error&quot; not in result.stderr]</code></pre>
-<pre><code>[]</code></pre>
+<pre><code class="python">[]</code></pre>
 <p>也许bc程序的奔溃由程序自己捕捉。不幸的是，返回码似乎永远都不会为0.</p>
 <pre><code class="python">sum(1 for (data, result) in runs if result.returncode != 0)</code></pre>
-<pre><code>0</code></pre>
+<pre><code class="python">0</code></pre>
 <p>我们再让上面的<code>bc</code>测试运行怎么样？当它运行时，让我们看一下1989年的技术水平能做到哪一步。</p>
 <h4 id="利用Fuzzers查找Bug"><a href="#利用Fuzzers查找Bug" class="headerlink" title="利用Fuzzers查找Bug"></a>利用Fuzzers查找Bug</h4><p>当Miller和他的学生在1989年运行他们的第一个模糊器时，他们发现了一个令人震惊的结果：大约1/3的UNIX实用程序遇到了问题—它们在模糊测试输入时崩溃、挂起或以其他方式失败[ <a target="_blank" rel="noopener" href="https://doi.org/10.1145/96267.96279">Miller，1990</a> ]。这也包括上面的<code>bc</code>程序。（当然，这些错误现已修复！）</p>
 <p>考虑到这些UNIX实用程序中有许多都是在脚本中使用的，这些脚本也将处理网络输入，因此这是一个令人震惊的结果。程序员迅速构建并运行了自己的模糊器，急于修复所报告的错误，并学会了不再信任外部输入。</p>
@@ -179,7 +179,7 @@ ValueError (expected)</code></pre>
                 break
         i += 1</code></pre>
 <p>使用我们从在第一篇文章介绍的超时机制，我们可以在一段时间后中断此功能。实测，经过一些模糊的输入后，它确实会挂起。</p>
-<pre><code>from ExpectError import ExpectTimeout</code></pre>
+<pre><code class="python">from ExpectError import ExpectTimeout</code></pre>
 <pre><code class="python">trials = 100
 with ExpectTimeout(2):
     for i in range(trials):
@@ -208,13 +208,13 @@ TimeoutError (expected)</code></pre>
     if int(s) &gt; 1000:
         raise ValueError</code></pre>
 <p>我们可以让fuzzer（）创建一个数字字符串：</p>
-<pre><code>long_number = fuzzer(100, ord(&#39;0&#39;), 10)
+<pre><code class="python">long_number = fuzzer(100, ord(&#39;0&#39;), 10)
 print(long_number)</code></pre>
-<pre><code>7056414967099541967374507745748918952640135045</code></pre>
+<pre><code class="python">7056414967099541967374507745748918952640135045</code></pre>
 <p>如果我们将这些数字输入collapse_if_too_large（），它将很快崩溃。</p>
-<pre><code>with ExpectError():
+<pre><code class="python">with ExpectError():
     collapse_if_too_large(long_number)</code></pre>
-<pre><code>Traceback (most recent call last):
+<pre><code class="python">Traceback (most recent call last):
   File &quot;&lt;ipython-input-29-7a1817f3dbfc&gt;&quot;, line 2, in &lt;module&gt;
     collapse_if_too_large(long_number)
   File &quot;&lt;ipython-input-27-2c22a83a4dca&gt;&quot;, line 3, in collapse_if_too_large
@@ -244,8 +244,8 @@ int main(int argc, char** argv) &#123;
     return val;
 &#125;
     &quot;&quot;&quot;)</code></pre>
-<pre><code>from bookutils import print_file</code></pre>
-<pre><code>print_file(&quot;program.c&quot;)</code></pre>
+<pre><code class="python">from bookutils import print_file</code></pre>
+<pre><code class="python">print_file(&quot;program.c&quot;)</code></pre>
 <pre><code class="c">#include &lt;stdlib.h&gt;
 #include &lt;string.h&gt;
 
@@ -263,13 +263,13 @@ int main(int argc, char** argv) &#123;
     return val;
 &#125;</code></pre>
 <p>我们在启用ASAN的情况下编译此C程序：</p>
-<pre><code>!clang -fsanitize=address -g -o program program.c</code></pre>
+<pre><code class="python">!clang -fsanitize=address -g -o program program.c</code></pre>
 <p>如果运行参数为的程序<code>99</code>，则返回<code>buf[99]</code>，即42。</p>
-<pre><code>!./program 99; echo $?</code></pre>
-<pre><code>42</code></pre>
+<pre><code class="python">!./program 99; echo $?</code></pre>
+<pre><code class="python">42</code></pre>
 <p>但是，访问buf [110]会导致AddressSanitizer中出现越界错误。</p>
-<pre><code>!./program 110</code></pre>
-<pre><code class="powershell">=================================================================
+<pre><code class="python">!./program 110</code></pre>
+<pre><code class="python">=================================================================
 ==9753==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x60b0000000ae at pc 0x000104078ef0 bp 0x7ffeebb87390 sp 0x7ffeebb87388
 READ of size 1 at 0x60b0000000ae thread T0
     #0 0x104078eef in main program.c:12
@@ -318,7 +318,7 @@ Shadow byte legend (one shadow byte represents 8 application bytes):
 <p>如果您想在C程序中发现错误，则为模糊测试打开此类检查相当容易。根据工具的不同，它会将执行速度降低一定的因素（对于AddressSanitizer，通常为2××），并且消耗更多的内存，但是与发现这些错误所需的人工相比，CPU周期实在是太便宜了。</p>
 <p>对内存的越界访问具有很大的安全风险，因为它们可能使攻击者访问甚至修改并非针对他们的信息。作为一个著名的例子，<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Heartbleed">HeartBleed错误</a>是OpenSSL库中的一个安全错误，它实现了加密协议，该协议提供了计算机网络上的通信安全性。（如果您在浏览器中阅读此文本，则可能已使用这些协议对其进行了加密。）</p>
 <p>通过向SSL<em>心跳</em>服务发送特制命令来利用HeartBleed错误。心跳服务用于检查另一端的服务器是否仍在运行。客户端会向服务发送一个字符串，例如</p>
-<pre><code>BIRD (4 letters)</code></pre>
+<pre><code class="python">BIRD (4 letters)</code></pre>
 <p>服务器将向其回复<code>BIRD</code>，并且客户端将知道服务器仍在运行。</p>
 <p>不幸的是，这种服务可以通过要求服务器回复利用指定的一组字母。下面的<a target="_blank" rel="noopener" href="https://xkcd.com/1354/">XKCD漫画</a>很好地解释了这一点：</p>
 <p><img src="https://i.loli.net/2021/01/04/Izm9Elg1HbvxQ8h.png" alt="xkcd_heartbleed_1"></p>
@@ -328,13 +328,13 @@ Shadow byte legend (one shadow byte represents 8 application bytes):
 <p>但是如何发现HeartBleed？非常简单。Codenomicon公司以及Google的研究人员都使用内存清理器编译了OpenSSL库，然后用模糊的命令很快将其触发。然后，内存清理程序会注意到是否发生了越界内存访问-实际上，它将很快发现这一点。</p>
 <p>内存检查器只是众多检查器之一，可在模糊检查期间运行该检查器以检测运行时错误。在后续章节我们将学习更多有关如何定义通用检查器的信息。</p>
 <p>我们已经完成了<code>program</code>，所以我们进行清理：</p>
-<pre><code>!rm -fr program program.*</code></pre>
+<pre><code class="python">!rm -fr program program.*</code></pre>
 <h6 id="信息泄露"><a href="#信息泄露" class="headerlink" title="信息泄露"></a>信息泄露</h6><p>信息泄漏不仅可能通过非法的内存访问而发生；它们也可能出现在“有效”内存中-如果此“有效”内存包含不应泄漏的敏感信息。让我们在Python程序中说明此问题。首先，让我们创建一些程序存储器，其中填充了实际数据和随机数据：</p>
-<pre><code>secrets = (&quot;&lt;space for reply&gt;&quot; + fuzzer(100)
+<pre><code class="python">secrets = (&quot;&lt;space for reply&gt;&quot; + fuzzer(100)
      + &quot;&lt;secret-certificate&gt;&quot; + fuzzer(100)
      + &quot;&lt;secret-key&gt;&quot; + fuzzer(100) + &quot;&lt;other-secrets&gt;&quot;)</code></pre>
 <p>我们向中添加了更多的“内存”字符<code>secrets</code>，并用它们<code>&quot;deadbeef&quot;</code>作为未初始化内存的标记：</p>
-<pre><code>uninitialized_memory_marker = &quot;deadbeef&quot;
+<pre><code class="python">uninitialized_memory_marker = &quot;deadbeef&quot;
 while len(secrets) &lt; 2048:
     secrets += uninitialized_memory_marker</code></pre>
 <p>我们定义了一个服务（类似于上面讨论的心跳服务），该服务将接收答复并发送回一个长度。它会将要发送的回复存储在内存中，然后以给定的长度发送回去。</p>
@@ -348,21 +348,21 @@ while len(secrets) &lt; 2048:
         s += memory[i]
     return s</code></pre>
 <p>这非常适合标准字符串：</p>
-<pre><code>heartbeat(&quot;potato&quot;, 6, memory=secrets)</code></pre>
-<pre><code>&#39;potato&#39;</code></pre>
-<pre><code>heartbeat(&quot;bird&quot;, 4, memory=secrets)</code></pre>
-<pre><code>&#39;bird&#39;</code></pre>
+<pre><code class="python">heartbeat(&quot;potato&quot;, 6, memory=secrets)</code></pre>
+<pre><code class="python">&#39;potato&#39;</code></pre>
+<pre><code class="python">heartbeat(&quot;bird&quot;, 4, memory=secrets)</code></pre>
+<pre><code class="python">&#39;bird&#39;</code></pre>
 <p>但是，如果该长度大于应答字符串的长度，则会溢出其他内存内容。请注意，所有这些仍然在常规数组范围内发生，因此不会触发地址清理器：</p>
-<pre><code>heartbeat(&quot;hat&quot;, 500, memory=secrets)</code></pre>
-<pre><code>&#39;hatace for reply&gt;#,,!3?30&gt;#61)$4--8=&lt;7)4 )03/%,5+! &quot;4)0?.9+?3();&lt;42?=?0&lt;secret-certificate&gt;7(+/+((1)#/0\&#39;4!&gt;/&lt;#=78%6$!!$&lt;-&quot;3&quot;\&#39;-?1?85!05629%/); *)1\&#39;/=9%&lt;secret-key&gt;.(#.4%&lt;other-secrets&gt;deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadb&#39;</code></pre>
+<pre><code class="python">heartbeat(&quot;hat&quot;, 500, memory=secrets)</code></pre>
+<pre><code class="python">&#39;hatace for reply&gt;#,,!3?30&gt;#61)$4--8=&lt;7)4 )03/%,5+! &quot;4)0?.9+?3();&lt;42?=?0&lt;secret-certificate&gt;7(+/+((1)#/0\&#39;4!&gt;/&lt;#=78%6$!!$&lt;-&quot;3&quot;\&#39;-?1?85!05629%/); *)1\&#39;/=9%&lt;secret-key&gt;.(#.4%&lt;other-secrets&gt;deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadb&#39;</code></pre>
 <p>一个人如何发现这种问题？这个想法是要识别不应该泄漏的信息，例如给定的机密，以及未初始化的内存。我们可以在一个小的Python示例中模拟这种检查：</p>
-<pre><code>from ExpectError import ExpectError</code></pre>
-<pre><code>with ExpectError():
+<pre><code class="python">from ExpectError import ExpectError</code></pre>
+<pre><code class="python">with ExpectError():
     for i in range(10):
         s = heartbeat(fuzzer(), random.randint(1, 500), memory=secrets)
         assert not s.find(uninitialized_memory_marker)
         assert not s.find(&quot;secret&quot;)</code></pre>
-<pre><code>Traceback (most recent call last):
+<pre><code class="python">Traceback (most recent call last):
   File &quot;&lt;ipython-input-44-b7e8a1210599&gt;&quot;, line 4, in &lt;module&gt;
     assert not s.find(uninitialized_memory_marker)
 AssertionError (expected)</code></pre>
