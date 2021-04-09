@@ -28,7 +28,7 @@ ga('send', 'pageview');</script><!-- End Google Analytics -->
 <p>我们在反汇编窗口点击右键——转到——表达式，然后输入之前选取的空白区域起始地址0041FFB1。</p>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g754cv3jrdj318p0u04br.jpg" alt="img"> </p>
 <p>我们在转入的0041FFB1地址开始，一步一步输入花指令。我们在这里使用一段比较经典的花指令。</p>
-<pre class="line-numbers language-汇编" data-language="汇编"><code class="language-汇编">nop
+<pre><code class="汇编">nop
 nop
 nop
 mov ebp,esp
@@ -47,7 +47,7 @@ pop eax
 mov ebp,eax
 mov eax,原入口地址
 push eax
-retn<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+retn</code></pre>
 <p>注意在该程序中的“原入口地址”位置就是打开OD载入软件时的入口地址，00403510。</p>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g754czcxknj31c40u0dik.jpg" alt="img"> </p>
 <p>随后在花指令的首行“0041FFB1”使用右键将此处设置为新EIP。</p>

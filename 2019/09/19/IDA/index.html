@@ -12,12 +12,12 @@ ga('send', 'pageview');</script><!-- End Google Analytics -->
 <p>IDA Pro提供了许多强大功能，例如函数的交叉引用查看、函数执行流程图及伪代码等，并且也有一定的动态调试功能。同时，IDA pro可以在windows、linux、ios下进行二进制程序的动态调试和动态附加，支持查看程序运行内存空间，设置内存断点和硬件断点。</p>
 <p>IDA无疑是当今最强大的反汇编软件，虽然目前IDA支持简单的动态调试，但是大多数情况下我们主要使用其强大的反汇编功能。</p>
 <h3 id="IDA加载自编译HelloWorld程序"><a href="#IDA加载自编译HelloWorld程序" class="headerlink" title="IDA加载自编译HelloWorld程序"></a>IDA加载自编译HelloWorld程序</h3><p>我们使用visual c++编写一个简单的helloworld，在编译、链接后形成一个二进制程序，程序如下所示：</p>
-<pre class="line-numbers language-c++" data-language="c++"><code class="language-c++">#include &lt;iostream.h&gt;
+<pre><code class="c++">#include &lt;iostream.h&gt;
 int main()&#123;
-	cout&lt;&lt;&quot;Hello,World!&quot;&lt;&lt;endl;
-	cin.get();
-	return 0;
-&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    cout&lt;&lt;&quot;Hello,World!&quot;&lt;&lt;endl;
+    cin.get();
+    return 0;
+&#125;</code></pre>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753ldo622j31ex0oawif.jpg" alt="img"></p>
 <p>将该程序放入IDA Pro中进行静态反汇编</p>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g753m24s3rj31100o042c.jpg" alt="img"> </p>

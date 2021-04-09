@@ -31,39 +31,39 @@ ga('send', 'pageview');</script><!-- End Google Analytics -->
 <p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1g9ztz80rrfj30m80ngn76.jpg" alt="image-20191217170754307"></p>
 <p>这种定位shellcode的方法使用进程空间里一条jmp esp指令作为“跳板”，不论栈帧怎么“移位”，都能够精确地跳回栈区，从而适应程序运行中shellcode内存地址的动态变化。</p>
 <p>想要找到ESP的地址，可以使用各种工具中自带的插件，也可以使用以下的c程序。</p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;windows.h></span><span class="token expression">￼</span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span><span class="token expression">￼</span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">DLL_NAME</span> <span class="token string">"user32.dll"</span><span class="token expression">￼</span></span>
-<span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>￼<span class="token punctuation">&#123;</span>￼
-BYTE<span class="token operator">*</span> ptr<span class="token punctuation">;</span>￼
-<span class="token keyword">int</span> position<span class="token punctuation">,</span>address<span class="token punctuation">;</span>￼
-HINSTANCE handle<span class="token punctuation">;</span>￼
-BOOL done_flag <span class="token operator">=</span> FALSE<span class="token punctuation">;</span>￼    handle<span class="token operator">=</span><span class="token function">LoadLibrary</span><span class="token punctuation">(</span>DLL_NAME<span class="token punctuation">)</span><span class="token punctuation">;</span>￼
-<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span>handle<span class="token punctuation">)</span>￼
-<span class="token punctuation">&#123;</span>￼
-	<span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">" load dll erro !"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>￼
-  <span class="token function">exit</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>￼
-<span class="token punctuation">&#125;</span>￼
-ptr <span class="token operator">=</span> <span class="token punctuation">(</span>BYTE<span class="token operator">*</span><span class="token punctuation">)</span>handle<span class="token punctuation">;</span>￼
-<span class="token keyword">for</span><span class="token punctuation">(</span>position <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> <span class="token operator">!</span>done_flag<span class="token punctuation">;</span> position<span class="token operator">++</span><span class="token punctuation">)</span>￼
-<span class="token punctuation">&#123;</span>￼
-	try￼
-  <span class="token punctuation">&#123;</span>￼
-  	<span class="token keyword">if</span><span class="token punctuation">(</span>ptr<span class="token punctuation">[</span>position<span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token number">0xFF</span> <span class="token operator">&amp;&amp;</span> ptr<span class="token punctuation">[</span>position<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token number">0xE4</span><span class="token punctuation">)</span>￼
-    <span class="token punctuation">&#123;</span>￼
-    	<span class="token comment">//0xFFE4 is the opcode of jmp esp￼  </span>
-   	  <span class="token keyword">int</span> address <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">)</span>ptr <span class="token operator">+</span> position<span class="token punctuation">;</span>￼ 
-    	<span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"OPCODE found at 0x%x\n"</span><span class="token punctuation">,</span>address<span class="token punctuation">)</span><span class="token punctuation">;</span>￼
-    <span class="token punctuation">&#125;</span>￼
-  <span class="token punctuation">&#125;</span>￼
-  <span class="token function">catch</span><span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span>￼
-  <span class="token punctuation">&#123;</span>￼
-  	<span class="token keyword">int</span> address <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">)</span>ptr <span class="token operator">+</span> position<span class="token punctuation">;</span>￼
-  	<span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"END OF 0x%x\n"</span><span class="token punctuation">,</span> address<span class="token punctuation">)</span><span class="token punctuation">;</span>￼
-  	done_flag <span class="token operator">=</span> true<span class="token punctuation">;</span>￼
-  <span class="token punctuation">&#125;</span>￼
- <span class="token punctuation">&#125;</span>￼
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre><code class="c">#include &lt;windows.h&gt;￼
+#include &lt;stdio.h&gt;￼
+#define DLL_NAME &quot;user32.dll&quot;￼
+main()￼&#123;￼
+BYTE* ptr;￼
+int position,address;￼
+HINSTANCE handle;￼
+BOOL done_flag = FALSE;￼    handle=LoadLibrary(DLL_NAME);￼
+if(!handle)￼
+&#123;￼
+    printf(&quot; load dll erro !&quot;);￼
+  exit(0);￼
+&#125;￼
+ptr = (BYTE*)handle;￼
+for(position = 0; !done_flag; position++)￼
+&#123;￼
+    try￼
+  &#123;￼
+      if(ptr[position] == 0xFF &amp;&amp; ptr[position+1] == 0xE4)￼
+    &#123;￼
+        //0xFFE4 is the opcode of jmp esp￼  
+         int address = (int)ptr + position;￼ 
+        printf(&quot;OPCODE found at 0x%x\n&quot;,address);￼
+    &#125;￼
+  &#125;￼
+  catch(...)￼
+  &#123;￼
+      int address = (int)ptr + position;￼
+      printf(&quot;END OF 0x%x\n&quot;, address);￼
+      done_flag = true;￼
+  &#125;￼
+ &#125;￼
+&#125;</code></pre>
 <h3 id="缓冲区组成"><a href="#缓冲区组成" class="headerlink" title="缓冲区组成"></a>缓冲区组成</h3><p>送入缓冲区的数据可以分为以下几种。<br>（1）填充物：可以是任何值，但是一般用NOP指令对应的0x90来填充缓冲区，并把shellcode布置于其后。这样即使不能准确地跳转到shellcode的开始，只要能跳进填充区，处理器最终也能顺序执行到shellcode。<br>（2）淹没返回地址的数据：可以是跳转指令的地址、shellcode起始地址，甚至是一个近似的shellcode的地址。<br>（3）shellcode：可执行的机器代码。<br>在缓冲区中怎样摆放shellcode对exploit的成功至关重要。</p>
 <p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1g9zuel3opqj30m80f6gq8.jpg" alt="image-20191217172239708"></p>
 <p>如果缓冲区较大，更推荐把shellcode布置在缓冲区内，有以下好处：</p>

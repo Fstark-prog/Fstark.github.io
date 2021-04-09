@@ -19,21 +19,21 @@ ga('send', 'pageview');</script><!-- End Google Analytics -->
 <p>(3)在命令提示工具中进入WinAFL的目录下</p>
 <p>(4) 在Visual Studio命令提示工具中输入如下命令进行WinAFL编译安装（需将-DDynamoRIO_DIR参数设置为你的DynamoRIO cmake文件所在位置）</p>
 <p>32-bit build:</p>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">mkdir build32
+<pre><code class="shell">mkdir build32
 cd build32
-cmake -G&quot;Visual Studio 16 2019&quot; -A Win32 .. -DDynamoRIO_DIR&#x3D;..\path\to\DynamoRIO\cmake 
-cmake --build . --config Release<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+cmake -G&quot;Visual Studio 16 2019&quot; -A Win32 .. -DDynamoRIO_DIR=..\path\to\DynamoRIO\cmake 
+cmake --build . --config Release</code></pre>
 <p>64-bit build:</p>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">mkdir build64
+<pre><code class="shell">mkdir build64
 cd build64
-cmake -G&quot;Visual Studio 16 2019&quot; -A x64 .. -DDynamoRIO_DIR&#x3D;..\path\to\DynamoRIO\cmake
-cmake --build . --config Release<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+cmake -G&quot;Visual Studio 16 2019&quot; -A x64 .. -DDynamoRIO_DIR=..\path\to\DynamoRIO\cmake
+cmake --build . --config Release</code></pre>
 <p>这里需要注意一下-G选择平台时VS16与之前版本默认目标平台架构是有些区别的：</p>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">cmake -G &quot;Visual Studio 16 2019&quot; -A Win32   ;x32
+<pre><code class="shell">cmake -G &quot;Visual Studio 16 2019&quot; -A Win32   ;x32
 cmake -G &quot;Visual Studio 16 2019&quot; -A x64     ;x64  默认目标平台名称（架构）为Win64
 
 cmake -G &quot;Visual Studio 15 2017&quot;            ;x32  默认目标平台名称（架构）为Win32
-cmake -G &quot;Visual Studio 15 2017 Win64&quot;      ;x64<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+cmake -G &quot;Visual Studio 15 2017 Win64&quot;      ;x64</code></pre>
 <p>winafl 命令行参数，主要分为三段,(afl执行参数–dynamoRIO执行参数–程序执行参数)</p>
 <ul>
 <li>afl执行参数主要包括<ul>
@@ -65,11 +65,11 @@ cmake -G &quot;Visual Studio 15 2017 Win64&quot;      ;x64<span aria-hidden="tru
 </ol>
 <p>在winafl中，他们存在于 winafl-cmin.py，对输入的样本文件进行最小化处理，以用来提高 WinAFL 的执行效率。</p>
 <p>筛选命令</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python">python winafl<span class="token operator">-</span>cmin<span class="token punctuation">.</span>py <span class="token operator">-</span><span class="token operator">-</span>working<span class="token operator">-</span><span class="token builtin">dir</span> C<span class="token punctuation">:</span>\Users\test\Desktop\winafl<span class="token operator">-</span>master\build32\<span class="token builtin">bin</span>\Release <span class="token operator">-</span>D C<span class="token punctuation">:</span>\Users\test\Desktop\DynamoRIO<span class="token operator">-</span>Windows<span class="token operator">-</span><span class="token number">8.0</span><span class="token number">.0</span><span class="token operator">-</span><span class="token number">1</span>\bin32 <span class="token operator">-</span>t <span class="token number">100000</span> <span class="token operator">-</span>i C<span class="token punctuation">:</span>\Users\test\Desktop\jpg <span class="token operator">-</span>o C<span class="token punctuation">:</span>\Users\test\Desktop\jpg\out <span class="token operator">-</span>coverage_module FreeImage<span class="token punctuation">.</span>dll <span class="token operator">-</span>target_module Project1<span class="token punctuation">.</span>exe <span class="token operator">-</span>target_method main <span class="token operator">-</span>nargs <span class="token number">2</span> <span class="token operator">-</span><span class="token operator">-</span> C<span class="token punctuation">:</span>\Users\test\source\repos\Project1\Release\Project1<span class="token punctuation">.</span>exe @@<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre><code class="python">python winafl-cmin.py --working-dir C:\Users\test\Desktop\winafl-master\build32\bin\Release -D C:\Users\test\Desktop\DynamoRIO-Windows-8.0.0-1\bin32 -t 100000 -i C:\Users\test\Desktop\jpg -o C:\Users\test\Desktop\jpg\out -coverage_module FreeImage.dll -target_module Project1.exe -target_method main -nargs 2 -- C:\Users\test\source\repos\Project1\Release\Project1.exe @@</code></pre>
 <p>此时可能出现[!] Dry-run failed, 2 executions resulted differently:Tuples matching? False的报错</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge6ywxmm5cj30p206iq5z.jpg" alt="截屏2020-04-24 下午6.00.34"></p>
 <p>看来测试用例中存在一些坏的用例，导致不能正确精简，在语料库所在文件夹可以利用以下bash脚本简单判断一下</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">λ <span class="token keyword">for</span> <span class="token for-or-select variable">file</span> <span class="token keyword">in</span> *<span class="token punctuation">;</span> <span class="token keyword">do</span> <span class="token builtin class-name">printf</span> <span class="token string">"==== FILE: <span class="token variable">$file</span> =====<span class="token entity" title="\n">\n</span>"</span><span class="token punctuation">;</span>/c/Users/test/source/repos/Project1/Release/Project1.exe <span class="token variable">$file</span> <span class="token punctuation">;</span><span class="token builtin class-name">echo</span> <span class="token variable">$?</span><span class="token punctuation">;</span> <span class="token keyword">done</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre><code class="bash">λ for file in *; do printf &quot;==== FILE: $file =====\n&quot;;/c/Users/test/source/repos/Project1/Release/Project1.exe $file ;echo $?; done</code></pre>
 <p>正常运行的文件返回值都是0，有问题的文件返回结果都不太正常</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge70jesh5mj30h80at422.jpg" alt="image-20200426113452542"></p>
 <p>把这些返回结果不太正常的删除之后，再运行一次语料库蒸馏，发现运行成功了</p>
@@ -77,7 +77,7 @@ cmake -G &quot;Visual Studio 15 2017 Win64&quot;      ;x64<span aria-hidden="tru
 <p>可以看到原本429张被精简到了148张，确实少了不少，根据参考教程中的提示，Winafl在处理大于4Kb的图片时，速度会变得很慢，因此再删除一波，最终语料库就剩下这么点了。</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge70r1i5iaj31cj0lwqrn.jpg" alt="image-20200426114211822"></p>
 <h3 id="开始运行"><a href="#开始运行" class="headerlink" title="开始运行"></a>开始运行</h3><p>经过动态和静态的简单分析后，发现ABC看图主要调用Freeimage.dll进行图片解析的，决定对 FreeImage 库的载入函数进行模糊测试，针对 FreeImage_LoadU 函数编写测试程序</p>
-<pre class="line-numbers language-c++" data-language="c++"><code class="language-c++">#define _CRT_SECURE_NO_WARNINGS
+<pre><code class="c++">#define _CRT_SECURE_NO_WARNINGS
 #include &lt;windows.h&gt; 
 #include &lt;tchar.h&gt;
 #include &lt;iostream&gt;
@@ -101,71 +101,71 @@ FreeImage_DeInitialise DeInitialise;
 
 int main(int argc, char** argv)
 &#123;
-	if (argc &lt; 2) &#123;
-		printf(&quot;Usage: %s &lt; file&gt;\n&quot;, argv[0]);
-		return 0;
-	&#125;
+    if (argc &lt; 2) &#123;
+        printf(&quot;Usage: %s &lt; file&gt;\n&quot;, argv[0]);
+        return 0;
+    &#125;
 
-	wchar_t* PathName &#x3D; charToWChar(argv[1]);
+    wchar_t* PathName = charToWChar(argv[1]);
 
-	HINSTANCE hinstLib; BOOL fFreeResult, fRunTimeLinkSuccess &#x3D; FALSE; DWORD Error &#x3D; NULL;
-	hinstLib &#x3D; LoadLibrary(TEXT(&quot;C:\\FreeImage.dll&quot;));
+    HINSTANCE hinstLib; BOOL fFreeResult, fRunTimeLinkSuccess = FALSE; DWORD Error = NULL;
+    hinstLib = LoadLibrary(TEXT(&quot;C:\\FreeImage.dll&quot;));
 
-	if (hinstLib !&#x3D; NULL)
-	&#123;
-		fRunTimeLinkSuccess &#x3D; TRUE;
+    if (hinstLib != NULL)
+    &#123;
+        fRunTimeLinkSuccess = TRUE;
 
-		Initialise &#x3D; (FreeImage_Initialise)GetProcAddress(hinstLib, (LPCSTR)163); &#x2F;&#x2F; 初始化 FreeImage 库
-		LoadFileType &#x3D; (FreeImage_GetFileTypeU)GetProcAddress(hinstLib, (LPCSTR)126);&#x2F;&#x2F; 获取位图文件类型
-		LoadU &#x3D; (FreeImage_LoadU)GetProcAddress(hinstLib, (LPCSTR)181);	&#x2F;&#x2F; 加载位图
-		UnLoad &#x3D; (FreeImage_UnLoad)GetProcAddress(hinstLib, (LPCSTR)242);&#x2F;&#x2F; 卸载位图
-		DeInitialise &#x3D; (FreeImage_DeInitialise)GetProcAddress(hinstLib, (LPCSTR)83);&#x2F;&#x2F;卸载 FreeImage 库
+        Initialise = (FreeImage_Initialise)GetProcAddress(hinstLib, (LPCSTR)163); // 初始化 FreeImage 库
+        LoadFileType = (FreeImage_GetFileTypeU)GetProcAddress(hinstLib, (LPCSTR)126);// 获取位图文件类型
+        LoadU = (FreeImage_LoadU)GetProcAddress(hinstLib, (LPCSTR)181);    // 加载位图
+        UnLoad = (FreeImage_UnLoad)GetProcAddress(hinstLib, (LPCSTR)242);// 卸载位图
+        DeInitialise = (FreeImage_DeInitialise)GetProcAddress(hinstLib, (LPCSTR)83);//卸载 FreeImage 库
 
-		test(hinstLib, PathName);
-		fFreeResult &#x3D; FreeLibrary(hinstLib);
-	&#125;
+        test(hinstLib, PathName);
+        fFreeResult = FreeLibrary(hinstLib);
+    &#125;
 
-	if (!fRunTimeLinkSuccess)
-		cout &lt;&lt; &quot;加载函数失败, Error: &quot; &lt;&lt; Error &lt;&lt; endl;
-	return 0;
+    if (!fRunTimeLinkSuccess)
+        cout &lt;&lt; &quot;加载函数失败, Error: &quot; &lt;&lt; Error &lt;&lt; endl;
+    return 0;
 &#125;
 
 void test(HINSTANCE hinstLib, wchar_t* PathName)
 &#123;
-	
-	DWORD FileType &#x3D; (LoadFileType)(PathName, 0);
-	load &#x3D; (LoadU)(FileType, PathName, 0);
-	return;
+
+    DWORD FileType = (LoadFileType)(PathName, 0);
+    load = (LoadU)(FileType, PathName, 0);
+    return;
 
 &#125;
 
 wchar_t* charToWChar(const char* text)
 &#123;
-	size_t size &#x3D; strlen(text) + 1;
-	wchar_t* wa &#x3D; new wchar_t[size];
-	mbstowcs(wa, text, size);
-	return wa;
-&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    size_t size = strlen(text) + 1;
+    wchar_t* wa = new wchar_t[size];
+    mbstowcs(wa, text, size);
+    return wa;
+&#125;</code></pre>
 <p>在对该程序进行编译之后，可以先简单测试一下WinAFL 是否可以正常使用。-debug 表示设置为调试模式。</p>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell"><span class="token punctuation">\</span>winafl<span class="token punctuation">\</span>bin3<span class="token operator"><span class="token file-descriptor important">2</span>></span> C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>DynamoRIO-Windows-8.0.0-1<span class="token punctuation">\</span>bin32<span class="token punctuation">\</span>drrun.exe -c winafl.dll -debug -coverage_module FreeImage.dll -target_module Project1.exe -target_method main -fuzz_iterations <span class="token number">10</span> -nargs <span class="token number">2</span> -- C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>source<span class="token punctuation">\</span>repos<span class="token punctuation">\</span>Project1<span class="token punctuation">\</span>Debug<span class="token punctuation">\</span>Project1.exe C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>jpg<span class="token punctuation">\</span>1x1-low.jpg<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre><code class="shell">\winafl\bin32&gt; C:\Users\test\Desktop\DynamoRIO-Windows-8.0.0-1\bin32\drrun.exe -c winafl.dll -debug -coverage_module FreeImage.dll -target_module Project1.exe -target_method main -fuzz_iterations 10 -nargs 2 -- C:\Users\test\source\repos\Project1\Debug\Project1.exe C:\Users\test\Desktop\jpg\1x1-low.jpg</code></pre>
 <p>如下图所示，日志文件当中模块加载正常并没有错误显示</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge71bk08znj30u80htk1b.jpg" alt="image-20200426120155981"></p>
 <p>下面就要开始模糊测试了，按照教程进行的，但是它的目标函数是main，我们来看看结果如何。</p>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">afl-fuzz.exe -i C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>jpg<span class="token punctuation">\</span>out -o C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>jpg<span class="token punctuation">\</span>re -D C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>DynamoRIO-Windows-8.0.0-1<span class="token punctuation">\</span>bin32 -t <span class="token number">9000</span> -- -coverage_module FreeImage.dll -target_module Project1.exe -target_method main -fuzz_iterations <span class="token number">5000</span> -nargs <span class="token number">2</span> -- C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>source<span class="token punctuation">\</span>repos<span class="token punctuation">\</span>Project1<span class="token punctuation">\</span>Debug<span class="token punctuation">\</span>Project1.exe @@<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre><code class="shell">afl-fuzz.exe -i C:\Users\test\Desktop\jpg\out -o C:\Users\test\Desktop\jpg\re -D C:\Users\test\Desktop\DynamoRIO-Windows-8.0.0-1\bin32 -t 9000 -- -coverage_module FreeImage.dll -target_module Project1.exe -target_method main -fuzz_iterations 5000 -nargs 2 -- C:\Users\test\source\repos\Project1\Debug\Project1.exe @@</code></pre>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge71f0ipmzj30lq0kvn4l.jpg" alt="截屏2020-04-23 下午5.17.24"></p>
 <p>如图所示，可以跑是可以跑，但是这个速度实在太慢了，执行main函数浪费了太多时间，实际上我们的load函数只测test函数就可以，我们将-target_method改为test尝试一下</p>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">afl-fuzz.exe -i C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>jpg<span class="token punctuation">\</span>out -o C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>jpg<span class="token punctuation">\</span>re -D C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>DynamoRIO-Windows-8.0.0-1<span class="token punctuation">\</span>bin32 -t <span class="token number">9000</span> -- -coverage_module FreeImage.dll -target_module Project1.exe -target_method <span class="token builtin class-name">test</span> -fuzz_iterations <span class="token number">5000</span> -nargs <span class="token number">2</span> -- C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>source<span class="token punctuation">\</span>repos<span class="token punctuation">\</span>Project1<span class="token punctuation">\</span>Debug<span class="token punctuation">\</span>Project1.exe @@<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre><code class="shell">afl-fuzz.exe -i C:\Users\test\Desktop\jpg\out -o C:\Users\test\Desktop\jpg\re -D C:\Users\test\Desktop\DynamoRIO-Windows-8.0.0-1\bin32 -t 9000 -- -coverage_module FreeImage.dll -target_module Project1.exe -target_method test -fuzz_iterations 5000 -nargs 2 -- C:\Users\test\source\repos\Project1\Debug\Project1.exe @@</code></pre>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge71j4kjn3j30hd079jsl.jpg" alt="1587641858789_8DC06F32-53EE-4A64-8FD1-45907DC9CF93"></p>
 <p>然后就蹦框了，看起来是没有找到我们写的test函数，忘了在vs里把test函数也导出</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge71lacv24j30i90200tk.jpg" alt="image-20200426121116517"></p>
 <p>这里导出后再编译一遍，再尝试一下，成功了，这速度明显提升了好几倍啊</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge71q85ybaj30ko0bkn57.jpg" alt="image-20200426121601823"></p>
 <p>为了让fuzz效率更高一点，充分利用cpu的多核，进行多核系统的并行测试</p>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">afl-fuzz.exe -i C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>jpg<span class="token punctuation">\</span>out -o C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>jpg<span class="token punctuation">\</span>re -M master -D C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>DynamoRIO-Windows-8.0.0-1<span class="token punctuation">\</span>bin32 -t <span class="token number">9000</span> -- -coverage_module FreeImage.dll -target_module Project1.exe -target_method <span class="token builtin class-name">test</span> -fuzz_iterations <span class="token number">5000</span> -nargs <span class="token number">2</span> -- C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>source<span class="token punctuation">\</span>repos<span class="token punctuation">\</span>Project1<span class="token punctuation">\</span>Debug<span class="token punctuation">\</span>Project1.exe @@
+<pre><code class="shell">afl-fuzz.exe -i C:\Users\test\Desktop\jpg\out -o C:\Users\test\Desktop\jpg\re -M master -D C:\Users\test\Desktop\DynamoRIO-Windows-8.0.0-1\bin32 -t 9000 -- -coverage_module FreeImage.dll -target_module Project1.exe -target_method test -fuzz_iterations 5000 -nargs 2 -- C:\Users\test\source\repos\Project1\Debug\Project1.exe @@
 
-afl-fuzz.exe -i C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>jpg<span class="token punctuation">\</span>out -o C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>jpg<span class="token punctuation">\</span>re -S slaver01 -D C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>DynamoRIO-Windows-8.0.0-1<span class="token punctuation">\</span>bin32 -t <span class="token number">9000</span> -- -coverage_module FreeImage.dll -target_module Project1.exe -target_method <span class="token builtin class-name">test</span> -fuzz_iterations <span class="token number">5000</span> -nargs <span class="token number">2</span> -- C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>source<span class="token punctuation">\</span>repos<span class="token punctuation">\</span>Project1<span class="token punctuation">\</span>Debug<span class="token punctuation">\</span>Project1.exe @@
+afl-fuzz.exe -i C:\Users\test\Desktop\jpg\out -o C:\Users\test\Desktop\jpg\re -S slaver01 -D C:\Users\test\Desktop\DynamoRIO-Windows-8.0.0-1\bin32 -t 9000 -- -coverage_module FreeImage.dll -target_module Project1.exe -target_method test -fuzz_iterations 5000 -nargs 2 -- C:\Users\test\source\repos\Project1\Debug\Project1.exe @@
 
-afl-fuzz.exe -i C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>jpg<span class="token punctuation">\</span>out -o C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>jpg<span class="token punctuation">\</span>re -S slaver02 -D C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>Desktop<span class="token punctuation">\</span>DynamoRIO-Windows-8.0.0-1<span class="token punctuation">\</span>bin32 -t <span class="token number">9000</span> -- -coverage_module FreeImage.dll -target_module Project1.exe -target_method <span class="token builtin class-name">test</span> -fuzz_iterations <span class="token number">5000</span> -nargs <span class="token number">2</span> -- C:<span class="token punctuation">\</span>Users<span class="token punctuation">\</span>test<span class="token punctuation">\</span>source<span class="token punctuation">\</span>repos<span class="token punctuation">\</span>Project1<span class="token punctuation">\</span>Debug<span class="token punctuation">\</span>Project1.exe @@<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+afl-fuzz.exe -i C:\Users\test\Desktop\jpg\out -o C:\Users\test\Desktop\jpg\re -S slaver02 -D C:\Users\test\Desktop\DynamoRIO-Windows-8.0.0-1\bin32 -t 9000 -- -coverage_module FreeImage.dll -target_module Project1.exe -target_method test -fuzz_iterations 5000 -nargs 2 -- C:\Users\test\source\repos\Project1\Debug\Project1.exe @@</code></pre>
 <p>因为我的配置比较垃圾只有四核，所以就开这么多了😂核多的朋友请自行往上添加，挂了一个晚上跑出来了不少的crash，我们先试一下</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge71vxdm8lj30dx08pn0e.jpg" alt="image-20200426122130582"></p>
 <p>扔到ABC看图里，发现真的崩溃了</p>
@@ -179,21 +179,21 @@ afl-fuzz.exe -i C:<span class="token punctuation">\</span>Users<span class="toke
 </ul>
 <p>如果使用默认设置安装Windows的Python和调试工具，则BugId应该能够运行而无需调整任何设置。您可以在本地文件系统上任意位置解压缩BugId</p>
 <p>但是理论上BugID需要一个一个进行文件分析，而Crash这么多，只是就可以写一个Python脚本来帮助我们</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> sys
-<span class="token keyword">import</span> os
+<pre><code class="python">import sys
+import os
 
-sys<span class="token punctuation">.</span>path<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string">r"C:\Users\test\Desktop\BugId-master"</span><span class="token punctuation">)</span>
-testcases <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+sys.path.append(r&quot;C:\Users\test\Desktop\BugId-master&quot;)
+testcases = []
 
-<span class="token keyword">for</span> root<span class="token punctuation">,</span> dirs<span class="token punctuation">,</span> files <span class="token keyword">in</span> os<span class="token punctuation">.</span>walk<span class="token punctuation">(</span><span class="token string">r"C:\Users\test\Desktop\jpg\re\slaver01\crashes"</span><span class="token punctuation">,</span> topdown<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token keyword">for</span> name <span class="token keyword">in</span> files<span class="token punctuation">:</span>
-        testcase <span class="token operator">=</span>  os<span class="token punctuation">.</span>path<span class="token punctuation">.</span>abspath<span class="token punctuation">(</span>os<span class="token punctuation">.</span>path<span class="token punctuation">.</span>join<span class="token punctuation">(</span>root<span class="token punctuation">,</span> name<span class="token punctuation">)</span><span class="token punctuation">)</span>
-        testcases<span class="token punctuation">.</span>append<span class="token punctuation">(</span>testcase<span class="token punctuation">)</span>
+for root, dirs, files in os.walk(r&quot;C:\Users\test\Desktop\jpg\re\slaver01\crashes&quot;, topdown=False):
+    for name in files:
+        testcase =  os.path.abspath(os.path.join(root, name))
+        testcases.append(testcase)
 
-<span class="token keyword">for</span> testcase <span class="token keyword">in</span> testcases<span class="token punctuation">:</span>
-    <span class="token keyword">print</span> <span class="token punctuation">(</span><span class="token string">"[*] Gonna run: "</span><span class="token punctuation">,</span> testcase<span class="token punctuation">)</span>
-    os<span class="token punctuation">.</span>system<span class="token punctuation">(</span><span class="token string">r'PageHeap.cmd "Project1.exe" ON'</span><span class="token punctuation">)</span>
-    os<span class="token punctuation">.</span>system<span class="token punctuation">(</span><span class="token string">r'python C:\Users\test\Desktop\BugId-master\BugId.py C:\Users\test\source\repos\Project1\Debug\Project1.exe --isa= x86 -- %s'</span> <span class="token operator">%</span> testcase<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+for testcase in testcases:
+    print (&quot;[*] Gonna run: &quot;, testcase)
+    os.system(r&#39;PageHeap.cmd &quot;Project1.exe&quot; ON&#39;)
+    os.system(r&#39;python C:\Users\test\Desktop\BugId-master\BugId.py C:\Users\test\source\repos\Project1\Debug\Project1.exe --isa= x86 -- %s&#39; % testcase)</code></pre>
 <p>请注意在最后的程序后面加上–isa= x86哦，不加默认作为64位调试会报错</p>
 <p>运行脚本之后，我们就看到源源不断的bug信息出来了</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge72be2rxoj31bn0jw4ok.jpg" alt="image-20200426123621956"></p>

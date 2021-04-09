@@ -43,76 +43,76 @@ ga('send', 'pageview');</script><!-- End Google Analytics -->
 <p>libFuzzer所有的程序的主要功能都是对一些 <strong>字节序列</strong> 进行操作，基于这一个事实（<code>libfuzzer</code> 生成 随机的 字节序列 ，扔给 待<code>fuzz</code> 的程序，然后检测是否有异常出现） 所以在 <code>libfuzzer</code> 看来，<code>fuzz</code> 的目标 其实就是一个 以 <strong>字节序列</strong> 为输入的 <strong>函数</strong>。其过程形如下图：</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfhpsxzyddj30g10ay49d.jpg" alt="image-20200605210458829"></p>
 <h3 id="libFuzzer的理论过程"><a href="#libFuzzer的理论过程" class="headerlink" title="libFuzzer的理论过程"></a>libFuzzer的理论过程</h3><p>简单理解 <code>libfuzzer</code> 就是，如果我们要 <code>fuzz</code> 一个程序，找到一个入口函数，然后利用</p>
-<pre class="line-numbers language-none"><code class="language-none">extern &quot;C&quot; int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) &#123;
+<pre><code>extern &quot;C&quot; int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) &#123;
     .......
     .......
-&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+&#125;</code></pre>
 <p>接口（hardness），我们可以拿到 <code>libfuzzer</code> 生成的 <strong>测试数据以及测试数据的长度</strong>，我们的任务就是<strong>把这些生成的测试数据 传入到目标程序中 让程序来处理 测试数据， 同时要尽可能的触发更多的代码逻辑</strong>。</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfhqqg37osj30ig0a4aar.jpg" alt="image-20200605213711784"></p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfhqr5qln1j30ig09kaar.jpg" alt="image-20200605213753311"></p>
 <p><code>libfuzzer</code> 已经把 一个 <code>fuzzer</code> 的核心（样本生成引擎和异常检测系统） 给做好了， 我们需要做的是根据目标程序的逻辑，把 <code>libfuzzer</code> 生成的数据，交给目标程序处理，然后在编译时采取合适的 <code>Sanitizer</code> 用于检测运行时出现的内存错误。</p>
 <h2 id="实践篇"><a href="#实践篇" class="headerlink" title="实践篇"></a>实践篇</h2><p>实践部分建议学习查阅Google的**<a target="_blank" rel="noopener" href="https://github.com/google/fuzzing/blob/master/tutorial/libFuzzerTutorial.md">libFuzzerTutorial</a>**，内容比较完善跟随不同的案例逐个验证libFuzzer的具体功能，但是因为介绍每个功能采用的案例不同，可能对于新手来说割裂感比较严重，我把共用的部分摘取总结出来把这部分变成一个工具书，理想的是在一个具体案例中能够运用一遍所有的常用功能，这样更加连贯，具体实践放在最后的案例篇。</p>
 <h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p>官方推荐使用Ubuntu16.04 x64安装，其本身是<code>llvm</code>项目的一部分，和<code>clang</code>是亲兄弟，二者项目源码分别可见于<a target="_blank" rel="noopener" href="https://github.com/llvm/llvm-project/tree/master/compiler-rt/lib/fuzzer%E5%92%8Chttps://github.com/llvm/llvm-project/tree/master/clang%EF%BC%8C%E5%B0%B1%E5%9C%A8%E5%90%8C%E4%B8%80%E4%B8%AA%E4%BB%93%E5%BA%93%E9%87%8C%E9%9D%A2%EF%BC%8C%E7%8E%B0%E5%9C%A8%E7%A8%8D%E5%BE%AE%E6%96%B0%E7%9A%84%E7%89%88%E6%9C%AC%E7%9A%84clang%E9%83%BD%E5%B7%B2%E7%BB%8F%E5%86%85%E7%BD%AElibFuzzer%E4%BA%86%EF%BC%8C%E4%B9%9F%E5%8F%AF%E4%BB%A5%E4%BD%BF%E7%94%A8llvm%E5%AE%98%E6%96%B9%E6%8F%90%E4%BE%9B%E7%9A%84%E8%84%9A%E6%9C%AC%E8%BF%9B%E8%A1%8C%E5%AE%89%E8%A3%85%E3%80%82">https://github.com/llvm/llvm-project/tree/master/compiler-rt/lib/fuzzer和https://github.com/llvm/llvm-project/tree/master/clang，就在同一个仓库里面，现在稍微新的版本的clang都已经内置libFuzzer了，也可以使用llvm官方提供的脚本进行安装。</a></p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash -eux</span>
-<span class="token comment"># Copyright 2016 Google Inc.</span>
-<span class="token comment">#</span>
-<span class="token comment"># Licensed under the Apache License, Version 2.0 (the "License");</span>
-<span class="token comment"># you may not use this file except in compliance with the License.</span>
-<span class="token comment"># You may obtain a copy of the License at</span>
-<span class="token comment">#</span>
-<span class="token comment">#      http://www.apache.org/licenses/LICENSE-2.0</span>
-<span class="token comment">#</span>
-<span class="token comment"># Unless required by applicable law or agreed to in writing, software</span>
-<span class="token comment"># distributed under the License is distributed on an "AS IS" BASIS,</span>
-<span class="token comment"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
-<span class="token comment"># See the License for the specific language governing permissions and</span>
-<span class="token comment"># limitations under the License.</span>
-<span class="token comment">#</span>
-<span class="token comment">################################################################################</span>
+<pre><code class="bash">#!/bin/bash -eux
+# Copyright 2016 Google Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+################################################################################
 
-<span class="token function">sudo</span> <span class="token function">apt-get</span> update
-<span class="token function">sudo</span> <span class="token function">apt-get</span> upgrade -y
-<span class="token function">sudo</span> <span class="token function">apt-get</span> autoremove -y
+sudo apt-get update
+sudo apt-get upgrade -y
+sudo apt-get autoremove -y
 
-<span class="token function">sudo</span> <span class="token function">apt-get</span> <span class="token function">install</span> -y libc6-dev binutils libgcc-5-dev
+sudo apt-get install -y libc6-dev binutils libgcc-5-dev
 
-<span class="token assign-left variable">LLVM_DEP_PACKAGES</span><span class="token operator">=</span><span class="token string">"build-essential make cmake ninja-build git python2.7"</span>
-<span class="token function">sudo</span> <span class="token function">apt-get</span> <span class="token function">install</span> -y <span class="token variable">$LLVM_DEP_PACKAGES</span>
+LLVM_DEP_PACKAGES=&quot;build-essential make cmake ninja-build git python2.7&quot;
+sudo apt-get install -y $LLVM_DEP_PACKAGES
 
-<span class="token assign-left variable">WORK_DIR</span><span class="token operator">=</span><span class="token environment constant">$PWD</span>
-<span class="token function">mkdir</span> -p <span class="token variable">$WORK_DIR</span>/src
+WORK_DIR=$PWD
+mkdir -p $WORK_DIR/src
 
-<span class="token comment"># Checkout</span>
-<span class="token builtin class-name">cd</span> <span class="token variable">$WORK_DIR</span>/src <span class="token operator">&amp;&amp;</span> <span class="token function">git</span> clone --depth <span class="token number">1</span> http://llvm.org/git/llvm.git
-<span class="token builtin class-name">cd</span> <span class="token variable">$WORK_DIR</span>/src/llvm/tools <span class="token operator">&amp;&amp;</span> <span class="token function">git</span> clone --depth <span class="token number">1</span> http://llvm.org/git/clang.git
-<span class="token builtin class-name">cd</span> <span class="token variable">$WORK_DIR</span>/src/llvm/projects <span class="token operator">&amp;&amp;</span> <span class="token function">git</span> clone --depth <span class="token number">1</span> http://llvm.org/git/compiler-rt.git
-<span class="token builtin class-name">cd</span> <span class="token variable">$WORK_DIR</span>/src/llvm/projects <span class="token operator">&amp;&amp;</span> <span class="token function">git</span> clone --depth <span class="token number">1</span> http://llvm.org/git/libcxx.git
-<span class="token builtin class-name">cd</span> <span class="token variable">$WORK_DIR</span>/src/llvm/projects <span class="token operator">&amp;&amp;</span> <span class="token function">git</span> clone --depth <span class="token number">1</span> http://llvm.org/git/libcxxabi.git
+# Checkout
+cd $WORK_DIR/src &amp;&amp; git clone --depth 1 http://llvm.org/git/llvm.git
+cd $WORK_DIR/src/llvm/tools &amp;&amp; git clone --depth 1 http://llvm.org/git/clang.git
+cd $WORK_DIR/src/llvm/projects &amp;&amp; git clone --depth 1 http://llvm.org/git/compiler-rt.git
+cd $WORK_DIR/src/llvm/projects &amp;&amp; git clone --depth 1 http://llvm.org/git/libcxx.git
+cd $WORK_DIR/src/llvm/projects &amp;&amp; git clone --depth 1 http://llvm.org/git/libcxxabi.git
 
-<span class="token comment"># Uncomment if you want *fresh* libFuzzer from checkouted repository.</span>
-<span class="token comment">#rm -r $WORK_DIR/libFuzzer/Fuzzer</span>
-<span class="token comment">#cp -r $WORK_DIR/src/llvm/projects/compiler-rt/lib/fuzzer/ $WORK_DIR/libFuzzer/Fuzzer</span>
+# Uncomment if you want *fresh* libFuzzer from checkouted repository.
+#rm -r $WORK_DIR/libFuzzer/Fuzzer
+#cp -r $WORK_DIR/src/llvm/projects/compiler-rt/lib/fuzzer/ $WORK_DIR/libFuzzer/Fuzzer
 
-<span class="token comment"># Build &amp; Install</span>
-<span class="token function">mkdir</span> -p <span class="token variable">$WORK_DIR</span>/work/llvm
-<span class="token builtin class-name">cd</span> <span class="token variable">$WORK_DIR</span>/work/llvm
+# Build &amp; Install
+mkdir -p $WORK_DIR/work/llvm
+cd $WORK_DIR/work/llvm
 
-<span class="token comment"># Consider adding of -DCMAKE_INSTALL_PREFIX=%PATH% flag, if you do not want to</span>
-<span class="token comment"># install fresh llvm binaries into standard system paths.</span>
-cmake -G <span class="token string">"Ninja"</span> <span class="token punctuation">\</span>
-      -DLIBCXX_ENABLE_SHARED<span class="token operator">=</span>OFF -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY<span class="token operator">=</span>ON <span class="token punctuation">\</span>
-      -DCMAKE_BUILD_TYPE<span class="token operator">=</span>Release -DLLVM_TARGETS_TO_BUILD<span class="token operator">=</span><span class="token string">"X86"</span> <span class="token punctuation">\</span>
-      <span class="token variable">$WORK_DIR</span>/src/llvm
-ninja -j<span class="token variable"><span class="token variable">$(</span>nproc<span class="token variable">)</span></span>
-<span class="token function">sudo</span> ninja <span class="token function">install</span>
-<span class="token function">rm</span> -rf <span class="token variable">$WORK_DIR</span>/work/llvm<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+# Consider adding of -DCMAKE_INSTALL_PREFIX=%PATH% flag, if you do not want to
+# install fresh llvm binaries into standard system paths.
+cmake -G &quot;Ninja&quot; \
+      -DLIBCXX_ENABLE_SHARED=OFF -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON \
+      -DCMAKE_BUILD_TYPE=Release -DLLVM_TARGETS_TO_BUILD=&quot;X86&quot; \
+      $WORK_DIR/src/llvm
+ninja -j$(nproc)
+sudo ninja install
+rm -rf $WORK_DIR/work/llvm</code></pre>
 <h3 id="编写Fussing-Target（hardness）"><a href="#编写Fussing-Target（hardness）" class="headerlink" title="编写Fussing Target（hardness）"></a>编写Fussing Target（hardness）</h3><p>libFuzzer要求实现一个<code>fuzz target</code>作为被测对象的接口，这个入口点用来接收 libFuzzer 生成的 测试用例（比特序列）</p>
 <p>官方文档中的代码示例如下：</p>
-<pre class="line-numbers language-c++" data-language="c++"><code class="language-c++">&#x2F;&#x2F; fuzz_target.cc
+<pre><code class="c++">// fuzz_target.cc
 extern &quot;C&quot; int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) &#123;
   DoSomethingInterestingWithMyAPI(Data, Size);
-  return 0;  &#x2F;&#x2F; Non-zero return values are reserved for future use.
-&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+  return 0;  // Non-zero return values are reserved for future use.
+&#125;</code></pre>
 <p>名称参数返回值类型都不能动，并且注意参数中传来的字节数组<code>Data</code>是通过底层const修饰了的，也就是不允许修改其中数据。</p>
 <ul>
 <li><p><code>data</code> 是 <code>libFuzzer</code> 生成的 测试数据， <code>size</code> 是数据的长度</p>
@@ -155,9 +155,9 @@ extern &quot;C&quot; int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size
 </li>
 </ul>
 <h3 id="编译连接"><a href="#编译连接" class="headerlink" title="编译连接"></a>编译连接</h3><p>文档中给出的编译链接命令大致可归纳为：</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">clang++ -g -O1 -fsanitize<span class="token operator">=</span>fuzzer,address -fsanitize-coverage<span class="token operator">=</span>trace-pc-guard <span class="token punctuation">\</span>
-fuzz_target.cc <span class="token punctuation">..</span>/<span class="token punctuation">..</span>/libFuzzer/Fuzzer/libFuzzer.a <span class="token punctuation">\</span>
--o mytarget_fuzzer<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<pre><code class="bash">clang++ -g -O1 -fsanitize=fuzzer,address -fsanitize-coverage=trace-pc-guard \
+fuzz_target.cc ../../libFuzzer/Fuzzer/libFuzzer.a \
+-o mytarget_fuzzer</code></pre>
 <ul>
 <li><p><code>-g</code>和<code>-O1</code>是gcc/clang的通用选项，前者保留调试信息，使错误消息更易于阅读；后者指定优化等级为1（保守地少量优化），但这两个选项不是必须的。</p>
 </li>
@@ -183,7 +183,7 @@ fuzz_target.cc <span class="token punctuation">..</span>/<span class="token punc
 <p>这一步最终生成的就是这个fuzzer。</p>
 <h3 id="开始测试"><a href="#开始测试" class="headerlink" title="开始测试"></a>开始测试</h3><p>被测程序在启用<code>libFuzzer</code>并编译链接后，即成为了一个可接受用户参数的命令行程序，直接执行程序便是启动测试。</p>
 <p>一般格式：</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">./your-fuzzer -flag1<span class="token operator">=</span>val1 -flag2<span class="token operator">=</span>val2 <span class="token punctuation">..</span>. dir1 dir2 <span class="token punctuation">..</span>.<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre><code class="bash">./your-fuzzer -flag1=val1 -flag2=val2 ... dir1 dir2 ...</code></pre>
 <p>flags代表各个控制测试过程的选项参数，可以提供零到任意个，但必须是严格的<code>-flag=value</code>形式</p>
 <ul>
 <li>选项前导用单横线，即使选项是一个词而非单个字符</li>
@@ -377,59 +377,59 @@ fuzz_target.cc <span class="token punctuation">..</span>/<span class="token punc
 </tr>
 </tbody></table>
 <p>重运行模式：</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">./your-fuzzer -flag1<span class="token operator">=</span>val1 -flag2<span class="token operator">=</span>val2 <span class="token punctuation">..</span>. file1 file2 <span class="token punctuation">..</span>.<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre><code class="bash">./your-fuzzer -flag1=val1 -flag2=val2 ... file1 file2 ...</code></pre>
 <p>与上面一样，但是选项后面接的是文件列表而非文件夹列表，这些输入样例将会重新读取并输入运行，不会产生新样例，在回归测试时十分有用。</p>
 <p>这里有几个选项功能是值得单独说一下的</p>
 <h4 id="Seed-corpus-种子语料库"><a href="#Seed-corpus-种子语料库" class="headerlink" title="Seed corpus 种子语料库"></a>Seed corpus 种子语料库</h4><p>corpus语料库就是给目标程序的各种各样的输入</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">mkdir</span> MY_CORPUS
-./your-fuzzer MY_CORPUS/ seeds/<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre><code class="bash">mkdir MY_CORPUS
+./your-fuzzer MY_CORPUS/ seeds/</code></pre>
 <p>当基于libFuzzer的模糊器以另一个目录作为参数执行时，它将首先递归地从每个目录中读取文件（在本例中MY_CORPUS/和seeds/都读），并对所有目录执行目标函数。然后，任何触发感兴趣的代码路径的输入将被写回到第一个语料库目录（在本例中为<code>MY_CORPUS</code>）。一般情况下我们将相关文件放在seeds的位置下，MY_CORPUS/目录为空，这样运行后生成的样本就存在MY_CORPUS/中了。</p>
 <h4 id="精简语料库样本集"><a href="#精简语料库样本集" class="headerlink" title="精简语料库样本集"></a>精简语料库样本集</h4><p>在模糊测试期间，测试语料库可能会增长到很大容量。如果希望最小化语料库，即创建具有相同覆盖率的语料库子集但容量却小很多，这就是一件性价比十分高的事情了。</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">mkdir</span> corpus1_min
-./your-fuzzer -merge<span class="token operator">=</span><span class="token number">1</span> corpus1_min corpus1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre><code class="bash">mkdir corpus1_min
+./your-fuzzer -merge=1 corpus1_min corpus1</code></pre>
 <ul>
 <li><code>corpus1_min</code>: 精简后的样本集存放的位置</li>
 <li><code>corpus1</code>: 原始样本集存放的位置</li>
 </ul>
 <h4 id="并行运行"><a href="#并行运行" class="headerlink" title="并行运行"></a>并行运行</h4><p>提高模糊测试效率的另一种方法是使用更多的CPU。如果您使用<code>-jobs=N</code>它运行模糊器，它将产生N个独立的作业，但最多不超过拥有的内核数的一半。用于<code>-workers=M</code>设置允许的并行作业数。</p>
 <p>当指定了多个任务时，程序启动时会先产生一个<code>master</code>进程，同时并发启动相应数量个<code>worker</code>进程，master会把jobs分配到workers上去执行，当某个任务结束后，相应进程终止，同时master会启动一个新的任务进程分配到对应的worker上，平均每个worker上会分配<em>jobs/workers</em>个任务。</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">./your-fuzzer MY_CORPUS/ seeds/ -jobs<span class="token operator">=</span><span class="token number">8</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre><code class="bash">./your-fuzzer MY_CORPUS/ seeds/ -jobs=8</code></pre>
 <p>在8核计算机上，这将产生4个并行工作器。如果其中一个被退出，将自动创建另一个，最多8个。</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">fuzzer -jobs<span class="token operator">=</span><span class="token number">8</span>
-  ├─sh -c ./fuzzer <span class="token operator">></span>fuzz-0.log <span class="token operator"><span class="token file-descriptor important">2</span>></span><span class="token file-descriptor important">&amp;1</span>
+<pre><code class="bash">fuzzer -jobs=8
+  ├─sh -c ./fuzzer &gt;fuzz-0.log 2&gt;&amp;1
   │   └─fuzzer
-  │       └─<span class="token punctuation">&#123;</span>fuzzer<span class="token punctuation">&#125;</span>
-  ├─sh -c ./fuzzer <span class="token operator">></span>fuzz-1.log <span class="token operator"><span class="token file-descriptor important">2</span>></span><span class="token file-descriptor important">&amp;1</span>
+  │       └─&#123;fuzzer&#125;
+  ├─sh -c ./fuzzer &gt;fuzz-1.log 2&gt;&amp;1
   │   └─fuzzer
-  │       └─<span class="token punctuation">&#123;</span>fuzzer<span class="token punctuation">&#125;</span>
-  ├─sh -c ./fuzzer <span class="token operator">></span>fuzz-2.log <span class="token operator"><span class="token file-descriptor important">2</span>></span><span class="token file-descriptor important">&amp;1</span>
+  │       └─&#123;fuzzer&#125;
+  ├─sh -c ./fuzzer &gt;fuzz-2.log 2&gt;&amp;1
   │   └─fuzzer
-  │       └─<span class="token punctuation">&#123;</span>fuzzer<span class="token punctuation">&#125;</span>
-  ├─sh -c ./fuzzer <span class="token operator">></span>fuzz-3.log <span class="token operator"><span class="token file-descriptor important">2</span>></span><span class="token file-descriptor important">&amp;1</span>
+  │       └─&#123;fuzzer&#125;
+  ├─sh -c ./fuzzer &gt;fuzz-3.log 2&gt;&amp;1
   │   └─fuzzer
-  │       └─<span class="token punctuation">&#123;</span>fuzzer<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+  │       └─&#123;fuzzer&#125;</code></pre>
 <h4 id="Dictionaries-字典"><a href="#Dictionaries-字典" class="headerlink" title="Dictionaries 字典"></a>Dictionaries 字典</h4><p>字典最早是afl在2015年一篇博客上提出的<a target="_blank" rel="noopener" href="https://lcamtuf.blogspot.com/2015/01/afl-fuzz-making-up-grammar-with.html">afl-fuzz: making up grammar with a dictionary in hand</a>，</p>
 <p>基本思路就是应用程序都是都是<strong>处理具有一定格式的数据</strong>，比如 <code>xml</code> 文档， <code>png</code>图片等等。 这些数据中会有一些<strong>特殊字符序列 （或者说关键字）</strong>， 比如 在 <code>xml</code> 文档中 就有 <code>CDATA</code>,  等，<strong>png图片</strong> 就有 <strong>png 图片头</strong>。</p>
 <p>如果我们事先就把这些 <strong>字符序列</strong> 列举出来， <code>fuzz</code> 直接使用这些关键字去 组合，就会就可以减少很多没有意义的 尝试，同时还有可能会走到更深的程序分支中去。</p>
 <p><code>Dictionary</code> 就是实现了这种思路。 <code>libfuzzer</code> 和 <code>afl</code> 使用的 <code>dictionary</code> 文件的语法是一样的， 所以可以直接拿 afl 里面的 <code>dictionary</code> 文件来给 <code>libfuzzer</code> 使用。</p>
 <p>如下是libFuzzer官方文档中的字典示例</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># Lines starting with '#' and empty lines are ignored.</span>
+<pre><code class="bash"># Lines starting with &#39;#&#39; and empty lines are ignored.
 
-<span class="token comment"># Adds "blah" (w/o quotes) to the dictionary.</span>
-<span class="token assign-left variable">kw1</span><span class="token operator">=</span><span class="token string">"blah"</span>
-<span class="token comment"># Use \\ for backslash and \" for quotes.</span>
-<span class="token assign-left variable">kw2</span><span class="token operator">=</span><span class="token string">"<span class="token entity" title="\&quot;">\"</span>ac<span class="token entity" title="\\">\\</span>dc<span class="token entity" title="\&quot;">\"</span>"</span>
-<span class="token comment"># Use \xAB for hex values</span>
-<span class="token assign-left variable">kw3</span><span class="token operator">=</span><span class="token string">"<span class="token entity" title="\xF7">\xF7</span><span class="token entity" title="\xF8">\xF8</span>"</span>
-<span class="token comment"># the name of the keyword followed by '=' may be omitted:</span>
-<span class="token string">"foo<span class="token entity" title="\x0A">\x0A</span>bar"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+# Adds &quot;blah&quot; (w/o quotes) to the dictionary.
+kw1=&quot;blah&quot;
+# Use \\ for backslash and \&quot; for quotes.
+kw2=&quot;\&quot;ac\\dc\&quot;&quot;
+# Use \xAB for hex values
+kw3=&quot;\xF7\xF8&quot;
+# the name of the keyword followed by &#39;=&#39; may be omitted:
+&quot;foo\x0Abar&quot;</code></pre>
 <ul>
 <li><code>#</code> 开头的行 和 空行会被忽略</li>
 <li><code>kw1=</code> 这些就类似于注释， 没有意义</li>
 <li>真正有用的是由 <code>&quot;</code> 包裹的<strong>字串</strong>，这些 <strong>字串</strong> 就会作为一个个的关键字， <code>libfuzzer</code> 会用它们进行组合来生成样本。</li>
 </ul>
 <p><code>libfuzzer</code> 使用 <code>-dict</code> 指定 <code>dict</code> 文件，下面使用 <code>xml.dict</code> 为 <code>dictionary</code> 文件，进行 <code>fuzz</code>。</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">./your-fuzzer -dict<span class="token operator">=</span>DICTIONARY_FILE<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre><code class="bash">./your-fuzzer -dict=DICTIONARY_FILE</code></pre>
 <h3 id="输出"><a href="#输出" class="headerlink" title="输出"></a>输出</h3><p>当fuzzer成功运行之后，信息会输出在屏幕上。输出行具有事件代码和统计信息的形式。常见的事件代码是：</p>
 <ul>
 <li><code>READ</code> fuzzer已从语料库目录中读取了所有提供的输入样本。</li>
@@ -453,97 +453,97 @@ fuzz_target.cc <span class="token punctuation">..</span>/<span class="token punc
 <li><code>MS: &lt;n&gt; &lt;operations&gt;</code> 用于生成输入的变异操作的计数和列表。</li>
 </ul>
 <p>我们以如下样例作解释：</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">INFO: Seed: <span class="token number">1608565063</span>
-INFO: Loaded <span class="token number">1</span> modules <span class="token punctuation">(</span><span class="token number">37</span> guards<span class="token punctuation">)</span>: <span class="token punctuation">[</span>0x788ec0, 0x788f54<span class="token punctuation">)</span>, 
-INFO: -max_len is not provided, using <span class="token number">64</span>
+<pre><code class="bash">INFO: Seed: 1608565063
+INFO: Loaded 1 modules (37 guards): [0x788ec0, 0x788f54), 
+INFO: -max_len is not provided, using 64
 INFO: A corpus is not provided, starting from an empty corpus
-<span class="token comment">#0  READ units: 1</span>
-<span class="token comment">#1  INITED cov: 3 ft: 3 corp: 1/1b exec/s: 0 rss: 11Mb</span>
-<span class="token comment">#3  NEW    cov: 4 ft: 4 corp: 2/4b exec/s: 0 rss: 12Mb L: 3 MS: 2 InsertByte-InsertByte-</span>
-<span class="token comment">#3348   NEW    cov: 5 ft: 5 corp: 3/65b exec/s: 0 rss: 12Mb L: 61 MS: 2 ChangeByte-InsertRepeatedBytes-</span>
-<span class="token comment">#468765 NEW    cov: 6 ft: 6 corp: 4/78b exec/s: 0 rss: 49Mb L: 13 MS: 4 CrossOver-ChangeBit-EraseBytes-ChangeByte-</span>
-<span class="token comment">#564131 NEW    cov: 7 ft: 7 corp: 5/97b exec/s: 0 rss: 56Mb L: 19 MS: 5 InsertRepeatedBytes-InsertByte-ChangeByte-InsertByte-InsertByte-</span>
-<span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">=</span>
-<span class="token operator">==</span><span class="token number">32049</span><span class="token operator">==</span>ERROR: AddressSanitizer: heap-buffer-overflow on address 0x60200072bb93 at pc 0x000000528540 bp 0x7ffdb3439100 sp 0x7ffdb34390f8
-READ of size <span class="token number">1</span> at 0x60200072bb93 thread T0
-    <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
-    <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
-    <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+#0  READ units: 1
+#1  INITED cov: 3 ft: 3 corp: 1/1b exec/s: 0 rss: 11Mb
+#3  NEW    cov: 4 ft: 4 corp: 2/4b exec/s: 0 rss: 12Mb L: 3 MS: 2 InsertByte-InsertByte-
+#3348   NEW    cov: 5 ft: 5 corp: 3/65b exec/s: 0 rss: 12Mb L: 61 MS: 2 ChangeByte-InsertRepeatedBytes-
+#468765 NEW    cov: 6 ft: 6 corp: 4/78b exec/s: 0 rss: 49Mb L: 13 MS: 4 CrossOver-ChangeBit-EraseBytes-ChangeByte-
+#564131 NEW    cov: 7 ft: 7 corp: 5/97b exec/s: 0 rss: 56Mb L: 19 MS: 5 InsertRepeatedBytes-InsertByte-ChangeByte-InsertByte-InsertByte-
+=================================================================
+==32049==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x60200072bb93 at pc 0x000000528540 bp 0x7ffdb3439100 sp 0x7ffdb34390f8
+READ of size 1 at 0x60200072bb93 thread T0
+    ......................................................
+    ......................................................
+    ......................................................
 
-0x60200072bb93 is located <span class="token number">0</span> bytes to the right of <span class="token number">3</span>-byte region <span class="token punctuation">[</span>0x60200072bb90,0x60200072bb93<span class="token punctuation">)</span>
+0x60200072bb93 is located 0 bytes to the right of 3-byte region [0x60200072bb90,0x60200072bb93)
 allocated by thread T0 here:
-   <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
-   <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
-   <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+   ......................................................
+   ......................................................
+   ......................................................
 
-SUMMARY: AddressSanitizer: heap-buffer-overflow /home/haclh/vmdk_kernel/libfuzzer-workshop-master/lessons/04/./vulnerable_functions.h:22:14 <span class="token keyword">in</span> VulnerableFunction1<span class="token punctuation">(</span>unsigned char const*, unsigned long<span class="token punctuation">)</span>
+SUMMARY: AddressSanitizer: heap-buffer-overflow /home/haclh/vmdk_kernel/libfuzzer-workshop-master/lessons/04/./vulnerable_functions.h:22:14 in VulnerableFunction1(unsigned char const*, unsigned long)
 Shadow bytes around the buggy address:
   0x0c04800dd720: fa fa fd fd fa fa fd fa fa fa fd fa fa fa fd fa
   0x0c04800dd730: fa fa fd fd fa fa fd fd fa fa fd fd fa fa fd fd
   0x0c04800dd740: fa fa fd fa fa fa fd fa fa fa fd fa fa fa fd fa
   0x0c04800dd750: fa fa fd fa fa fa fd fa fa fa fd fa fa fa fd fa
   0x0c04800dd760: fa fa fd fa fa fa fd fa fa fa fd fd fa fa fd fd
-<span class="token operator">=</span><span class="token operator">></span>0x0c04800dd770: fa fa<span class="token punctuation">[</span>03<span class="token punctuation">]</span>fa fa fa fa fa fa fa fa fa fa fa fa fa
+=&gt;0x0c04800dd770: fa fa[03]fa fa fa fa fa fa fa fa fa fa fa fa fa
   0x0c04800dd780: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
   0x0c04800dd790: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
   0x0c04800dd7a0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
   0x0c04800dd7b0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
   0x0c04800dd7c0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
-<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
-<span class="token operator">==</span><span class="token number">32049</span><span class="token operator">==</span>ABORTING
-MS: <span class="token number">1</span> CrossOver-<span class="token punctuation">;</span> base unit: 38a223b0988bd9576fb17f5947af80b80203f0ef
+......................................................
+......................................................
+==32049==ABORTING
+MS: 1 CrossOver-; base unit: 38a223b0988bd9576fb17f5947af80b80203f0ef
 0x46,0x55,0x5a,
 FUZ
-<span class="token assign-left variable">artifact_prefix</span><span class="token operator">=</span><span class="token string">'./'</span><span class="token punctuation">;</span> Test unit written to ./crash-0eb8e4ed029b774d80f2b66408203801cb982a60
-Base64: RlVa<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+artifact_prefix=&#39;./&#39;; Test unit written to ./crash-0eb8e4ed029b774d80f2b66408203801cb982a60
+Base64: RlVa</code></pre>
 <p>首先我们可以看出来<code>Seed: 1608565063</code> 说明这次的种子数据，如果我们想重现重新运行<code>-seed=1608565063</code>以得到相同的结果。其次<code>-max_len is not provided, using 64</code> ， <code>-max_len</code> 用于设置最大的数据长度，因为没有设置fuzzer会自己猜测，这里设置的数据不大于64KB。</p>
 <p>接下来 <code>#</code> 开头的行是 <code>fuzz</code> 过程中找到的路径信息</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># 564131 NEW    cov: 7 ft: 7 corp: 5/97b exec/s: 0 rss: 56Mb L: 19 MS: 5 InsertRepeatedBytes-InsertByte-ChangeByte-InsertByte-InsertByte-</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre><code class="bash"># 564131 NEW    cov: 7 ft: 7 corp: 5/97b exec/s: 0 rss: 56Mb L: 19 MS: 5 InsertRepeatedBytes-InsertByte-ChangeByte-InsertByte-InsertByte-</code></pre>
 <p>我们可以看出来libFuzzer尝试了至少564131个输入（<code>#564131</code>），发现了5个输入，总共97个字节（<code>corp: 5/97b</code>），它们总共覆盖了7个<em>覆盖点</em>（<code>cov: 7</code>）。我们可以将覆盖点视为代码中的 <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Basic_block">基本块</a>。</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token operator">==</span><span class="token number">32049</span><span class="token operator">==</span>ERROR: AddressSanitizer: heap-buffer-overflow on address 0x60200072bb93 at pc 0x000000528540 bp 0x7ffdb3439100 sp 0x7ffdb34390f8
-READ of size <span class="token number">1</span> at 0x60200072bb93 thread T0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre><code class="bash">==32049==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x60200072bb93 at pc 0x000000528540 bp 0x7ffdb3439100 sp 0x7ffdb34390f8
+READ of size 1 at 0x60200072bb93 thread T0</code></pre>
 <p>这个信息说明在其中一个输入上，AddressSanitizer已检测到<code>heap-buffer-overflow</code>错误并中止了执行。</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token assign-left variable">artifact_prefix</span><span class="token operator">=</span><span class="token string">'./'</span><span class="token punctuation">;</span> Test unit written to ./crash-0eb8e4ed029b774d80f2b66408203801cb982a60<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre><code class="bash">artifact_prefix=&#39;./&#39;; Test unit written to ./crash-0eb8e4ed029b774d80f2b66408203801cb982a60</code></pre>
 <p>倒数第二行是触发漏洞的测试用例，在退出进程之前，libFuzzer已创建了一个文件，其中包含触发崩溃的字节和所有信息，要重现崩溃而无模糊运行可以使用</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token assign-left variable">ASAN_OPTIONS</span><span class="token operator">=</span>symbolize<span class="token operator">=</span><span class="token number">1</span> ./first_fuzzer ./crash-0eb8e4ed029b774d80f2b66408203801
-<span class="token comment"># ASAN_OPTIONS=symbolize=1 用于显示栈的符号信息</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre><code class="bash">ASAN_OPTIONS=symbolize=1 ./first_fuzzer ./crash-0eb8e4ed029b774d80f2b66408203801
+# ASAN_OPTIONS=symbolize=1 用于显示栈的符号信息</code></pre>
 <p>来重现crash</p>
 <p>如果我们在fuzzer运行的选项里有使用字典 <code>-dictionary</code>和<code>-print_final_stats</code>执行完打印统计信息，最后的输出可能还会多出两块，形如下面</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment">###### Recommended dictionary. ######</span>
-<span class="token string">"X<span class="token entity" title="\x00">\x00</span><span class="token entity" title="\x00">\x00</span><span class="token entity" title="\x00">\x00</span><span class="token entity" title="\x00">\x00</span><span class="token entity" title="\x00">\x00</span><span class="token entity" title="\x00">\x00</span><span class="token entity" title="\x00">\x00</span>"</span> <span class="token comment"># Uses: 1228</span>
-<span class="token string">"prin"</span> <span class="token comment"># Uses: 1353</span>
-<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>.
-<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>.
-<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>.
-<span class="token string">"U&lt;/UTrri<span class="token entity" title="\x09">\x09</span>&lt;/UTD"</span> <span class="token comment"># Uses: 61</span>
-<span class="token comment">###### End of recommended dictionary. ######</span>
-Done <span class="token number">1464491</span> runs <span class="token keyword">in</span> <span class="token number">301</span> second<span class="token punctuation">(</span>s<span class="token punctuation">)</span>
-stat::number_of_executed_units: <span class="token number">1464491</span>
-stat::average_exec_per_sec:     <span class="token number">4865</span>
-stat::new_units_added:          <span class="token number">1407</span>
-stat::slowest_unit_time_sec:    <span class="token number">0</span>
-stat::peak_rss_mb:              <span class="token number">407</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre><code class="bash">###### Recommended dictionary. ######
+&quot;X\x00\x00\x00\x00\x00\x00\x00&quot; # Uses: 1228
+&quot;prin&quot; # Uses: 1353
+...........................
+...........................
+...........................
+&quot;U&lt;/UTrri\x09&lt;/UTD&quot; # Uses: 61
+###### End of recommended dictionary. ######
+Done 1464491 runs in 301 second(s)
+stat::number_of_executed_units: 1464491
+stat::average_exec_per_sec:     4865
+stat::new_units_added:          1407
+stat::slowest_unit_time_sec:    0
+stat::peak_rss_mb:              407</code></pre>
 <p>开始由 <code>####</code> 夹着的是 <code>libfuzzer</code> 在 <code>fuzz</code> 过程中挑选出来的 <code>dictionary</code>， 同时还给出了使用的次数，这些 <code>dictionary</code> 可以在以后 <code>fuzz</code> 同类型程序时 节省 <code>fuzz</code> 的时间。</p>
 <p>然后以 <code>stat:</code> 开头的是一些 fuzz 的统计信息， 主要看 <code>stat::new_units_added</code> 表示整个 <code>fuzz</code> 过程中触发了多少个代码单元。</p>
 <p>可以看到直接 <code>fuzz</code> , <code>5</code>分钟 触发了 <code>1407</code> 个代码单元</p>
 <h2 id="实例篇"><a href="#实例篇" class="headerlink" title="实例篇"></a>实例篇</h2><h3 id="以Freeimage为例进行测试"><a href="#以Freeimage为例进行测试" class="headerlink" title="以Freeimage为例进行测试"></a>以Freeimage为例进行测试</h3><p>我们首先把最新版本的Freeimage给拉到本地，然后解压</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">wget</span> https://downloads.sourceforge.net/freeimage/FreeImage3180.zip
-<span class="token function">unzip</span> FreeImage3180.zip<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre><code class="bash">wget https://downloads.sourceforge.net/freeimage/FreeImage3180.zip
+unzip FreeImage3180.zip</code></pre>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfjsagnbtqj316n09bn5y.jpg" alt="截屏2020-06-07 下午3.30.33"></p>
 <p>对这个源包先进行一下编译</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">pushd</span> FreeImage
+<pre><code class="bash">pushd FreeImage
 
-<span class="token comment"># b44ExpLogTable.cpp only contains a definition of main().</span>
-<span class="token function">sed</span> -i <span class="token string">'s/Source\/OpenEXR\/IlmImf\/b44ExpLogTable.cpp//'</span> Makefile.srcs
-<span class="token function">make</span> <span class="token assign-left variable">LIBRARIES</span><span class="token operator">=</span>-lc++ -j<span class="token variable"><span class="token variable">$(</span>nproc<span class="token variable">)</span></span>
+# b44ExpLogTable.cpp only contains a definition of main().
+sed -i &#39;s/Source\/OpenEXR\/IlmImf\/b44ExpLogTable.cpp//&#39; Makefile.srcs
+make LIBRARIES=-lc++ -j$(nproc)
 
-<span class="token function">popd</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+popd</code></pre>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfjsf6ax3uj30yh0eshbw.jpg" alt="截屏2020-06-07 下午4.06.37"></p>
 <p>编译成功后在Freeimage/Dist里应该就生成了<code>libfreeimage.a</code> ,<code>.h</code>和 <code> .o</code>文件</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfjsk1djg6j30f406l0tf.jpg" alt="截屏2020-06-07 下午4.11.18"></p>
 <p>随后根据Freeimage的功能特性写对应的hardness，也就是fuzzing target，这里直接使用OSS-fuzz的project中给出的Freeimage的hardness，在根目录保存为load_from_memory_fuzzer.cc文件</p>
-<pre class="line-numbers language-c++" data-language="c++"><code class="language-c++">#include &lt;cstddef&gt;
+<pre><code class="c++">#include &lt;cstddef&gt;
 #include &lt;cstdint&gt;
 #include &lt;cstdlib&gt;
 #include &lt;vector&gt;
@@ -551,17 +551,17 @@ stat::peak_rss_mb:              <span class="token number">407</span><span aria-
 
 namespace &#123;
 
-&#x2F;&#x2F; Returns true if the format should be attempted to loaded from memory.
+// Returns true if the format should be attempted to loaded from memory.
 bool SafeToLoadFromMemory(FREE_IMAGE_FORMAT fif) &#123;
-  &#x2F;&#x2F; For now, just load if it is a BMP. Future heuristics may need to be based
-  &#x2F;&#x2F; on the expected size in different formats for memory regions to avoid OOMs.
-  return fif &#x3D;&#x3D; FIF_BMP;
+  // For now, just load if it is a BMP. Future heuristics may need to be based
+  // on the expected size in different formats for memory regions to avoid OOMs.
+  return fif == FIF_BMP;
 &#125;
 
-&#125;  &#x2F;&#x2F; namespace
+&#125;  // namespace
 
 extern &quot;C&quot; int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) &#123;
-  static bool initialized &#x3D; false;
+  static bool initialized = false;
   if (!initialized) &#123;
     FreeImage_Initialise();
   &#125;
@@ -571,28 +571,28 @@ extern &quot;C&quot; int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size
   &#125;
 
   std::vector&lt;uint8_t&gt; fuzzer_data_vector(data, data + size);
-  FIMEMORY* fiMem &#x3D; FreeImage_OpenMemory(
+  FIMEMORY* fiMem = FreeImage_OpenMemory(
       reinterpret_cast&lt;unsigned char*&gt;(fuzzer_data_vector.data()),
       fuzzer_data_vector.size());
 
-  FREE_IMAGE_FORMAT fif &#x3D; FreeImage_GetFileTypeFromMemory(fiMem, 0);
+  FREE_IMAGE_FORMAT fif = FreeImage_GetFileTypeFromMemory(fiMem, 0);
   if (SafeToLoadFromMemory(fif)) &#123;
-    FIBITMAP* fiBitmap &#x3D; FreeImage_LoadFromMemory(fif, fiMem);
+    FIBITMAP* fiBitmap = FreeImage_LoadFromMemory(fif, fiMem);
     FreeImage_Unload(fiBitmap);
   &#125;
   FreeImage_CloseMemory(fiMem);
 
   return 0;
-&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+&#125;</code></pre>
 <p>接下来的步骤就是开始编译fuzzer，把对应参数输入在后面，使用clang++开始编译</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">clang++ -g -fsanitize<span class="token operator">=</span>fuzzer,address <span class="token punctuation">\</span>
-load_from_memory_fuzzer.cc ./FreeImage/Dist/libfreeimage.a <span class="token punctuation">\</span>
--o load_from_memory_fuzzer<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<pre><code class="bash">clang++ -g -fsanitize=fuzzer,address \
+load_from_memory_fuzzer.cc ./FreeImage/Dist/libfreeimage.a \
+-o load_from_memory_fuzzer</code></pre>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfjstwsua4j30g402wdh5.jpg" alt="截屏2020-06-07 下午4.20.47"></p>
 <p>出现了一点错误，看来是Freeimage.h文件没有找到，需要用-I 指定一下文件的路径让他可以找到</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">clang++ -g -fsanitize<span class="token operator">=</span>fuzzer,address -I<span class="token string">'/home/fstark/FreeImage/Dist'</span> <span class="token punctuation">\</span>
-load_from_memory_fuzzer.cc ./FreeImage/Dist/libfreeimage.a <span class="token punctuation">\</span>
--o load_from_memory_fuzzer<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<pre><code class="bash">clang++ -g -fsanitize=fuzzer,address -I&#39;/home/fstark/FreeImage/Dist&#39; \
+load_from_memory_fuzzer.cc ./FreeImage/Dist/libfreeimage.a \
+-o load_from_memory_fuzzer</code></pre>
 <p>这次成功了，发现已经成功生成了load_from_memory_fuzzer</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfjswpiuydj30hw05zgnu.jpg" alt="截屏2020-06-07 下午4.23.28"></p>
 <p>不加任何附加命令直接运行一下试试，发现可以跑了，就是速度不怎么快</p>

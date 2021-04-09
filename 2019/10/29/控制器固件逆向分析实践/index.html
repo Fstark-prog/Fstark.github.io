@@ -30,7 +30,7 @@ ga('send', 'pageview');</script><!-- End Google Analytics -->
 <h3 id="3-识别和解压升级包"><a href="#3-识别和解压升级包" class="headerlink" title="3.识别和解压升级包"></a>3.识别和解压升级包</h3><p>提取固件通常的方法是使用Binwalk等二进制分析工具对固件升级包进行自动化分析，待确认升级包类型后在进行解压或其他操作。<br>NOE771的固件文件名为NOE77101.bin，首先我们需要使用Binwalk来确认该文件的类型。通过使用Binwalk进行自动分析可以发现，该固件升级包包含了一个zlib压缩的文件。</p>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g8f3vpmszhj313u0l3nop.jpg" alt="截屏2019-10-28下午8.06.00"></p>
 <p>Binwalk支持提取zlib压缩的文件，我们可以通过如下命令进行解压</p>
-<pre class="line-numbers language-none"><code class="language-none">Binwalk-e NOE77101.bin<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre><code>Binwalk-e NOE77101.bin</code></pre>
 <p>解压后的文件385将存储在_NOE77101.bin.extracted目录中，并以文件在固件升级包中的起始位置来命名。</p>
 <p>下图为解压固件升级包结果。</p>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g8f3xj7a19j313u0l3noz.jpg" alt="截屏2019-10-28下午8.06.53"></p>
@@ -61,28 +61,28 @@ ga('send', 'pageview');</script><!-- End Google Analytics -->
 <p>由于符号表有他自己的特征，因此能够通过遍历的方式快速的锁定符号表的起始及结束地址。我们所测试的固件的符号表起始地址为0x301e60+0x10000，结束地址为0x3293b0+0x10000。</p>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g8f4nnqbq2j31d10la1kx.jpg" alt="截屏2019-10-29上午10.09.54"></p>
 <p>在得到了符号表的位置后，我们就需要使用IDA的api来修复函数名，这里将使用如下的Python脚本。</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment"># coding:utf-8</span>
-<span class="token keyword">from</span> idaapi <span class="token keyword">import</span> <span class="token operator">*</span>
-<span class="token comment"># 符号表间隔</span>
-symbol_interval <span class="token operator">=</span> <span class="token number">16</span>
-load_address <span class="token operator">=</span> <span class="token number">0x10000</span>
-symbol_table_start <span class="token operator">=</span> <span class="token number">0x301e60</span> <span class="token operator">+</span> load_address
-symbol_table_end <span class="token operator">=</span> <span class="token number">0x3293b0</span> <span class="token operator">+</span> load_address
-ea <span class="token operator">=</span> symbol_table_start
+<pre><code class="python"># coding:utf-8
+from idaapi import *
+# 符号表间隔
+symbol_interval = 16
+load_address = 0x10000
+symbol_table_start = 0x301e60 + load_address
+symbol_table_end = 0x3293b0 + load_address
+ea = symbol_table_start
 
-<span class="token keyword">while</span> ea <span class="token operator">&lt;</span> symbol_table_end<span class="token punctuation">:</span>
-    <span class="token comment"># 循环遍历修复函数名</span>
-    offset <span class="token operator">=</span> <span class="token number">4</span>
-    MakeStr<span class="token punctuation">(</span>Dword<span class="token punctuation">(</span>ea <span class="token operator">+</span> offset<span class="token punctuation">)</span><span class="token punctuation">,</span> BADADDR<span class="token punctuation">)</span>
-    sName <span class="token operator">=</span> GetString<span class="token punctuation">(</span>Dword<span class="token punctuation">(</span>ea <span class="token operator">+</span> offset<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> ASCSTR_C<span class="token punctuation">)</span>
-    <span class="token keyword">print</span><span class="token punctuation">(</span>sName<span class="token punctuation">)</span>
-    <span class="token keyword">if</span> sName<span class="token punctuation">:</span>
-        eaFunc <span class="token operator">=</span> Dword<span class="token punctuation">(</span>ea <span class="token operator">+</span> offset <span class="token operator">+</span> <span class="token number">4</span><span class="token punctuation">)</span>
-        MakeName<span class="token punctuation">(</span>eaFunc<span class="token punctuation">,</span> sName<span class="token punctuation">)</span>
-        MakeCode<span class="token punctuation">(</span>eaFunc<span class="token punctuation">)</span>
-        MakeFunction<span class="token punctuation">(</span>eaFunc<span class="token punctuation">,</span> BADADDR<span class="token punctuation">)</span>
-    ea <span class="token operator">+=</span> symbol_interval
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+while ea &lt; symbol_table_end:
+    # 循环遍历修复函数名
+    offset = 4
+    MakeStr(Dword(ea + offset), BADADDR)
+    sName = GetString(Dword(ea + offset), -1, ASCSTR_C)
+    print(sName)
+    if sName:
+        eaFunc = Dword(ea + offset + 4)
+        MakeName(eaFunc, sName)
+        MakeCode(eaFunc)
+        MakeFunction(eaFunc, BADADDR)
+    ea += symbol_interval
+</code></pre>
 <p>在IDA的脚本中运行</p>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g8f4wi7rsrj30m40frdm5.jpg" alt="截屏2019-10-29上午10.23.47"></p>
 <p>运行之后发现旁边函数列表大多函数都找到了符号表中对应的名称</p>
@@ -90,13 +90,13 @@ ea <span class="token operator">=</span> symbol_table_start
 <h3 id="7-后门代码分析"><a href="#7-后门代码分析" class="headerlink" title="7.后门代码分析"></a>7.后门代码分析</h3><p>在固件预处理完成后，我们就可以通过查看固件的服务加载过程查看初始化时所添加的账号等信息。查看usrAppinit函数，可以发现大量的loginUserAddd调用。（多个后门函数）</p>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g8f504uq6hj31390nzgyc.jpg" alt="截屏2019-10-29上午11.03.43"></p>
 <p>而密码则是经过loginDefaultEncrypt函数哈希加密<br>结合vxworks5的源码来看</p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/******************************************************************************
+<pre><code class="c">/******************************************************************************
 *
 * loginDefaultEncrypt - default password encryption routine
 *
 * This routine provides default encryption for login passwords.  It employs
-* a simple encryption algorithm.  It takes as arguments a string &lt;in> and a
-* pointer to a buffer &lt;out>.  The encrypted string is then stored in the
+* a simple encryption algorithm.  It takes as arguments a string &lt;in&gt; and a
+* pointer to a buffer &lt;out&gt;.  The encrypted string is then stored in the
 * buffer.
 *
 * The input strings must be at least 8 characters and no more than 40
@@ -105,8 +105,8 @@ ea <span class="token operator">=</span> symbol_table_start
 * If a more sophisticated encryption algorithm is needed, this routine can
 * be replaced, as long as the new encryption routine retains the same
 * declarations as the default routine.  The routine vxencrypt
-* in \f3host/&lt;hostOs>/bin\fP
-* should also be replaced by a host version of &lt;encryptionRoutine>.  For more
+* in \f3host/&lt;hostOs&gt;/bin\fP
+* should also be replaced by a host version of &lt;encryptionRoutine&gt;.  For more
 * information, see the manual entry for loginEncryptInstall().
 *
 * RETURNS: OK, or ERROR if the password is invalid.
@@ -116,45 +116,45 @@ ea <span class="token operator">=</span> symbol_table_start
 * INTERNAL
 * The encryption is done by summing the password and multiplying it by
 * a magic number.
-*/</span>
+*/
 
-STATUS <span class="token function">loginDefaultEncrypt</span>
-    <span class="token punctuation">(</span>
-    <span class="token keyword">char</span> <span class="token operator">*</span>in<span class="token punctuation">,</span>                           <span class="token comment">/* input string */</span>
-    <span class="token keyword">char</span> <span class="token operator">*</span>out                           <span class="token comment">/* encrypted string */</span>
-    <span class="token punctuation">)</span>
-    <span class="token punctuation">&#123;</span>
-    <span class="token keyword">int</span>            ix<span class="token punctuation">;</span>
-    <span class="token keyword">unsigned</span> <span class="token keyword">long</span>  magic     <span class="token operator">=</span> <span class="token number">31695317</span><span class="token punctuation">;</span>
-    <span class="token keyword">unsigned</span> <span class="token keyword">long</span>  passwdInt <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+STATUS loginDefaultEncrypt
+    (
+    char *in,                           /* input string */
+    char *out                           /* encrypted string */
+    )
+    &#123;
+    int            ix;
+    unsigned long  magic     = 31695317;
+    unsigned long  passwdInt = 0;
 
-   <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">strlen</span> <span class="token punctuation">(</span>in<span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">8</span> <span class="token operator">||</span> <span class="token function">strlen</span> <span class="token punctuation">(</span>in<span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">40</span><span class="token punctuation">)</span>
-        <span class="token punctuation">&#123;</span>
-	<span class="token function">errnoSet</span> <span class="token punctuation">(</span>S_loginLib_INVALID_PASSWORD<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token keyword">return</span> <span class="token punctuation">(</span>ERROR<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token punctuation">&#125;</span>
+   if (strlen (in) &lt; 8 || strlen (in) &gt; 40)
+        &#123;
+    errnoSet (S_loginLib_INVALID_PASSWORD);
+        return (ERROR);
+        &#125;
 
-    <span class="token keyword">for</span> <span class="token punctuation">(</span>ix <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> ix <span class="token operator">&lt;</span> <span class="token function">strlen</span><span class="token punctuation">(</span>in<span class="token punctuation">)</span><span class="token punctuation">;</span> ix<span class="token operator">++</span><span class="token punctuation">)</span>         <span class="token comment">/* sum the string */</span>
-        passwdInt <span class="token operator">+=</span> <span class="token punctuation">(</span>in<span class="token punctuation">[</span>ix<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token punctuation">(</span>ix<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">^</span> <span class="token punctuation">(</span>ix<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    for (ix = 0; ix &lt; strlen(in); ix++)         /* sum the string */
+        passwdInt += (in[ix]) * (ix+1) ^ (ix+1);
 
-    <span class="token function">sprintf</span> <span class="token punctuation">(</span>out<span class="token punctuation">,</span> <span class="token string">"%u"</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token keyword">long</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>passwdInt <span class="token operator">*</span> magic<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">/* convert interger
-							to string */</span>
-    <span class="token comment">/* make encrypted passwd printable */</span>
+    sprintf (out, &quot;%u&quot;, (long) (passwdInt * magic)); /* convert interger
+                            to string */
+    /* make encrypted passwd printable */
 
-    <span class="token keyword">for</span> <span class="token punctuation">(</span>ix <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> ix <span class="token operator">&lt;</span> <span class="token function">strlen</span> <span class="token punctuation">(</span>out<span class="token punctuation">)</span><span class="token punctuation">;</span> ix<span class="token operator">++</span><span class="token punctuation">)</span>
-        <span class="token punctuation">&#123;</span>
-        <span class="token keyword">if</span> <span class="token punctuation">(</span>out<span class="token punctuation">[</span>ix<span class="token punctuation">]</span> <span class="token operator">&lt;</span> <span class="token string">'3'</span><span class="token punctuation">)</span>
-            out<span class="token punctuation">[</span>ix<span class="token punctuation">]</span> <span class="token operator">=</span> out<span class="token punctuation">[</span>ix<span class="token punctuation">]</span> <span class="token operator">+</span> <span class="token string">'!'</span><span class="token punctuation">;</span>    <span class="token comment">/* arbitrary */</span>
+    for (ix = 0; ix &lt; strlen (out); ix++)
+        &#123;
+        if (out[ix] &lt; &#39;3&#39;)
+            out[ix] = out[ix] + &#39;!&#39;;    /* arbitrary */
 
-        <span class="token keyword">if</span> <span class="token punctuation">(</span>out<span class="token punctuation">[</span>ix<span class="token punctuation">]</span> <span class="token operator">&lt;</span> <span class="token string">'7'</span><span class="token punctuation">)</span>
-            out<span class="token punctuation">[</span>ix<span class="token punctuation">]</span> <span class="token operator">=</span> out<span class="token punctuation">[</span>ix<span class="token punctuation">]</span> <span class="token operator">+</span> <span class="token string">'/'</span><span class="token punctuation">;</span>    <span class="token comment">/* arbitrary */</span>
+        if (out[ix] &lt; &#39;7&#39;)
+            out[ix] = out[ix] + &#39;/&#39;;    /* arbitrary */
 
-        <span class="token keyword">if</span> <span class="token punctuation">(</span>out<span class="token punctuation">[</span>ix<span class="token punctuation">]</span> <span class="token operator">&lt;</span> <span class="token string">'9'</span><span class="token punctuation">)</span>
-            out<span class="token punctuation">[</span>ix<span class="token punctuation">]</span> <span class="token operator">=</span> out<span class="token punctuation">[</span>ix<span class="token punctuation">]</span> <span class="token operator">+</span> <span class="token string">'B'</span><span class="token punctuation">;</span>    <span class="token comment">/* arbitrary */</span>
-        <span class="token punctuation">&#125;</span>
+        if (out[ix] &lt; &#39;9&#39;)
+            out[ix] = out[ix] + &#39;B&#39;;    /* arbitrary */
+        &#125;
 
-    <span class="token keyword">return</span> <span class="token punctuation">(</span>OK<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    return (OK);
+    &#125;</code></pre>
 <p><a target="_blank" rel="noopener" href="https://i.loli.net/2018/07/19/5b5021f38a71a.jpg"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g8f58cr8q2j30od0jaaaq.jpg" alt="mark"></a><br><a target="_blank" rel="noopener" href="https://i.loli.net/2018/07/19/5b5021f39f749.jpg"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g8f58ej37bj30og0hsq43.jpg" alt="mark"></a><br><a target="_blank" rel="noopener" href="https://i.loli.net/2018/07/19/5b5021f3b3958.jpg"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g8f58gdnqwj30oo0ekwex.jpg" alt="mark"></a></p>
 <p>结合源码看汇编就非常清晰了</p>
 <blockquote>
@@ -171,84 +171,84 @@ STATUS <span class="token function">loginDefaultEncrypt</span>
 <p><a target="_blank" rel="noopener" href="https://github.com/cvonkleist/vxworks_hash">https://github.com/cvonkleist/vxworks_hash</a></p>
 </blockquote>
 <p>这里贴上C的</p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">// cvk/2010-08-09</span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string.h></span></span>
+<pre><code class="c">// cvk/2010-08-09
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
 
-<span class="token comment">// password settings</span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">MIN_LENGTH</span> <span class="token expression"><span class="token number">8</span></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">MAX_LENGTH</span> <span class="token expression"><span class="token number">40</span></span></span>
-<span class="token keyword">char</span> <span class="token operator">*</span>charset <span class="token operator">=</span> <span class="token string">" !\"#$%&amp;'()*+,-./0123456789:;&lt;=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz&#123;|&#125;~"</span><span class="token punctuation">;</span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">CHARSET_LENGTH</span> <span class="token expression"><span class="token number">95</span></span></span>
+// password settings
+#define MIN_LENGTH 8
+#define MAX_LENGTH 40
+char *charset = &quot; !\&quot;#$%&amp;&#39;()*+,-./0123456789:;&lt;=&gt;?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz&#123;|&#125;~&quot;;
+#define CHARSET_LENGTH 95
 
-<span class="token comment">// shortcut hash table</span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">MAX_SUM</span> <span class="token expression"><span class="token number">110000</span></span></span>
-<span class="token keyword">char</span> sums<span class="token punctuation">[</span>MAX_SUM<span class="token punctuation">]</span><span class="token punctuation">[</span>MAX_LENGTH <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+// shortcut hash table
+#define MAX_SUM 110000
+char sums[MAX_SUM][MAX_LENGTH + 1];
 
-<span class="token comment">// stage one of the hashing algorithm: the sum</span>
-<span class="token keyword">unsigned</span> <span class="token keyword">long</span> <span class="token function">sum</span><span class="token punctuation">(</span><span class="token keyword">char</span> <span class="token operator">*</span>plaintext<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> s <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
-  <span class="token keyword">int</span> i<span class="token punctuation">;</span>
-  <span class="token keyword">for</span> <span class="token punctuation">(</span>i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token function">strlen</span><span class="token punctuation">(</span>plaintext<span class="token punctuation">)</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span>
-    s <span class="token operator">+=</span> <span class="token punctuation">(</span>plaintext<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token punctuation">(</span>i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">^</span> <span class="token punctuation">(</span>i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token keyword">return</span> s<span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span>
+// stage one of the hashing algorithm: the sum
+unsigned long sum(char *plaintext) &#123;
+  unsigned long s = 0;
+  int i;
+  for (i = 0; i &lt; strlen(plaintext); i++)
+    s += (plaintext[i]) * (i + 1) ^ (i + 1);
+  return s;
+&#125;
 
-<span class="token comment">// builds a random password</span>
-<span class="token keyword">void</span> <span class="token function">random_password</span><span class="token punctuation">(</span><span class="token keyword">char</span> <span class="token operator">*</span>password<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token keyword">int</span> i<span class="token punctuation">;</span>
-  <span class="token keyword">int</span> length <span class="token operator">=</span> <span class="token function">rand</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token punctuation">(</span>MAX_LENGTH <span class="token operator">-</span> MIN_LENGTH<span class="token punctuation">)</span> <span class="token operator">+</span> MIN_LENGTH<span class="token punctuation">;</span>
-  <span class="token keyword">for</span><span class="token punctuation">(</span>i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> length<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span>
-    password<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> charset<span class="token punctuation">[</span><span class="token function">rand</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">%</span> CHARSET_LENGTH<span class="token punctuation">]</span><span class="token punctuation">;</span>
-  password<span class="token punctuation">[</span>length<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">'\0'</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span>
+// builds a random password
+void random_password(char *password) &#123;
+  int i;
+  int length = rand() % (MAX_LENGTH - MIN_LENGTH) + MIN_LENGTH;
+  for(i = 0; i &lt; length; i++)
+    password[i] = charset[rand() % CHARSET_LENGTH];
+  password[length] = &#39;\0&#39;;
+&#125;
 
-<span class="token comment">// randomly creates checksums</span>
-<span class="token comment">//</span>
-<span class="token comment">// when it discovers a shorter input plaintext for a checksum that has already</span>
-<span class="token comment">// been calculated, it replaces the existing plaintext with the new, shorter</span>
-<span class="token comment">// one</span>
-<span class="token keyword">void</span> <span class="token function">brute</span><span class="token punctuation">(</span><span class="token keyword">int</span> runs<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token keyword">int</span> i<span class="token punctuation">;</span>
-  <span class="token keyword">char</span> password<span class="token punctuation">[</span>MAX_LENGTH <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> s<span class="token punctuation">;</span>
+// randomly creates checksums
+//
+// when it discovers a shorter input plaintext for a checksum that has already
+// been calculated, it replaces the existing plaintext with the new, shorter
+// one
+void brute(int runs) &#123;
+  int i;
+  char password[MAX_LENGTH + 1];
+  unsigned long s;
 
-  <span class="token keyword">for</span><span class="token punctuation">(</span>i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> runs<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token function">random_password</span><span class="token punctuation">(</span>password<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    s <span class="token operator">=</span> <span class="token function">sum</span><span class="token punctuation">(</span>password<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token keyword">if</span><span class="token punctuation">(</span>s <span class="token operator">></span> MAX_SUM<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-      <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"error! sum too big"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-      <span class="token keyword">return</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-    <span class="token keyword">if</span><span class="token punctuation">(</span>sums<span class="token punctuation">[</span>s<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token string">'\0'</span> <span class="token operator">||</span> <span class="token function">strlen</span><span class="token punctuation">(</span>password<span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token function">strlen</span><span class="token punctuation">(</span>sums<span class="token punctuation">[</span>s<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-      <span class="token function">strcpy</span><span class="token punctuation">(</span>sums<span class="token punctuation">[</span>s<span class="token punctuation">]</span><span class="token punctuation">,</span> password<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-  <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span>
+  for(i = 0; i &lt; runs; i++) &#123;
+    random_password(password);
+    s = sum(password);
+    if(s &gt; MAX_SUM) &#123;
+      printf(&quot;error! sum too big&quot;);
+      return;
+    &#125;
+    if(sums[s][0] == &#39;\0&#39; || strlen(password) &lt; strlen(sums[s])) &#123;
+      strcpy(sums[s], password);
+    &#125;
+  &#125;
+&#125;
 
-<span class="token comment">// returns the number of checksums in the table</span>
-<span class="token keyword">int</span> <span class="token function">count</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token keyword">int</span> i<span class="token punctuation">;</span>
-  <span class="token keyword">int</span> c <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
-  <span class="token keyword">for</span><span class="token punctuation">(</span>i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> MAX_SUM<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span>
-    <span class="token keyword">if</span><span class="token punctuation">(</span>sums<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">!=</span> <span class="token string">'\0'</span><span class="token punctuation">)</span>
-      c<span class="token operator">++</span><span class="token punctuation">;</span>
-  <span class="token keyword">return</span> c<span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span>
+// returns the number of checksums in the table
+int count() &#123;
+  int i;
+  int c = 0;
+  for(i = 0; i &lt; MAX_SUM; i++)
+    if(sums[i][0] != &#39;\0&#39;)
+      c++;
+  return c;
+&#125;
 
-<span class="token comment">// prints discovered checksums</span>
-<span class="token keyword">void</span> <span class="token function">dump_table</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token keyword">int</span> i<span class="token punctuation">;</span>
-  <span class="token keyword">for</span><span class="token punctuation">(</span>i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> MAX_SUM<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span>
-    <span class="token keyword">if</span><span class="token punctuation">(</span>sums<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">!=</span> <span class="token string">'\0'</span><span class="token punctuation">)</span>
-      <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"%d\t%s\n"</span><span class="token punctuation">,</span> i<span class="token punctuation">,</span> sums<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span>
+// prints discovered checksums
+void dump_table() &#123;
+  int i;
+  for(i = 0; i &lt; MAX_SUM; i++)
+    if(sums[i][0] != &#39;\0&#39;)
+      printf(&quot;%d\t%s\n&quot;, i, sums[i]);
+&#125;
 
-<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">int</span> argc<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token operator">*</span>argv<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token function">brute</span><span class="token punctuation">(</span><span class="token number">1000000000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"%d checksums\n"</span><span class="token punctuation">,</span> <span class="token function">count</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token function">dump_table</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+int main(int argc, char **argv) &#123;
+  brute(1000000000);
+  printf(&quot;%d checksums\n&quot;, count());
+  dump_table();
+&#125;</code></pre>
 <h2 id="【预期结果】"><a href="#【预期结果】" class="headerlink" title="【预期结果】"></a>【预期结果】</h2><p>成功找到隐藏在固件封装程序中的若干个后门账号和密码</p>
 <h2 id="【思考问题】"><a href="#【思考问题】" class="headerlink" title="【思考问题】"></a>【思考问题】</h2><p>（1）如果固件的内存加载地址并没有采用一般默认的0x10000，我们有哪些可能的办法去寻找其加载地址呢？</p>
 <p>（2）除了本实验中提到的办法，还有什么其他思路可以找到固件的符号表地址？</p>

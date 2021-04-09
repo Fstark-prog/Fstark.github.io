@@ -28,19 +28,19 @@ ga('send', 'pageview');</script><!-- End Google Analytics -->
 <h3 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h3><p>反调试技术常常用来保护关键性的程序或软件，一旦该程序被调试就会出现错误。</p>
 <p>同时反调试技术也常常用于恶意代码的开发过程之中。恶意代码用它识别是否被调试，或者让调试器失效。恶意代码编写者意识到分析人员经常使用调试器来观察恶意代码的操作，因此他们使用反调试技术尽可能地延长恶意代码的分析时间。为了阻止调试器的分析，当恶意代码意识到自己被调试时，它们可能改变正常的执行路径或者修改自身程序让自己崩溃，从而增加调试时间和复杂度。</p>
 <h3 id="基本过程"><a href="#基本过程" class="headerlink" title="基本过程"></a>基本过程</h3><p>下面我们以一个简单的函数检测为例，即自带的IsDebuggerPresent函数检测是否使用了调试器。基本的代码为：</p>
-<pre class="line-numbers language-c++" data-language="c++"><code class="language-c++">int main()&#123;
+<pre><code class="c++">int main()&#123;
 if (IsDebuggerPresent())
 &#123;
-	cout &lt;&lt;&quot;朋友，你在使用调试器啊！&quot;&lt;&lt;endl;
-	system(&quot;pause&quot;);
-	exit(-1);
+    cout &lt;&lt;&quot;朋友，你在使用调试器啊！&quot;&lt;&lt;endl;
+    system(&quot;pause&quot;);
+    exit(-1);
 &#125;
 
 else
-	cout &lt;&lt;&quot;success!&quot;&lt;&lt;endl;
-	system(&quot;pause&quot;);
-	return 0;
-&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    cout &lt;&lt;&quot;success!&quot;&lt;&lt;endl;
+    system(&quot;pause&quot;);
+    return 0;
+&#125;</code></pre>
 <p>编译截图如下所示：</p>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g754k5ujb8j30so0itjrz.jpg" alt="img"> </p>
 <p>我们尝试一下在正常环境下打开和在OllyDbg中打开看看有什么不同。</p>

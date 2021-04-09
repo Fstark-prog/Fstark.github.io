@@ -39,58 +39,61 @@ XSS漏洞，通常指的是恶意攻击者利用浏览器的动态展示数据�
 <p>如果按照作用对象划分，还可以划为针对用户和针对Web服务两种大类，具体作用可看下图：</p>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6bncs2ff3j312s0hcdi8.jpg" alt="image-20190825090358128"></p>
 <center>Figure 2 XSS的作用图</center>
-<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token php language-php"><span class="token delimiter important">&lt;?php</span> 
-<span class="token comment">// Is there any input? </span>
-<span class="token keyword">if</span><span class="token punctuation">(</span> <span class="token function">array_key_exists</span><span class="token punctuation">(</span> <span class="token string double-quoted-string">"name"</span><span class="token punctuation">,</span> <span class="token variable">$_GET</span> <span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span> <span class="token string single-quoted-string">'name'</span> <span class="token punctuation">]</span> <span class="token operator">!=</span> <span class="token constant">NULL</span> <span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> 
-	<span class="token comment">// Feedback for end user</span>
-	<span class="token keyword">echo</span><span class="token string single-quoted-string">'&lt;pre>Hello '</span><span class="token operator">.</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span> <span class="token string single-quoted-string">'name'</span> <span class="token punctuation">]</span> <span class="token operator">.</span> <span class="token string single-quoted-string">'&lt;/pre>'</span><span class="token punctuation">;</span> 
-<span class="token punctuation">&#125;</span> 
-<span class="token delimiter important">?></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+```php
+<?php 
+// Is there any input? 
+if( array_key_exists( "name", $_GET ) && $_GET[ 'name' ] != NULL ) { 
+    // Feedback for end user
+    echo'<pre>Hello '. $_GET[ 'name' ] . '</pre>'; 
+} 
+?>
+```
+
 
 
 <h1 id="常见XSS分析"><a href="#常见XSS分析" class="headerlink" title="常见XSS分析"></a>常见XSS分析</h1><h2 id="反射型-XSS"><a href="#反射型-XSS" class="headerlink" title="反射型 XSS"></a>反射型 XSS</h2><p>反射型跨站脚本（Reflected Cross-Site Scripting）是最常见，也是使用最广的一种，可将恶意脚本附加到 URL 地址的参数中。</p>
 <p>反射型 XSS 的利用一般是攻击者通过特定手法（如电子邮件），诱使用户去访问一个包含恶意代码的 URL，当受害者点击这些专门设计的链接的时候，恶意代码会直接在受害者主机上的浏览器执行。此类 XSS 通常出现在网站的搜索栏、用户登录口等地方，常用来窃取客户端 Cookies 或进行钓鱼欺骗。</p>
 <p>服务器端代码：</p>
-<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
-<span class="token comment">// Is there any input?</span>
-<span class="token keyword">if</span><span class="token punctuation">(</span> <span class="token function">array_key_exists</span><span class="token punctuation">(</span> <span class="token string double-quoted-string">"name"</span><span class="token punctuation">,</span> <span class="token variable">$_GET</span> <span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span> <span class="token string single-quoted-string">'name'</span> <span class="token punctuation">]</span> <span class="token operator">!=</span> <span class="token constant">NULL</span> <span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> 
-    <span class="token comment">// Feedback for end user </span>
-    <span class="token keyword">echo</span> <span class="token string single-quoted-string">'&lt;pre>Hello '</span> <span class="token operator">.</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span> <span class="token string single-quoted-string">'name'</span> <span class="token punctuation">]</span> <span class="token operator">.</span> <span class="token string single-quoted-string">'&lt;/pre>'</span><span class="token punctuation">;</span> 
-<span class="token punctuation">&#125;</span> 
-<span class="token delimiter important">?></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre><code class="php">&lt;?php
+// Is there any input?
+if( array_key_exists( &quot;name&quot;, $_GET ) &amp;&amp; $_GET[ &#39;name&#39; ] != NULL ) &#123; 
+    // Feedback for end user 
+    echo &#39;&lt;pre&gt;Hello &#39; . $_GET[ &#39;name&#39; ] . &#39;&lt;/pre&gt;&#39;; 
+&#125; 
+?&gt;</code></pre>
 <p>可以看到，代码直接引用了 name 参数，并没有做任何的过滤和检查，存在明显的 XSS 漏洞。</p>
 <h2 id="持久型-XSS"><a href="#持久型-XSS" class="headerlink" title="持久型 XSS"></a>持久型 XSS</h2><p>持久型跨站脚本（Persistent Cross-Site Scripting）也等同于存储型跨站脚本（Stored Cross-Site Scripting）。</p>
 <p>此类 XSS 不需要用户单击特定 URL 就能执行跨站脚本，攻击者事先将恶意代码上传或储存到漏洞服务器中，只要受害者浏览包含此恶意代码的页面就会执行恶意代码。持久型 XSS 一般出现在网站留言、评论、博客日志等交互处，恶意脚本存储到客户端或者服务端的数据库中。</p>
 <p>服务器端代码：</p>
-<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
-  <span class="token keyword">if</span><span class="token punctuation">(</span> <span class="token keyword">isset</span><span class="token punctuation">(</span> <span class="token variable">$_POST</span><span class="token punctuation">[</span> <span class="token string single-quoted-string">'btnSign'</span> <span class="token punctuation">]</span> <span class="token punctuation">)</span> <span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token comment">// Get input</span>
-    <span class="token variable">$message</span> <span class="token operator">=</span> <span class="token function">trim</span><span class="token punctuation">(</span> <span class="token variable">$_POST</span><span class="token punctuation">[</span> <span class="token string single-quoted-string">'mtxMessage'</span> <span class="token punctuation">]</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token variable">$name</span>    <span class="token operator">=</span> <span class="token function">trim</span><span class="token punctuation">(</span> <span class="token variable">$_POST</span><span class="token punctuation">[</span> <span class="token string single-quoted-string">'txtName'</span> <span class="token punctuation">]</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token comment">// Sanitize message input</span>
-    <span class="token variable">$message</span> <span class="token operator">=</span> <span class="token function">stripslashes</span><span class="token punctuation">(</span> <span class="token variable">$message</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token variable">$message</span> <span class="token operator">=</span> <span class="token function">mysql_real_escape_string</span><span class="token punctuation">(</span> <span class="token variable">$message</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token comment">// Sanitize name input</span>
-    <span class="token variable">$name</span> <span class="token operator">=</span> <span class="token function">mysql_real_escape_string</span><span class="token punctuation">(</span> <span class="token variable">$name</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token comment">// Update database</span>
-    <span class="token variable">$query</span>  <span class="token operator">=</span> <span class="token string double-quoted-string">"INSERT INTO guestbook ( comment, name ) VALUES ( '<span class="token interpolation"><span class="token variable">$message</span></span>', '<span class="token interpolation"><span class="token variable">$name</span></span>' );"</span><span class="token punctuation">;</span>
-    <span class="token variable">$result</span> <span class="token operator">=</span> <span class="token function">mysql_query</span><span class="token punctuation">(</span> <span class="token variable">$query</span> <span class="token punctuation">)</span> <span class="token keyword">or</span> <span class="token keyword">die</span><span class="token punctuation">(</span> <span class="token string single-quoted-string">'&lt;pre>'</span> <span class="token operator">.</span> <span class="token function">mysql_error</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">.</span> <span class="token string single-quoted-string">'&lt;/pre>'</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token comment">//mysql_close(); &#125;</span>
-<span class="token delimiter important">?></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre><code class="php">&lt;?php
+  if( isset( $_POST[ &#39;btnSign&#39; ] ) ) &#123;
+    // Get input
+    $message = trim( $_POST[ &#39;mtxMessage&#39; ] );
+    $name    = trim( $_POST[ &#39;txtName&#39; ] );
+    // Sanitize message input
+    $message = stripslashes( $message );
+    $message = mysql_real_escape_string( $message );
+    // Sanitize name input
+    $name = mysql_real_escape_string( $name );
+    // Update database
+    $query  = &quot;INSERT INTO guestbook ( comment, name ) VALUES ( &#39;$message&#39;, &#39;$name&#39; );&quot;;
+    $result = mysql_query( $query ) or die( &#39;&lt;pre&gt;&#39; . mysql_error() . &#39;&lt;/pre&gt;&#39; );
+    //mysql_close(); &#125;
+?&gt;</code></pre>
 <p>代码只对一些空白符、特殊符号、反斜杠进行了删除或转义，没有做 XSS 的过滤和检查，且存储在数据库中，明显存在存储型 XSS 漏洞。</p>
 <h2 id="DOM-XSS"><a href="#DOM-XSS" class="headerlink" title="DOM XSS"></a>DOM XSS</h2><p>传统的 XSS 漏洞一般出现在服务器端代码中，而 DOM-Based XSS 是基于 DOM 文档对象模型的一种漏洞，所以，受客户端浏览器的脚本代码所影响。客户端 JavaScript 可以访问浏览器的 DOM 文本对象模型，因此能够决定用于加载当前页面的 URL。换句话说，客户端的脚本程序可以通过 DOM 动态地检查和修改页面内容，它不依赖于服务器端的数据，而从客户端获得 DOM 中的数据（如从 URL 中提取数据）并在本地执行。另一方面，浏览器用户可以操纵 DOM 中的一些对象，例如 URL、location 等。用户在客户端输入的数据如果包含了恶意 JavaScript 脚本，而这些脚本没有经过适当的过滤和消毒，那么应用程序就可能受到基于 DOM 的 XSS 攻击。</p>
 <p>HTML 代码：</p>
-<pre class="line-numbers language-html" data-language="html"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span><span class="token punctuation">></span></span>
-  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>head</span><span class="token punctuation">></span></span>
-    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>title</span><span class="token punctuation">></span></span>DOM-XSS test<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>title</span><span class="token punctuation">></span></span>
-  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>head</span><span class="token punctuation">></span></span>
-  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">></span></span>
-    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
-      <span class="token keyword">var</span> a<span class="token operator">=</span>document<span class="token punctuation">.</span><span class="token constant">URL</span><span class="token punctuation">;</span>
-	    document<span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span>a<span class="token punctuation">.</span><span class="token function">substring</span><span class="token punctuation">(</span>a<span class="token punctuation">.</span><span class="token function">indexOf</span><span class="token punctuation">(</span><span class="token string">"a="</span><span class="token punctuation">)</span><span class="token operator">+</span><span class="token number">2</span><span class="token punctuation">,</span>a<span class="token punctuation">.</span>length<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    </span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
-  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>html</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre><code class="html">&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;DOM-XSS test&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;script&gt;
+      var a=document.URL;
+        document.write(a.substring(a.indexOf(&quot;a=&quot;)+2,a.length));
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
 <p>将代码保存在 domXSS.html 中，浏览器访问：</p>
 <p><a target="_blank" rel="noopener" href="http://127.0.0.1/domXSS.html?a=%3Cscript%3Ealert(%27XSS%27)%3C/script%3E">http://127.0.0.1/domXSS.html?a=&lt;script&gt;alert(&#39;XSS&#39;)&lt;/script&gt;</a></p>
 <p>即可触发 XSS 漏洞。</p>
@@ -140,23 +143,23 @@ XSS漏洞，通常指的是恶意攻击者利用浏览器的动态展示数据�
 <p>前端在使用 <code>.innerHTML</code>、<code>.outerHTML</code>、<code>document.write()</code> 时要特别小心，不要把不可信的数据作为 HTML 插到页面上，而应尽量使用 <code>.textContent</code>、<code>.setAttribute()</code> 等。</p>
 <p>如果用 Vue/React 技术栈，并且不使用 <code>v-html</code>或<code>dangerouslySetInnerHTML</code> 功能，就在前端 render 阶段避免 <code>innerHTML</code>、<code>outerHTML</code> 的 XSS 隐患。</p>
 <p>DOM 中的内联事件监听器，如 <code>location、onclick、onerror、onload、onmouseover</code> 等，<code>&lt;a&gt;</code> 标签的 <code>href</code> 属性，JavaScript 的 <code>eval()、setTimeout()、setInterval()</code> 等，都能把字符串作为代码运行。如果不可信的数据拼接到字符串中传递给这些 API，很容易产生安全隐患，请务必避免。</p>
-<pre class="line-numbers language-js" data-language="js"><code class="language-js"><span class="token operator">&lt;</span><span class="token operator">!</span><span class="token operator">--</span> 内联事件监听器中包含恶意代码 <span class="token operator">--</span><span class="token operator">></span>
-<span class="token operator">&lt;</span>img onclick<span class="token operator">=</span><span class="token string">"UNTRUSTED"</span> onerror<span class="token operator">=</span><span class="token string">"UNTRUSTED"</span> src<span class="token operator">=</span><span class="token string">"data:image/png,"</span><span class="token operator">></span>
+<pre><code class="js">&lt;!-- 内联事件监听器中包含恶意代码 --&gt;
+&lt;img onclick=&quot;UNTRUSTED&quot; onerror=&quot;UNTRUSTED&quot; src=&quot;data:image/png,&quot;&gt;
 
-<span class="token operator">&lt;</span><span class="token operator">!</span><span class="token operator">--</span> 链接内包含恶意代码 <span class="token operator">--</span><span class="token operator">></span>
-<span class="token operator">&lt;</span>a href<span class="token operator">=</span><span class="token string">"UNTRUSTED"</span><span class="token operator">></span><span class="token number">1</span><span class="token operator">&lt;</span><span class="token operator">/</span>a<span class="token operator">></span>
+&lt;!-- 链接内包含恶意代码 --&gt;
+&lt;a href=&quot;UNTRUSTED&quot;&gt;1&lt;/a&gt;
 
-<span class="token operator">&lt;</span>script<span class="token operator">></span>
-<span class="token comment">// setTimeout()/setInterval() 中调用恶意代码</span>
-<span class="token function">setTimeout</span><span class="token punctuation">(</span><span class="token string">"UNTRUSTED"</span><span class="token punctuation">)</span>
-<span class="token function">setInterval</span><span class="token punctuation">(</span><span class="token string">"UNTRUSTED"</span><span class="token punctuation">)</span>
+&lt;script&gt;
+// setTimeout()/setInterval() 中调用恶意代码
+setTimeout(&quot;UNTRUSTED&quot;)
+setInterval(&quot;UNTRUSTED&quot;)
 
-<span class="token comment">// location 调用恶意代码</span>
-location<span class="token punctuation">.</span>href <span class="token operator">=</span> <span class="token string">'UNTRUSTED'</span>
+// location 调用恶意代码
+location.href = &#39;UNTRUSTED&#39;
 
-<span class="token comment">// eval() 中调用恶意代码</span>
-<span class="token function">eval</span><span class="token punctuation">(</span><span class="token string">"UNTRUSTED"</span><span class="token punctuation">)</span>
-<span class="token operator">&lt;</span><span class="token operator">/</span>script<span class="token operator">></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+// eval() 中调用恶意代码
+eval(&quot;UNTRUSTED&quot;)
+&lt;/script&gt;</code></pre>
 <p>如果项目中有用到这些的话，一定要避免在字符串中拼接不可信数据。</p>
 <h2 id="防御方法二-服务器端过滤（转义）"><a href="#防御方法二-服务器端过滤（转义）" class="headerlink" title="防御方法二 服务器端过滤（转义）"></a>防御方法二 服务器端过滤（转义）</h2><p>XSS的本质就是”恶意注入”，恶意的数据被当成了代码一部分来执行，从而混淆了原本的语义，产生了新的语义。</p>
 <p>服务器端过滤指的是对部分输入的数据进行相应的编码转换，这样就会将输入解读为数据而不是XSS，阻碍了漏洞的执行。编码的转换主要包括HTML实体编码和JavaScript编码：</p>
@@ -201,52 +204,52 @@ location<span class="token punctuation">.</span>href <span class="token operator
 </tbody></table>
 <p>所以要完善 XSS 防护措施，我们要使用更完善更细致的转义策略。</p>
 <p>例如在工程里，常用的转义库为 <code>org.owasp.encoder</code>。以下代码引用自 <a href="https://link.juejin.im/?target=https://www.owasp.org/index.php/OWASP_Java_Encoder_Project%23tab=Use_the_Java_Encoder_Project">org.owasp.encoder 的官方说明</a>。</p>
-<pre class="line-numbers language-html" data-language="html"><code class="language-html"><span class="token comment">&lt;!-- HTML 标签内文字内容 --></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span><span class="token punctuation">></span></span>&lt;%= Encode.forHtml(UNTRUSTED) %><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+<pre><code class="html">&lt;!-- HTML 标签内文字内容 --&gt;
+&lt;div&gt;&lt;%= Encode.forHtml(UNTRUSTED) %&gt;&lt;/div&gt;
 
-<span class="token comment">&lt;!-- HTML 标签属性值 --></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>&lt;%= Encode.forHtml(UNTRUSTED) %><span class="token punctuation">"</span></span> <span class="token punctuation">/></span></span>
+&lt;!-- HTML 标签属性值 --&gt;
+&lt;input value=&quot;&lt;%= Encode.forHtml(UNTRUSTED) %&gt;&quot; /&gt;
 
-<span class="token comment">&lt;!-- CSS 属性值 --></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token style-attr"><span class="token attr-name">style</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token style language-css"><span class="token property">width</span><span class="token punctuation">:</span>&lt;= Encode.<span class="token function">forCssString</span><span class="token punctuation">(</span>UNTRUSTED<span class="token punctuation">)</span> %></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>
+&lt;!-- CSS 属性值 --&gt;
+&lt;div style=&quot;width:&lt;= Encode.forCssString(UNTRUSTED) %&gt;&quot;&gt;
 
-<span class="token comment">&lt;!-- CSS URL --></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token style-attr"><span class="token attr-name">style</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token style language-css"><span class="token property">background</span><span class="token punctuation">:</span>&lt;= Encode.<span class="token function">forCssUrl</span><span class="token punctuation">(</span>UNTRUSTED<span class="token punctuation">)</span> %></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>
+&lt;!-- CSS URL --&gt;
+&lt;div style=&quot;background:&lt;= Encode.forCssUrl(UNTRUSTED) %&gt;&quot;&gt;
 
-<span class="token comment">&lt;!-- JavaScript 内联代码块 --></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
-  <span class="token keyword">var</span> msg <span class="token operator">=</span> <span class="token string">"&lt;%= Encode.forJavaScript(UNTRUSTED) %>"</span><span class="token punctuation">;</span>
-  <span class="token function">alert</span><span class="token punctuation">(</span>msg<span class="token punctuation">)</span><span class="token punctuation">;</span>
-</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
+&lt;!-- JavaScript 内联代码块 --&gt;
+&lt;script&gt;
+  var msg = &quot;&lt;%= Encode.forJavaScript(UNTRUSTED) %&gt;&quot;;
+  alert(msg);
+&lt;/script&gt;
 
-<span class="token comment">&lt;!-- JavaScript 内联代码块内嵌 JSON --></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
-<span class="token keyword">var</span> __INITIAL_STATE__ <span class="token operator">=</span> <span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">parse</span><span class="token punctuation">(</span><span class="token string">'&lt;%= Encoder.forJavaScript(data.to_json) %>'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
+&lt;!-- JavaScript 内联代码块内嵌 JSON --&gt;
+&lt;script&gt;
+var __INITIAL_STATE__ = JSON.parse(&#39;&lt;%= Encoder.forJavaScript(data.to_json) %&gt;&#39;);
+&lt;/script&gt;
 
-<span class="token comment">&lt;!-- HTML 标签内联监听器 --></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span>
-  <span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>alert(<span class="token punctuation">'</span>&lt;%= Encode.forJavaScript(UNTRUSTED) %><span class="token punctuation">'</span>);<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+&lt;!-- HTML 标签内联监听器 --&gt;
+&lt;button
+  onclick=&quot;alert(&#39;&lt;%= Encode.forJavaScript(UNTRUSTED) %&gt;&#39;);&quot;&gt;
   click me
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
+&lt;/button&gt;
 
-<span class="token comment">&lt;!-- URL 参数 --></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>/search?value=&lt;%= Encode.forUriComponent(UNTRUSTED) %>&amp;order=1#top<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+&lt;!-- URL 参数 --&gt;
+&lt;a href=&quot;/search?value=&lt;%= Encode.forUriComponent(UNTRUSTED) %&gt;&amp;order=1#top&quot;&gt;
 
-<span class="token comment">&lt;!-- URL 路径 --></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>/page/&lt;%= Encode.forUriComponent(UNTRUSTED) %><span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+&lt;!-- URL 路径 --&gt;
+&lt;a href=&quot;/page/&lt;%= Encode.forUriComponent(UNTRUSTED) %&gt;&quot;&gt;
 
-<span class="token comment">&lt;!--
+&lt;!--
   URL.
-  注意：要根据项目情况进行过滤，禁止掉 "javascript:" 链接、非法 scheme 等
---></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">'</span>&lt;%=
+  注意：要根据项目情况进行过滤，禁止掉 &quot;javascript:&quot; 链接、非法 scheme 等
+--&gt;
+&lt;a href=&#39;&lt;%=
   urlValidator.isValid(UNTRUSTED) ?
     Encode.forHtml(UNTRUSTED) :
-    <span class="token punctuation">"</span>/404<span class="token punctuation">"</span>
-%><span class="token punctuation">'</span></span><span class="token punctuation">></span></span>
+    &quot;/404&quot;
+%&gt;&#39;&gt;
   link
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>a</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+&lt;/a&gt;</code></pre>
 <p>可见，HTML 的编码是十分复杂的，在不同的上下文里要使用相应的转义规则。开发人员要注意在正确的地方使用正确的编码方式，有时为了防御XSS，在一个地方我们需要联合<code>HTMLEncode、JavaScriptEncode</code>进行编码，甚至是叠加，并不是固定一种方式编码。具体在哪种地方使用哪种编转义可以总结如下：</p>
 <ol>
 <li><p> <strong>在HTML标签、属性中输出</strong>——用HTMLEncode</p>
@@ -285,7 +288,7 @@ location<span class="token punctuation">.</span>href <span class="token operator
 </li>
 </ul>
 <p>想要启用CSP主要可以使用两种方式，一种是通过网页的<code>\&lt;meta&gt;</code>标签。</p>
-<pre class="line-numbers language-html" data-language="html"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">http-equiv</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>Content-Security-Policy<span class="token punctuation">"</span></span> <span class="token attr-name">content</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>script-src <span class="token punctuation">'</span>self<span class="token punctuation">'</span>; object-src <span class="token punctuation">'</span>none<span class="token punctuation">'</span>; style-src cdn.example.org third-party.org; child-src https:<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre><code class="html">&lt;meta http-equiv=&quot;Content-Security-Policy&quot; content=&quot;script-src &#39;self&#39;; object-src &#39;none&#39;; style-src cdn.example.org third-party.org; child-src https:&quot;&gt;</code></pre>
 <p>在上面代码中，CSP 做了如下配置：</p>
 <ul>
 <li><p>  脚本：只信任当前域名</p>
@@ -304,7 +307,7 @@ location<span class="token punctuation">.</span>href <span class="token operator
 <p>CSP作为一种安全策略，浏览器对它响应头的兼容性也是随着版本的更迭逐渐扩大的，早期的 Chrome 是通过 X-WebKit-CSP 响应头来支持 CSP 的，而 firefox 和 IE 则支持 X-Content-Security-Policy，Chrome25 和 Firefox23 开始支持标准的 Content-Security-Policy。现有的主流浏览器不同版本号对于CSP响应头的兼容性如下图所示：</p>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6bo6s320zj31c40p4481.jpg" alt="image-20190825093247902"></p>
 <p>要使用 CSP，只需要服务端输出类似这样的响应头就行了：</p>
-<pre class="line-numbers language-html" data-language="html"><code class="language-html">Content-Security-Policy: default-src 'self'<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre><code class="html">Content-Security-Policy: default-src &#39;self&#39;</code></pre>
 <p>在这个响应头之中<code>default-src</code> 是 CSP 指令，多个指令之间用英文分号分割；<code>&#39;self&#39; </code>是指令值，多个指令值用英文空格分割。</p>
 <p>目前，有这些 CSP 指令：</p>
 <table>
@@ -451,22 +454,22 @@ location<span class="token punctuation">.</span>href <span class="token operator
 </blockquote>
 <p>x-xss-protection头很容易实现，只需要轻微的Web服务器配置的变化。</p>
 <p><strong>在Nginx中启用</strong></p>
-<pre class="line-numbers language-nginx" data-language="nginx"><code class="language-nginx"><span class="token keyword">add_header</span> x<span class="token operator">-</span>xss<span class="token operator">-</span>protection <span class="token string">"1; mode=block"</span> always<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre><code class="nginx">add_header x-xss-protection &quot;1; mode=block&quot; always;</code></pre>
 <p><strong>在Apache中启用</strong></p>
-<pre class="line-numbers language-php" data-language="php"><code class="language-php">header always set x<span class="token operator">-</span>xss<span class="token operator">-</span>protection <span class="token string double-quoted-string">"1; mode=block"</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre><code class="php">header always set x-xss-protection &quot;1; mode=block&quot;</code></pre>
 <p><strong>在IIS上启用</strong></p>
 <p>要在IIS上启用，只需以下代码添加到您网站的Web.config文件中即可。</p>
-<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token operator">&lt;</span>system<span class="token operator">.</span>webServer<span class="token operator">></span>
-    <span class="token operator">...</span>
+<pre><code class="php">&lt;system.webServer&gt;
+    ...
 
-    <span class="token operator">&lt;</span>httpProtocol<span class="token operator">></span>
-        <span class="token operator">&lt;</span>customHeaders<span class="token operator">></span>
-            <span class="token operator">&lt;</span>add name<span class="token operator">=</span><span class="token string double-quoted-string">"X-XSS-Protection"</span> value<span class="token operator">=</span><span class="token string double-quoted-string">"1; mode=block"</span> <span class="token operator">/</span><span class="token operator">></span>
-        <span class="token operator">&lt;</span><span class="token operator">/</span>customHeaders<span class="token operator">></span>
-    <span class="token operator">&lt;</span><span class="token operator">/</span>httpProtocol<span class="token operator">></span>
+    &lt;httpProtocol&gt;
+        &lt;customHeaders&gt;
+            &lt;add name=&quot;X-XSS-Protection&quot; value=&quot;1; mode=block&quot; /&gt;
+        &lt;/customHeaders&gt;
+    &lt;/httpProtocol&gt;
 
-    <span class="token operator">...</span>
-<span class="token operator">&lt;</span><span class="token operator">/</span>system<span class="token operator">.</span>webServer<span class="token operator">></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    ...
+&lt;/system.webServer&gt;</code></pre>
 <p>在进行配置之后，还需要检查以确保x-xss-protection头确实已经被启用。以下是一些快速检查的简单方法：</p>
 <ol>
 <li> 打开Chrome DevTools中的网络选项卡，如果您的站点使用安全标头，它将显示在标题选项卡内。</li>
@@ -519,16 +522,16 @@ location<span class="token punctuation">.</span>href <span class="token operator
 <p>下图是OWASP中所列XSSer的运作流程：</p>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6bomjsj42j314p0u0thz.jpg" alt="image-20190825094756457"></p>
 <p>XSSer可在许多平台上运行。它需要Python和以下库：</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token operator">-</span> python<span class="token operator">-</span>pycurl <span class="token operator">-</span> Python bindings to libcurl
-<span class="token operator">-</span> python<span class="token operator">-</span>xmlbuilder <span class="token operator">-</span> create xml<span class="token operator">/</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span>html files <span class="token operator">-</span> Python <span class="token number">2.</span>x
-<span class="token operator">-</span> python<span class="token operator">-</span>beautifulsoup <span class="token operator">-</span> error<span class="token operator">-</span>tolerant HTML parser <span class="token keyword">for</span> Python
-<span class="token operator">-</span> python<span class="token operator">-</span>geoip <span class="token operator">-</span> Python bindings <span class="token keyword">for</span> the GeoIP IP<span class="token operator">-</span>to<span class="token operator">-</span>country resolver library<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<pre><code class="python">- python-pycurl - Python bindings to libcurl
+- python-xmlbuilder - create xml/(x)html files - Python 2.x
+- python-beautifulsoup - error-tolerant HTML parser for Python
+- python-geoip - Python bindings for the GeoIP IP-to-country resolver library</code></pre>
 <p>若在基于Debian的系统上安装需要：</p>
-<pre class="line-numbers language-none"><code class="language-none">sudo apt-get install python-pycurl python-xmlbuilder python-beautifulsoup python-geoip<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre><code>sudo apt-get install python-pycurl python-xmlbuilder python-beautifulsoup python-geoip</code></pre>
 <p>利用”xsser -h”可以列出所有功能XSSer包：</p>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6booea5q7j30jc0cv3zo.jpg" alt="img"></p>
 <p>若要发起简单的XSS注入攻击可用：</p>
-<pre class="line-numbers language-none"><code class="language-none">root @ kali ：〜＃xsser -u“http:&#x2F;&#x2F;192.168.169.130&#x2F;xss&#x2F;example1.php?name&#x3D;hacker”<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre><code>root @ kali ：〜＃xsser -u“http://192.168.169.130/xss/example1.php?name=hacker”</code></pre>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6bopcyo2ij30jc0g3ta7.jpg" alt="img"></p>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6bopzvbulj30jc0g375l.jpg" alt="img"></p>
 <p>XSSer的主要特点是：</p>

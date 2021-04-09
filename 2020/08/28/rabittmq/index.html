@@ -32,39 +32,37 @@ ga('send', 'pageview');</script><!-- End Google Analytics -->
 <h3 id="教程1：简单一对一"><a href="#教程1：简单一对一" class="headerlink" title="教程1：简单一对一"></a>教程1：简单一对一</h3><p>生产者与消费者通过队列（queue）进行信息的传输</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi6ad02mhfj30le06maa8.jpg" alt="image-20200814175736145"></p>
 <p>生产者</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment">#!/usr/bin/env python</span>
-<span class="token keyword">import</span> pika
+<pre><code class="python">#!/usr/bin/env python
+import pika
 
-connection <span class="token operator">=</span> pika<span class="token punctuation">.</span>BlockingConnection<span class="token punctuation">(</span>pika<span class="token punctuation">.</span>ConnectionParameters<span class="token punctuation">(</span><span class="token string">'localhost'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-channel <span class="token operator">=</span> connection<span class="token punctuation">.</span>channel<span class="token punctuation">(</span><span class="token punctuation">)</span>
-channel<span class="token punctuation">.</span>queue_declare<span class="token punctuation">(</span>queue<span class="token operator">=</span><span class="token string">'hello'</span><span class="token punctuation">)</span>
-channel<span class="token punctuation">.</span>basic_publish<span class="token punctuation">(</span>exchange<span class="token operator">=</span><span class="token string">''</span><span class="token punctuation">,</span>
-                      routing_key<span class="token operator">=</span><span class="token string">'hello'</span><span class="token punctuation">,</span>
-                      body<span class="token operator">=</span><span class="token string">'Hello World!'</span><span class="token punctuation">)</span>
-<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">" [x] Sent 'Hello World!'"</span><span class="token punctuation">)</span>
-connection<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+connection = pika.BlockingConnection(pika.ConnectionParameters(&#39;localhost&#39;))
+channel = connection.channel()
+channel.queue_declare(queue=&#39;hello&#39;)
+channel.basic_publish(exchange=&#39;&#39;,
+                      routing_key=&#39;hello&#39;,
+                      body=&#39;Hello World!&#39;)
+print(&quot; [x] Sent &#39;Hello World!&#39;&quot;)
+connection.close()</code></pre>
 <p>消费者</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment">#!/usr/bin/env python</span>
-<span class="token keyword">import</span> pika
+<pre><code class="python">#!/usr/bin/env python
+import pika
 
-connection <span class="token operator">=</span> pika<span class="token punctuation">.</span>BlockingConnection<span class="token punctuation">(</span>
-    pika<span class="token punctuation">.</span>ConnectionParameters<span class="token punctuation">(</span>host<span class="token operator">=</span><span class="token string">'localhost'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-channel <span class="token operator">=</span> connection<span class="token punctuation">.</span>channel<span class="token punctuation">(</span><span class="token punctuation">)</span>
+connection = pika.BlockingConnection(
+    pika.ConnectionParameters(host=&#39;localhost&#39;))
+channel = connection.channel()
 
-channel<span class="token punctuation">.</span>queue_declare<span class="token punctuation">(</span>queue<span class="token operator">=</span><span class="token string">'hello'</span><span class="token punctuation">)</span>
-
-
-<span class="token keyword">def</span> <span class="token function">callback</span><span class="token punctuation">(</span>ch<span class="token punctuation">,</span> method<span class="token punctuation">,</span> properties<span class="token punctuation">,</span> body<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">" [x] Received %r"</span> <span class="token operator">%</span> body<span class="token punctuation">)</span>
+channel.queue_declare(queue=&#39;hello&#39;)
 
 
-channel<span class="token punctuation">.</span>basic_consume<span class="token punctuation">(</span>
-    queue<span class="token operator">=</span><span class="token string">'hello'</span><span class="token punctuation">,</span> on_message_callback<span class="token operator">=</span>callback<span class="token punctuation">,</span> auto_ack<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
-
-<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">' [*] Waiting for messages. To exit press CTRL+C'</span><span class="token punctuation">)</span>
-channel<span class="token punctuation">.</span>start_consuming<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+def callback(ch, method, properties, body):
+    print(&quot; [x] Received %r&quot; % body)
 
 
+channel.basic_consume(
+    queue=&#39;hello&#39;, on_message_callback=callback, auto_ack=True)
+
+print(&#39; [*] Waiting for messages. To exit press CTRL+C&#39;)
+channel.start_consuming()</code></pre>
 <h3 id="教程2：work工作队列"><a href="#教程2：work工作队列" class="headerlink" title="教程2：work工作队列"></a>教程2：work工作队列</h3><p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi6ad0pkmhj30kt084jru.jpg" alt="image-20200815111838307"></p>
 <p>把任务均匀分给别人，按照worker的数量完全平均分配</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi6ad13qmaj31fh059wek.jpg" alt="image-20200815111954847"></p>
@@ -72,77 +70,73 @@ channel<span class="token punctuation">.</span>start_consuming<span class="token
 <p>我们把<code>auto_ack=True</code>的选项删除，在加上<code>ch.basic_ack（delivery_tag = method.delivery_tag）</code>开始手动消息确认，这样如果任务死了，会紧接着传递给下一个人</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi6actz3a2j31fl03774c.jpg" alt="image-20200815112613770"></p>
 <p>但是RabbitMQ退出或崩溃时，它将忘记队列和消息，为了确保该队列将在RabbitMQ节点重启后继续存在，需要将其声明为<em>持久</em></p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python">channel<span class="token punctuation">.</span>queue_declare<span class="token punctuation">(</span>queue<span class="token operator">=</span><span class="token string">'hello'</span><span class="token punctuation">,</span> durable<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre><code class="python">channel.queue_declare(queue=&#39;hello&#39;, durable=True)</code></pre>
 <p>为了更公平的派遣，而非仅仅是从数量上的一个一个平均分配，更要考虑被分配任务的机器是否正在工作/有空闲的时间</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi6acsrs7gj30pq074aap.jpg" alt="image-20200815113412715"></p>
 <p>为了解决这个问题，我们可以将Channel＃basic_qos通道方法与 prefetch_count = 1设置一起使用。这使用basic.qos协议方法来告诉RabbitMQ一次不向工作人员提供多个消息。换句话说，在处理并确认上一条消息之前，不要将新消息发送给工作人员。而是将其分派给尚不繁忙的下一个工作人员。</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python">channel<span class="token punctuation">.</span>basic_qos<span class="token punctuation">(</span>prefetch_count<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre><code class="python">channel.basic_qos(prefetch_count=1)</code></pre>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi6actj87lj318y051jre.jpg" alt="image-20200815113321909"></p>
 <p>new_task.py</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment">#!/usr/bin/env python</span>
-<span class="token keyword">import</span> pika
-<span class="token keyword">import</span> sys
+<pre><code class="python">#!/usr/bin/env python
+import pika
+import sys
 
-connection <span class="token operator">=</span> pika<span class="token punctuation">.</span>BlockingConnection<span class="token punctuation">(</span>
-    pika<span class="token punctuation">.</span>ConnectionParameters<span class="token punctuation">(</span>host<span class="token operator">=</span><span class="token string">'localhost'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-channel <span class="token operator">=</span> connection<span class="token punctuation">.</span>channel<span class="token punctuation">(</span><span class="token punctuation">)</span>
+connection = pika.BlockingConnection(
+    pika.ConnectionParameters(host=&#39;localhost&#39;))
+channel = connection.channel()
 
-channel<span class="token punctuation">.</span>queue_declare<span class="token punctuation">(</span>queue<span class="token operator">=</span><span class="token string">'task_queue'</span><span class="token punctuation">,</span> durable<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+channel.queue_declare(queue=&#39;task_queue&#39;, durable=True)
 
-message <span class="token operator">=</span> <span class="token string">' '</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>sys<span class="token punctuation">.</span>argv<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token keyword">or</span> <span class="token string">"Hello World!"</span>
-channel<span class="token punctuation">.</span>basic_publish<span class="token punctuation">(</span>
-    exchange<span class="token operator">=</span><span class="token string">''</span><span class="token punctuation">,</span>
-    routing_key<span class="token operator">=</span><span class="token string">'task_queue'</span><span class="token punctuation">,</span>
-    body<span class="token operator">=</span>message<span class="token punctuation">,</span>
-    properties<span class="token operator">=</span>pika<span class="token punctuation">.</span>BasicProperties<span class="token punctuation">(</span>
-        delivery_mode<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">,</span>  <span class="token comment"># make message persistent</span>
-    <span class="token punctuation">)</span><span class="token punctuation">)</span>
-<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">" [x] Sent %r"</span> <span class="token operator">%</span> message<span class="token punctuation">)</span>
-connection<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-
+message = &#39; &#39;.join(sys.argv[1:]) or &quot;Hello World!&quot;
+channel.basic_publish(
+    exchange=&#39;&#39;,
+    routing_key=&#39;task_queue&#39;,
+    body=message,
+    properties=pika.BasicProperties(
+        delivery_mode=2,  # make message persistent
+    ))
+print(&quot; [x] Sent %r&quot; % message)
+connection.close()</code></pre>
 <p>worker.py</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment">#!/usr/bin/env python</span>
-<span class="token keyword">import</span> pika
-<span class="token keyword">import</span> time
+<pre><code class="python">#!/usr/bin/env python
+import pika
+import time
 
-connection <span class="token operator">=</span> pika<span class="token punctuation">.</span>BlockingConnection<span class="token punctuation">(</span>
-    pika<span class="token punctuation">.</span>ConnectionParameters<span class="token punctuation">(</span>host<span class="token operator">=</span><span class="token string">'localhost'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-channel <span class="token operator">=</span> connection<span class="token punctuation">.</span>channel<span class="token punctuation">(</span><span class="token punctuation">)</span>
+connection = pika.BlockingConnection(
+    pika.ConnectionParameters(host=&#39;localhost&#39;))
+channel = connection.channel()
 
-channel<span class="token punctuation">.</span>queue_declare<span class="token punctuation">(</span>queue<span class="token operator">=</span><span class="token string">'task_queue'</span><span class="token punctuation">,</span> durable<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
-<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">' [*] Waiting for messages. To exit press CTRL+C'</span><span class="token punctuation">)</span>
-
-
-<span class="token keyword">def</span> <span class="token function">callback</span><span class="token punctuation">(</span>ch<span class="token punctuation">,</span> method<span class="token punctuation">,</span> properties<span class="token punctuation">,</span> body<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">" [x] Received %r"</span> <span class="token operator">%</span> body<span class="token punctuation">)</span>
-    time<span class="token punctuation">.</span>sleep<span class="token punctuation">(</span>body<span class="token punctuation">.</span>count<span class="token punctuation">(</span><span class="token string">b'.'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">" [x] Done"</span><span class="token punctuation">)</span>
-    ch<span class="token punctuation">.</span>basic_ack<span class="token punctuation">(</span>delivery_tag<span class="token operator">=</span>method<span class="token punctuation">.</span>delivery_tag<span class="token punctuation">)</span>
+channel.queue_declare(queue=&#39;task_queue&#39;, durable=True)
+print(&#39; [*] Waiting for messages. To exit press CTRL+C&#39;)
 
 
-channel<span class="token punctuation">.</span>basic_qos<span class="token punctuation">(</span>prefetch_count<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">)</span>
-channel<span class="token punctuation">.</span>basic_consume<span class="token punctuation">(</span>queue<span class="token operator">=</span><span class="token string">'task_queue'</span><span class="token punctuation">,</span> on_message_callback<span class="token operator">=</span>callback<span class="token punctuation">)</span>
+def callback(ch, method, properties, body):
+    print(&quot; [x] Received %r&quot; % body)
+    time.sleep(body.count(b&#39;.&#39;))
+    print(&quot; [x] Done&quot;)
+    ch.basic_ack(delivery_tag=method.delivery_tag)
 
-channel<span class="token punctuation">.</span>start_consuming<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
+channel.basic_qos(prefetch_count=1)
+channel.basic_consume(queue=&#39;task_queue&#39;, on_message_callback=callback)
 
+channel.start_consuming()</code></pre>
 <h3 id="教程3：发布与订阅"><a href="#教程3：发布与订阅" class="headerlink" title="教程3：发布与订阅"></a>教程3：发布与订阅</h3><p>RabbitMQ消息传递模型的核心思想是生产者从不将任何消息直接发送到队列。实际上，生产者经常甚至根本不知道是否将消息传递到任何队列。</p>
 <p>相反，生产者只能将消息发送到<em>交换机</em>。交流是一件非常简单的事情。一方面，它接收来自生产者的消息，另一方面，将它们推入队列，<em>交换机</em>必须确切知道如何处理收到的消息。</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi6acz6tcfj30n007z0t0.jpg" alt="image-20200815114302592"></p>
 <p>有几种交换类型可用：direct，topic，headers 和fanout，这里主要讨论fanout扇区，我们创建一个exchange称之为log</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python">channel<span class="token punctuation">.</span>exchange_declare<span class="token punctuation">(</span>exchange<span class="token operator">=</span><span class="token string">'logs'</span><span class="token punctuation">,</span>
-                         exchange_type<span class="token operator">=</span><span class="token string">'fanout'</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre><code class="python">channel.exchange_declare(exchange=&#39;logs&#39;,
+                         exchange_type=&#39;fanout&#39;)</code></pre>
 <p>扇出交换指的是将接收到的所有消息广播到它知道的所有队列中</p>
 <p>无论何时连接到Rabbit，我们都需要一个全新的空队列。为此，我们可以创建一个具有随机名称的队列，或者甚至更好-让服务器为我们选择一个随机队列名称。我们可以通过为queue_declare提供空的queue参数来做到这一点</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python">result <span class="token operator">=</span> channel<span class="token punctuation">.</span>queue_declare<span class="token punctuation">(</span>queue<span class="token operator">=</span><span class="token string">''</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre><code class="python">result = channel.queue_declare(queue=&#39;&#39;)</code></pre>
 <p><code>result.method.queue</code>包含一个随机队列名称，它可能看起来像<code>amq.gen-JzTY20BRgKO-HjmUJj0wLg</code></p>
 <p>其次，一旦使用方连接关闭，则应删除队列。有一个<code>exclusive</code>标志：</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python">result <span class="token operator">=</span> channel<span class="token punctuation">.</span>queue_declare<span class="token punctuation">(</span>queue<span class="token operator">=</span><span class="token string">''</span><span class="token punctuation">,</span> exclusive<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre><code class="python">result = channel.queue_declare(queue=&#39;&#39;, exclusive=True)</code></pre>
 <p>我们已经创建了一个扇出交换和一个队列，现在我们需要告诉交换机将消息发送到我们的队列，交换和队列之间的关系称为<em>绑定 binding</em>。</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi6aczl8dvj30lh07wmxh.jpg" alt="image-20200815120339203"></p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python">channel<span class="token punctuation">.</span>queue_bind<span class="token punctuation">(</span>exchange<span class="token operator">=</span><span class="token string">'logs'</span><span class="token punctuation">,</span>
-                   queue<span class="token operator">=</span>result<span class="token punctuation">.</span>method<span class="token punctuation">.</span>queue<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre><code class="python">channel.queue_bind(exchange=&#39;logs&#39;,
+                   queue=result.method.queue)</code></pre>
 <p><img src="https://i.loli.net/2020/08/15/oQXLHDpbWGESK1q.png" alt="image-20200815135453038"></p>
 <p>exchange里的log</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi6acugqsdj30z406fmxb.jpg" alt="image-20200815135559756"></p>
@@ -151,46 +145,44 @@ channel<span class="token punctuation">.</span>start_consuming<span class="token
 <p>在发送消息结束之后，两个队列会自动取消</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi6acy7ccmj31a00gmjs3.jpg" alt="image-20200815135917845"></p>
 <p>receive_logs.py</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment">#!/usr/bin/env python</span>
-<span class="token keyword">import</span> pika
+<pre><code class="python">#!/usr/bin/env python
+import pika
 
-connection <span class="token operator">=</span> pika<span class="token punctuation">.</span>BlockingConnection<span class="token punctuation">(</span>
-    pika<span class="token punctuation">.</span>ConnectionParameters<span class="token punctuation">(</span>host<span class="token operator">=</span><span class="token string">'localhost'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-channel <span class="token operator">=</span> connection<span class="token punctuation">.</span>channel<span class="token punctuation">(</span><span class="token punctuation">)</span>
+connection = pika.BlockingConnection(
+    pika.ConnectionParameters(host=&#39;localhost&#39;))
+channel = connection.channel()
 
-channel<span class="token punctuation">.</span>exchange_declare<span class="token punctuation">(</span>exchange<span class="token operator">=</span><span class="token string">'logs'</span><span class="token punctuation">,</span> exchange_type<span class="token operator">=</span><span class="token string">'fanout'</span><span class="token punctuation">)</span>
+channel.exchange_declare(exchange=&#39;logs&#39;, exchange_type=&#39;fanout&#39;)
 
-result <span class="token operator">=</span> channel<span class="token punctuation">.</span>queue_declare<span class="token punctuation">(</span>queue<span class="token operator">=</span><span class="token string">''</span><span class="token punctuation">,</span> exclusive<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
-queue_name <span class="token operator">=</span> result<span class="token punctuation">.</span>method<span class="token punctuation">.</span>queue
+result = channel.queue_declare(queue=&#39;&#39;, exclusive=True)
+queue_name = result.method.queue
 
-channel<span class="token punctuation">.</span>queue_bind<span class="token punctuation">(</span>exchange<span class="token operator">=</span><span class="token string">'logs'</span><span class="token punctuation">,</span> queue<span class="token operator">=</span>queue_name<span class="token punctuation">)</span>
+channel.queue_bind(exchange=&#39;logs&#39;, queue=queue_name)
 
-<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">' [*] Waiting for logs. To exit press CTRL+C'</span><span class="token punctuation">)</span>
+print(&#39; [*] Waiting for logs. To exit press CTRL+C&#39;)
 
-<span class="token keyword">def</span> <span class="token function">callback</span><span class="token punctuation">(</span>ch<span class="token punctuation">,</span> method<span class="token punctuation">,</span> properties<span class="token punctuation">,</span> body<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">" [x] %r"</span> <span class="token operator">%</span> body<span class="token punctuation">)</span>
+def callback(ch, method, properties, body):
+    print(&quot; [x] %r&quot; % body)
 
-channel<span class="token punctuation">.</span>basic_consume<span class="token punctuation">(</span>
-    queue<span class="token operator">=</span>queue_name<span class="token punctuation">,</span> on_message_callback<span class="token operator">=</span>callback<span class="token punctuation">,</span> auto_ack<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+channel.basic_consume(
+    queue=queue_name, on_message_callback=callback, auto_ack=True)
 
-channel<span class="token punctuation">.</span>start_consuming<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+channel.start_consuming()</code></pre>
 <p>emit_log.py</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment">#!/usr/bin/env python</span>
-<span class="token keyword">import</span> pika
-<span class="token keyword">import</span> sys
+<pre><code class="python">#!/usr/bin/env python
+import pika
+import sys
 
-connection <span class="token operator">=</span> pika<span class="token punctuation">.</span>BlockingConnection<span class="token punctuation">(</span>
-    pika<span class="token punctuation">.</span>ConnectionParameters<span class="token punctuation">(</span>host<span class="token operator">=</span><span class="token string">'localhost'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-channel <span class="token operator">=</span> connection<span class="token punctuation">.</span>channel<span class="token punctuation">(</span><span class="token punctuation">)</span>
+connection = pika.BlockingConnection(
+    pika.ConnectionParameters(host=&#39;localhost&#39;))
+channel = connection.channel()
 
-channel<span class="token punctuation">.</span>exchange_declare<span class="token punctuation">(</span>exchange<span class="token operator">=</span><span class="token string">'logs'</span><span class="token punctuation">,</span> exchange_type<span class="token operator">=</span><span class="token string">'fanout'</span><span class="token punctuation">)</span>
+channel.exchange_declare(exchange=&#39;logs&#39;, exchange_type=&#39;fanout&#39;)
 
-message <span class="token operator">=</span> <span class="token string">' '</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>sys<span class="token punctuation">.</span>argv<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token keyword">or</span> <span class="token string">"info: Hello World!"</span>
-channel<span class="token punctuation">.</span>basic_publish<span class="token punctuation">(</span>exchange<span class="token operator">=</span><span class="token string">'logs'</span><span class="token punctuation">,</span> routing_key<span class="token operator">=</span><span class="token string">''</span><span class="token punctuation">,</span> body<span class="token operator">=</span>message<span class="token punctuation">)</span>
-<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">" [x] Sent %r"</span> <span class="token operator">%</span> message<span class="token punctuation">)</span>
-connection<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-
+message = &#39; &#39;.join(sys.argv[1:]) or &quot;info: Hello World!&quot;
+channel.basic_publish(exchange=&#39;logs&#39;, routing_key=&#39;&#39;, body=message)
+print(&quot; [x] Sent %r&quot; % message)
+connection.close()</code></pre>
 <h3 id="教程4：更加复杂的订阅系统"><a href="#教程4：更加复杂的订阅系统" class="headerlink" title="教程4：更加复杂的订阅系统"></a>教程4：更加复杂的订阅系统</h3><p>在教程三的基础上增加功能，使仅订阅消息的子集成为可能</p>
 <p>Direct exchange直接交换</p>
 <p>上一教程中的日志系统将所有消息广播给所有使用者，想要扩展它以允许根据邮件的严重性过滤邮件。例如，我们可能希望将日志消息写入磁盘的脚本仅接收严重错误，而不会在警告或信息日志消息上浪费磁盘空间。</p>
@@ -204,56 +196,56 @@ connection<span class="token punctuation">.</span>close<span class="token punctu
 <p>将以上的运用在我们的信息系统之中</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi6acxq03uj30qv0badgz.jpg" alt="image-20200815144536340"></p>
 <p>emit_log_direct.py</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment">#!/usr/bin/env python</span>
-<span class="token keyword">import</span> pika
-<span class="token keyword">import</span> sys
+<pre><code class="python">#!/usr/bin/env python
+import pika
+import sys
 
-connection <span class="token operator">=</span> pika<span class="token punctuation">.</span>BlockingConnection<span class="token punctuation">(</span>
-    pika<span class="token punctuation">.</span>ConnectionParameters<span class="token punctuation">(</span>host<span class="token operator">=</span><span class="token string">'localhost'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-channel <span class="token operator">=</span> connection<span class="token punctuation">.</span>channel<span class="token punctuation">(</span><span class="token punctuation">)</span>
+connection = pika.BlockingConnection(
+    pika.ConnectionParameters(host=&#39;localhost&#39;))
+channel = connection.channel()
 
-channel<span class="token punctuation">.</span>exchange_declare<span class="token punctuation">(</span>exchange<span class="token operator">=</span><span class="token string">'direct_logs'</span><span class="token punctuation">,</span> exchange_type<span class="token operator">=</span><span class="token string">'direct'</span><span class="token punctuation">)</span>
+channel.exchange_declare(exchange=&#39;direct_logs&#39;, exchange_type=&#39;direct&#39;)
 
-severity <span class="token operator">=</span> sys<span class="token punctuation">.</span>argv<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>sys<span class="token punctuation">.</span>argv<span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">1</span> <span class="token keyword">else</span> <span class="token string">'info'</span>
-message <span class="token operator">=</span> <span class="token string">' '</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>sys<span class="token punctuation">.</span>argv<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token keyword">or</span> <span class="token string">'Hello World!'</span>
-channel<span class="token punctuation">.</span>basic_publish<span class="token punctuation">(</span>
-    exchange<span class="token operator">=</span><span class="token string">'direct_logs'</span><span class="token punctuation">,</span> routing_key<span class="token operator">=</span>severity<span class="token punctuation">,</span> body<span class="token operator">=</span>message<span class="token punctuation">)</span>
-<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">" [x] Sent %r:%r"</span> <span class="token operator">%</span> <span class="token punctuation">(</span>severity<span class="token punctuation">,</span> message<span class="token punctuation">)</span><span class="token punctuation">)</span>
-connection<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+severity = sys.argv[1] if len(sys.argv) &gt; 1 else &#39;info&#39;
+message = &#39; &#39;.join(sys.argv[2:]) or &#39;Hello World!&#39;
+channel.basic_publish(
+    exchange=&#39;direct_logs&#39;, routing_key=severity, body=message)
+print(&quot; [x] Sent %r:%r&quot; % (severity, message))
+connection.close()</code></pre>
 <p>receive_logs_direct.py</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment">#!/usr/bin/env python</span>
-<span class="token keyword">import</span> pika
-<span class="token keyword">import</span> sys
+<pre><code class="python">#!/usr/bin/env python
+import pika
+import sys
 
-connection <span class="token operator">=</span> pika<span class="token punctuation">.</span>BlockingConnection<span class="token punctuation">(</span>
-    pika<span class="token punctuation">.</span>ConnectionParameters<span class="token punctuation">(</span>host<span class="token operator">=</span><span class="token string">'localhost'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-channel <span class="token operator">=</span> connection<span class="token punctuation">.</span>channel<span class="token punctuation">(</span><span class="token punctuation">)</span>
+connection = pika.BlockingConnection(
+    pika.ConnectionParameters(host=&#39;localhost&#39;))
+channel = connection.channel()
 
-channel<span class="token punctuation">.</span>exchange_declare<span class="token punctuation">(</span>exchange<span class="token operator">=</span><span class="token string">'direct_logs'</span><span class="token punctuation">,</span> exchange_type<span class="token operator">=</span><span class="token string">'direct'</span><span class="token punctuation">)</span>
+channel.exchange_declare(exchange=&#39;direct_logs&#39;, exchange_type=&#39;direct&#39;)
 
-result <span class="token operator">=</span> channel<span class="token punctuation">.</span>queue_declare<span class="token punctuation">(</span>queue<span class="token operator">=</span><span class="token string">''</span><span class="token punctuation">,</span> exclusive<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
-queue_name <span class="token operator">=</span> result<span class="token punctuation">.</span>method<span class="token punctuation">.</span>queue
+result = channel.queue_declare(queue=&#39;&#39;, exclusive=True)
+queue_name = result.method.queue
 
-severities <span class="token operator">=</span> sys<span class="token punctuation">.</span>argv<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token punctuation">]</span>
-<span class="token keyword">if</span> <span class="token keyword">not</span> severities<span class="token punctuation">:</span>
-    sys<span class="token punctuation">.</span>stderr<span class="token punctuation">.</span>write<span class="token punctuation">(</span><span class="token string">"Usage: %s [info] [warning] [error]\n"</span> <span class="token operator">%</span> sys<span class="token punctuation">.</span>argv<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-    sys<span class="token punctuation">.</span>exit<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+severities = sys.argv[1:]
+if not severities:
+    sys.stderr.write(&quot;Usage: %s [info] [warning] [error]\n&quot; % sys.argv[0])
+    sys.exit(1)
 
-<span class="token keyword">for</span> severity <span class="token keyword">in</span> severities<span class="token punctuation">:</span>
-    channel<span class="token punctuation">.</span>queue_bind<span class="token punctuation">(</span>
-        exchange<span class="token operator">=</span><span class="token string">'direct_logs'</span><span class="token punctuation">,</span> queue<span class="token operator">=</span>queue_name<span class="token punctuation">,</span> routing_key<span class="token operator">=</span>severity<span class="token punctuation">)</span>
+for severity in severities:
+    channel.queue_bind(
+        exchange=&#39;direct_logs&#39;, queue=queue_name, routing_key=severity)
 
-<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">' [*] Waiting for logs. To exit press CTRL+C'</span><span class="token punctuation">)</span>
-
-
-<span class="token keyword">def</span> <span class="token function">callback</span><span class="token punctuation">(</span>ch<span class="token punctuation">,</span> method<span class="token punctuation">,</span> properties<span class="token punctuation">,</span> body<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">" [x] %r:%r"</span> <span class="token operator">%</span> <span class="token punctuation">(</span>method<span class="token punctuation">.</span>routing_key<span class="token punctuation">,</span> body<span class="token punctuation">)</span><span class="token punctuation">)</span>
+print(&#39; [*] Waiting for logs. To exit press CTRL+C&#39;)
 
 
-channel<span class="token punctuation">.</span>basic_consume<span class="token punctuation">(</span>
-    queue<span class="token operator">=</span>queue_name<span class="token punctuation">,</span> on_message_callback<span class="token operator">=</span>callback<span class="token punctuation">,</span> auto_ack<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+def callback(ch, method, properties, body):
+    print(&quot; [x] %r:%r&quot; % (method.routing_key, body))
 
-channel<span class="token punctuation">.</span>start_consuming<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+channel.basic_consume(
+    queue=queue_name, on_message_callback=callback, auto_ack=True)
+
+channel.start_consuming()</code></pre>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi6acyoj8pj31fp07ewfg.jpg" alt="image-20200815145732667"></p>
 <h3 id="教程5-更复杂的topic交换"><a href="#教程5-更复杂的topic交换" class="headerlink" title="教程5 更复杂的topic交换"></a>教程5 更复杂的topic交换</h3><p><code>direct</code>虽然相比<code>sanout</code>有了更加好的功能性，但仍有局限性，无法基于多个条件进行路由。</p>
 <p>例如我们可能只想听听来自’cron’的严重错误，也可以听听’kern’的所有日志，为了实现类似的功能我们就需要<code>topic</code></p>
