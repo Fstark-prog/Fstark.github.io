@@ -264,18 +264,18 @@ ga('send', 'pageview');</script><!-- End Google Analytics -->
 </ul>
 </li>
 <li>使用AFL对其进行编译<ul>
-<li>CC=afl-gccCFLAGS=”-g -fsanitize=address -fno-omit-frame-pointer” LDFLAGS=”-g -fsanitize=address -fno-omit-frame-pointer” ./configure</li>
+<li>CC=afl-gcc CFLAGS=”-g -fsanitize=address -fno-omit-frame-pointer” LDFLAGS=”-g -fsanitize=address -fno-omit-frame-pointer” ./configure</li>
 <li>sudo make &amp;&amp; make install</li>
 </ul>
 </li>
 <li>语料库从哪来？？<ul>
 <li>查看一下项目自带的test文件夹</li>
 <li>收集别的符合条件的文件，比如issue页面</li>
-<li>精简它们：afl-cmin–itests –o mincorpus–m none –./tcpdump–vv–ee–nnr@@</li>
+<li>精简它们：afl-cmin–i tests –o mincorpus –m none –./tcpdump –vv –ee –nnr @@</li>
 </ul>
 </li>
 <li>Fuzz 它<ul>
-<li>afl-fuzz –I mincorpus–o fuzzoutput–m none –./tcpdump–vv–ee–nnr@@</li>
+<li>afl-fuzz –I mincorpus –o fuzzoutput –m none – ./tcpdump –vv –ee –nnr @@</li>
 </ul>
 </li>
 </ul>
@@ -299,7 +299,7 @@ ga('send', 'pageview');</script><!-- End Google Analytics -->
 </ul>
 </li>
 <li>Fuzz 它们<ul>
-<li>afl-fuzz –i <input> -o fuzzoutput –m none – tiff2rgba @@ test.tiff</li>
+<li>afl-fuzz –i &lt;*input&gt; -o fuzzoutput –m none – tiff2rgba @@ test.tiff</li>
 </ul>
 </li>
 </ul>
