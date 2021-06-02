@@ -1,0 +1,252 @@
+<!DOCTYPE html><html class="appearance-dark" lang="zh-CN"><head><meta charset="UTF-8"><title>模糊测试之WinAFL总结</title><meta name="description" content="Winter is coming"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><!-- Google Analytics --><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q || []).push(arguments)},i[r].l=1 * new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', '', 'auto');
+ga('send', 'pageview');</script><!-- End Google Analytics -->
+<!-- Baidu Analytics --><!-- End Baidu Analytics --><link rel="icon" href="/source/favicon.png"><link rel="stylesheet" href="/style/common/bulma.css"><link rel="stylesheet" href="/style/base.css"><link rel="stylesheet" href="/style/common/helper.css"><script src="/js/common.js"></script><link rel="stylesheet" href="/style/post.css"><link rel="stylesheet" href="/style/themes/highlight-theme-light.css"><script src="/js/highlight.pack.js"></script><script src="//unpkg.com/valine/dist/Valine.min.js"></script><meta name="generator" content="Hexo 5.3.0"></head><body class="is-flex is-flex-direction-column"><header class="header-widget is-flex-shrink-0 is-hidden-mobile"><div class="container is-fullhd is-flex is-justify-content-space-between is-align-items-center is-full-height"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/">Fstark's blog</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">模糊测试之WinAFL总结</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">点击返回顶部</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about/">关于</a></h3><h3 class="is-inline-block"><a href="/archives/">归档</a></h3></aside></div></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about/">关于</a></h3><h3 class="is-inline-block"><a href="/archives/">归档</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Winafl%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-text">Winafl是什么？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8DynamoRIO%E8%BF%94%E5%9B%9E%E8%A6%86%E7%9B%96%E7%8E%87%E4%BF%A1%E6%81%AF"><span class="toc-text">使用DynamoRIO返回覆盖率信息</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%A1%E7%B3%8A%E7%AD%96%E7%95%A5"><span class="toc-text">模糊策略</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%80%E5%A7%8B%E4%BD%BF%E7%94%A8Winafl"><span class="toc-text">开始使用Winafl</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A8%E6%89%8B%EF%BC%9A%E8%AE%A9%E6%88%91%E4%BB%AC%E4%BD%BF%E7%94%A8WinAFL"><span class="toc-text">动手：让我们使用WinAFL</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A8%E6%89%8B%EF%BC%9A%E8%BF%90%E8%A1%8CWinAFL%E5%BC%80%E5%A7%8BFuzzing"><span class="toc-text">动手：运行WinAFL开始Fuzzing</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A8%E6%89%8B%EF%BC%9AWinAFL%E7%8A%B6%E6%80%81%E5%B1%8F%E5%B9%95"><span class="toc-text">动手：WinAFL状态屏幕</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A8%E6%89%8B%EF%BC%9A%E5%88%86%E6%9E%90%E5%B4%A9%E6%BA%83%E5%B9%B6%E6%89%BE%E5%88%B0%E6%A0%B9%E6%9C%AC%E5%8E%9F%E5%9B%A0"><span class="toc-text">动手：分析崩溃并找到根本原因</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%80%E6%90%9E%E7%9C%9F%E5%AE%9E%E7%9A%84%E5%95%86%E4%B8%9A%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F"><span class="toc-text">开搞真实的商业应用程序</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9MDB%E6%96%87%E4%BB%B6%E8%BF%9B%E8%A1%8Cfuzz"><span class="toc-text">对MDB文件进行fuzz</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CVE-2018-8423%E5%92%8CCVE-2019-0576%E5%88%86%E6%9E%90"><span class="toc-text">CVE-2018-8423和CVE-2019-0576分析</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#CVE-2018-8423"><span class="toc-text">CVE-2018-8423</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#CVE-2019-0576"><span class="toc-text">CVE-2019-0576</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9C%A8Windows%E4%B8%8B%E5%A6%82%E4%BD%95%E8%BF%BD%E8%B8%AA%E5%88%86%E7%B1%BBCrash%EF%BC%9F"><span class="toc-text">在Windows下如何追踪分类Crash？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-text">总结</span></a></li></ol></div><div class="column is-9"><header class="my-4"><a href="/tags/%E4%BA%8C%E8%BF%9B%E5%88%B6"><i class="tag post-item-tag">二进制</i></a></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">模糊测试之WinAFL总结</h1><time class="has-text-grey" datetime="2021-06-02T03:22:00.000Z">2021-06-02</time><article class="mt-2 post-content"><p>本文是对于模糊测试方面的小总结，计划三篇；第一篇概述；第二篇afl；第三篇Winafl。非大部头书，只提取关键信息。<br>本篇为第三篇：winafl，本篇中的内容大量引用Hardik Shah的公开演讲。</p>
+<a id="more"></a>
+
+<p>本篇的主要内容如下：</p>
+<ul>
+<li>Winafl是什么</li>
+<li>使用DynamoRIO返回覆盖率信息</li>
+<li>模糊策略</li>
+<li>开始使用Winafl<ul>
+<li>动手：使用VisualStudio编译示例C程序</li>
+<li>动手：找到Fuzz函数的偏移量</li>
+<li>动手：在调试模式下运行Winafl，检查一切正常</li>
+<li>动手：开始使用WinAFL</li>
+<li>动手：分析崩溃并找到根本原因</li>
+</ul>
+</li>
+<li>开搞真实的商业应用程序<ul>
+<li>动手：编写一个线束/测试程序来读取/解析MDB文件</li>
+<li>动手：分析MDB文件</li>
+<li>动手：用WinAFL模糊它</li>
+<li>CVE-2018-8423和CVE-2019-0576分析</li>
+</ul>
+</li>
+<li>总结</li>
+</ul>
+<h2 id="Winafl是什么？"><a href="#Winafl是什么？" class="headerlink" title="Winafl是什么？"></a>Winafl是什么？</h2><ul>
+<li>在FUzz的闭源代码程序所面临许多挑战<ul>
+<li>无源码，仅有dll和exes<ul>
+<li>比如：Gdi32.dll,gdiplus.dll, msrd3x40.dll</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Winafl<ul>
+<li>Windows版本的afl（American Fuzzy Lop）</li>
+<li>由 Ivan Fratric 所维护</li>
+<li>使用 <strong>DynamoRIO</strong>(drrun.exe)来插桩和收集覆盖率</li>
+<li>afl-fuzz.exe与充当drrun.exe客户端的winafl.dll进行通信<ul>
+<li>信息流：afl-fuzz.exe &lt;——&gt; winafl.dll &lt;——&gt; drrun.exe</li>
+</ul>
+</li>
+<li>需要写一种叫harness的程序<ul>
+<li>它能从处理文件解析的DLL中调用函数</li>
+<li>harness应该有一个函数，它接受文件名作为输入，打开它，然后进行进一步的处理</li>
+<li>winafl将在内存模糊中使用这个函数</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>一个简单的实例</li>
+</ul>
+<p><img src="https://i.loli.net/2021/06/02/LoKvtGHfFnwMslW.png" alt="image-20210602094353421"></p>
+<h2 id="使用DynamoRIO返回覆盖率信息"><a href="#使用DynamoRIO返回覆盖率信息" class="headerlink" title="使用DynamoRIO返回覆盖率信息"></a>使用DynamoRIO返回覆盖率信息</h2><ul>
+<li><p>afl-fuzz.exe是负责在linux上实现模糊测试的过程主进程</p>
+</li>
+<li><p>winafl.dll是一个客户端dll，它负责处理从dynamorio, pre_fuzz, </p>
+<p>post_fuzz之类传递过来的信息</p>
+</li>
+<li><p>两者都通过IPC（Inter-Process Communication进程间通讯）进行通信</p>
+</li>
+<li><p>注册各种事件的回调，比如基本块、模块的加载和卸载等</p>
+</li>
+</ul>
+<p><img src="https://i.loli.net/2021/06/02/hEBCgiVymYzHIFM.png" alt="image-20210602095350741"></p>
+<ul>
+<li>检查其模块是否为目标模块，然后使用符号/地址来搜索模糊函数</li>
+</ul>
+<p><img src="https://i.loli.net/2021/06/02/tThbW7IMkB4aGdN.png" alt="image-20210602095717769"></p>
+<ul>
+<li>调用pre_fuzz处理程序以保存程序此时的状态</li>
+<li>执行函数并监控崩溃情况，不断更新覆盖率map</li>
+<li>调用post_fuzz处理程序并恢复状态</li>
+<li>一直循环到迭代次数</li>
+</ul>
+<h2 id="模糊策略"><a href="#模糊策略" class="headerlink" title="模糊策略"></a>模糊策略</h2><ul>
+<li><strong>bitflip</strong>，按位翻转，1变为0，0变为1<ul>
+<li>1/1,2/1,4/1,8/8 ….32/8</li>
+</ul>
+</li>
+<li><strong>Byte Flip</strong> ，按字节反转</li>
+<li><strong>arithmetic</strong>，整数加/减算术运算</li>
+<li><strong>havoc</strong>，中文意思是“大破坏”，此阶段会对原文件进行大量变异</li>
+<li><strong>dictionary</strong>，把自动生成或用户提供的token替换/插入到原文件中</li>
+<li><strong>interest</strong>，把一些特殊内容替换到原文件中</li>
+<li><strong>splice</strong>，中文意思是“绞接”，此阶段会将两个文件拼接起来得到一个新的文件</li>
+</ul>
+<p>该部分内容可参考官方文档： <a target="_blank" rel="noopener" href="https://github.com/googleprojectzero/winafl/blob/master/afl_docs/technical_details.txt">https://github.com/googleprojectzero/winafl/blob/master/afl_docs/technical_details.txt</a></p>
+<h2 id="开始使用Winafl"><a href="#开始使用Winafl" class="headerlink" title="开始使用Winafl"></a>开始使用Winafl</h2><h3 id="动手：让我们使用WinAFL"><a href="#动手：让我们使用WinAFL" class="headerlink" title="动手：让我们使用WinAFL"></a>动手：让我们使用WinAFL</h3><ul>
+<li>编译<ul>
+<li>使用 visual studio 编译目标二进制程序或者使用官方预编译好的二进制程序</li>
+</ul>
+</li>
+<li>开启<strong>Page Heap</strong>堆页<ul>
+<li>开启：<strong>gflags /p /enable readfile.exe</strong></li>
+<li>验证：<strong>gflags /p</strong> </li>
+</ul>
+</li>
+<li>对函数fuzz<ul>
+<li>查找处理器图像函数的偏移量<ul>
+<li>用 WinDBG</li>
+<li>x ReadFile!ProcessImage</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>确保程序得到DynamoRIO信息正确：<ul>
+<li>C:\fuzzingwork\DynamoRIO-Windows-7.1.0-1\bin32\drrun.exe -c winafl.dll -debug -target_module readfile.exe -target_offset 0x10a0 -fuzz_iterations 10 -nargs 1 – readfile.exe 1.img<ul>
+<li><strong>Drrun.exe</strong> -&gt; DynamoRIO 二进制程序</li>
+<li><strong>-c winafl.dll</strong> -&gt; 用于与drrun通讯的客户端程序</li>
+<li><strong>-debug</strong> -&gt; Winafl将生成调试日志</li>
+<li><strong>-target_module</strong> -&gt;  你想要插桩&amp;测量代码覆盖率的目标模块</li>
+<li><strong>-target_offset</strong> -&gt;  在内存模糊中的你要fuzz的函数的偏移</li>
+<li><strong>-fuzz_iterations</strong> -&gt; 你想要循环的次数</li>
+<li><strong>-nargs</strong> -&gt; 参数的数量</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="动手：运行WinAFL开始Fuzzing"><a href="#动手：运行WinAFL开始Fuzzing" class="headerlink" title="动手：运行WinAFL开始Fuzzing"></a>动手：运行WinAFL开始Fuzzing</h3><ul>
+<li>命令行格式：</li>
+</ul>
+<p><strong>AFL-FUZZ.EXE AFL_ARGS</strong> <strong>–</strong> <strong>INSTRUMENTATION_OPTIONS</strong> <strong>–</strong> <strong>PROGRAM_NAME @@</strong></p>
+<p><img src="https://i.loli.net/2021/06/02/NPi2VtCWQcqJ7sx.png" alt="image-20210602101900240"></p>
+<ol>
+<li><strong>afl-fuzz.exe参数</strong><ul>
+<li><strong>-M –</strong> Master模式</li>
+<li><strong>-S</strong> –  Slave模式</li>
+<li><strong>-i</strong> -&gt;  输入目录</li>
+<li><strong>-o</strong> -&gt; 输出目录</li>
+<li><strong>-D</strong> -&gt; DynamoRIO bin32/64  目录路径</li>
+<li><strong>-t</strong> -&gt; 超时时间</li>
+</ul>
+</li>
+<li><strong>DynamoRIO的参数</strong><ul>
+<li>-<strong>coverage_module -&gt;</strong> 需要进行检测的dll/exe的名称</li>
+<li><strong>-target_module -&gt;</strong> harness里可执行文件的名称。</li>
+<li><strong>-target_method or –target_offset -&gt;</strong>  处理输入文件的偏移量或者函数名称。</li>
+<li><strong>-call_convention –</strong>  -函数调用约定，比如 thiscall,stdcall,cdecl,fastcall等</li>
+</ul>
+</li>
+<li><strong>程序参数，后面跟着@@</strong></li>
+</ol>
+<h3 id="动手：WinAFL状态屏幕"><a href="#动手：WinAFL状态屏幕" class="headerlink" title="动手：WinAFL状态屏幕"></a>动手：WinAFL状态屏幕</h3><p><img src="https://i.loli.net/2021/06/02/563NPZpKOmeo4RT.png" alt="image-20210602103105193"></p>
+<p>详细情况说明可看官方文档： <a target="_blank" rel="noopener" href="https://github.com/google/AFL/blob/master/docs/status_screen.txt">https://github.com/google/AFL/blob/master/docs/status_screen.txt</a></p>
+<h3 id="动手：分析崩溃并找到根本原因"><a href="#动手：分析崩溃并找到根本原因" class="headerlink" title="动手：分析崩溃并找到根本原因"></a>动手：分析崩溃并找到根本原因</h3><ul>
+<li>使用Visual Studio<ul>
+<li>调试源代码，运行崩溃文件，并跟踪执行流程，查找根本原因。</li>
+</ul>
+</li>
+<li>使用windbg<ul>
+<li>使用崩溃文件调试可执行文件并查找根本原因</li>
+</ul>
+</li>
+</ul>
+<h2 id="开搞真实的商业应用程序"><a href="#开搞真实的商业应用程序" class="headerlink" title="开搞真实的商业应用程序"></a>开搞真实的商业应用程序</h2><h3 id="对MDB文件进行fuzz"><a href="#对MDB文件进行fuzz" class="headerlink" title="对MDB文件进行fuzz"></a>对MDB文件进行fuzz</h3><ul>
+<li><p>Fuzz MDB 文件的harness</p>
+<ul>
+<li>使用CDao数据库对象</li>
+<li>打开MDB文件</li>
+<li>关闭它</li>
+<li>解析代码在msrd3x40.dll中</li>
+<li>db.open将从这个dll中调用函数</li>
+<li>如果文件结构不正确，我们的程序将崩溃</li>
+<li>这个harness导致了13个CVE</li>
+</ul>
+<p><img src="https://i.loli.net/2021/06/02/oSwLDYZ9RxyBv2a.png" alt="image-20210602103951576"></p>
+</li>
+<li><p>开始fuzz</p>
+<ul>
+<li>编译这个c文件</li>
+<li>从谷歌收集一些MDB文件</li>
+<li>用winafl来fuzz它</li>
+</ul>
+</li>
+</ul>
+<h3 id="CVE-2018-8423和CVE-2019-0576分析"><a href="#CVE-2018-8423和CVE-2019-0576分析" class="headerlink" title="CVE-2018-8423和CVE-2019-0576分析"></a>CVE-2018-8423和CVE-2019-0576分析</h3><h4 id="CVE-2018-8423"><a href="#CVE-2018-8423" class="headerlink" title="CVE-2018-8423"></a>CVE-2018-8423</h4><ul>
+<li>Ref: <a target="_blank" rel="noopener" href="https://portal.msrc.microsoft.com/en-US/security-guidance/advisory/CVE-2018-8423">https://portal.msrc.microsoft.com/en-US/security-guidance/advisory/CVE-2018-8423</a></li>
+</ul>
+<p><img src="https://i.loli.net/2021/06/02/jhA2iK5vIfZ3LqR.png" alt="image-20210602104133063"></p>
+<ul>
+<li>这是一个OOB写入的漏洞</li>
+<li>在处理MDB文件时出现的漏洞</li>
+<li>MDB文件是由MSAccess使用的数据库文件<ul>
+<li>包含数据库结构，如表、索引、索引</li>
+<li>它有旧的和专有的文件格式，好在多年来许多人收集了不少样例<ul>
+<li>Ref: <a target="_blank" rel="noopener" href="http://jabakobob.net/mdb/">http://jabakobob.net/mdb/</a></li>
+<li>遵循页面结构<ul>
+<li>第一页，表定义页，数据页，OLE字段。表中的属性</li>
+<li>这使它成为一个容易的模糊目标</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>PoC Availble</strong> : <a target="_blank" rel="noopener" href="https://github.com/thezdi/PoC/tree/master/ZDI-18-1075">https://github.com/thezdi/PoC/tree/master/ZDI-18-1075</a><ul>
+<li>包含两个文件-&gt; Group1 [MDB file], poc.js [js file]</li>
+</ul>
+</li>
+<li>McAfee的分析报告：<a target="_blank" rel="noopener" href="https://www.mcafee.com/blogs/other-blogs/mcafee-labs/jet-database-engine-flaw-may-lead-to-exploitation-analyzing-cve-2018-8423/">https://www.mcafee.com/blogs/other-blogs/mcafee-labs/jet-database-engine-flaw-may-lead-to-exploitation-analyzing-cve-2018-8423/</a></li>
+</ul>
+<p><img src="https://i.loli.net/2021/06/02/6OXLNJh9GErZPuY.png" alt="image-20210602104749401"></p>
+<p><img src="https://i.loli.net/2021/06/02/lUgorCVdG5RSuxv.png" alt="image-20210602104821596"></p>
+<ul>
+<li>所以它被修复了，是吗？</li>
+</ul>
+<p><img src="https://i.loli.net/2021/06/02/yL5fYx8dKrogenN.png" alt="image-20210602104933026"></p>
+<h4 id="CVE-2019-0576"><a href="#CVE-2019-0576" class="headerlink" title="CVE-2019-0576"></a>CVE-2019-0576</h4><ul>
+<li>不，又发现了另一个问题！！cve-2019-0576</li>
+<li>Ref: <a target="_blank" rel="noopener" href="https://www.mcafee.com/blogs/other-blogs/mcafee-labs/analyzing-and-identifying-issues-with-the-microsoft-patch-for-cve-2018-8423/">https://www.mcafee.com/blogs/other-blogs/mcafee-labs/analyzing-and-identifying-issues-with-the-microsoft-patch-for-cve-2018-8423/</a></li>
+</ul>
+<p><img src="https://i.loli.net/2021/06/02/PVgNKXLq97n51JD.png" alt="image-20210602105031369"></p>
+<p><img src="https://i.loli.net/2021/06/02/SBcz7dJQkxfegZh.png" alt="image-20210602105110211"></p>
+<ul>
+<li>它最终是如何解决的？</li>
+</ul>
+<p><img src="https://i.loli.net/2021/06/02/ObgrYSxlPDB4smc.png" alt="image-20210602105135986"></p>
+<h2 id="在Windows下如何追踪分类Crash？"><a href="#在Windows下如何追踪分类Crash？" class="headerlink" title="在Windows下如何追踪分类Crash？"></a>在Windows下如何追踪分类Crash？</h2><ul>
+<li>人工手动一个个分析崩溃是非常困难的</li>
+<li>可以使用python + winappdbg 简单自动化</li>
+<li>编写自己的工具？</li>
+<li>使用bugid<ul>
+<li><a target="_blank" rel="noopener" href="https://bugid.skylined.nl/">https://bugid.skylined.nl/</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>模糊测试有助于全面理解软件安全<ul>
+<li>帮助编写更好的代码</li>
+<li>可以帮助找到使用正常测试找不到的问题</li>
+<li>帮助保护软件的安全</li>
+<li>软件开发生命周期的一部分</li>
+</ul>
+</li>
+<li>需要大量的艰苦的工作<ul>
+<li>会面临各种零碎的问题，任何小问题都会导致不工作</li>
+<li>花费无数小时去分析和解决这些问题</li>
+<li>期望供应商进行后续跟进</li>
+<li>结果被拒绝</li>
+</ul>
+</li>
+<li>但最终，这是值得的☺</li>
+</ul>
+</article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><em></em><a class="button is-default" href="/2021/03/16/symcc+afl/" title="符号执行Symcc与模糊测试AFL结合实践"><span class="has-text-weight-semibold">下一页: 符号执行Symcc与模糊测试AFL结合实践</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container" id="vcomments" data-comment_valine_id="gFcW43aIrI0SECFbJUKuX8Kd-gzGzoHsz" data-comment_valine_key="wRmrKhtHo1BipWydKE2EVHq6"></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><a title="twitter" target="_blank" rel="noopener nofollow" href="//twitter.com/FstarkFZY"><i class="iconfont icon-twitter"></i></a><!-- Github--><a title="github" target="_blank" rel="noopener nofollow" href="//github.com/F-ZhaoYang"><i class="iconfont icon-github"></i></a><!-- Ins--><a title="instagram" target="_blank" rel="noopener nofollow" href="//www.instagram.com//"><i class="iconfont icon-ins"></i></a><!-- RSS--><!-- 知乎--><!-- 领英--><!-- 脸书--><a title="facebook" target="_blank" rel="noopener nofollow" href="//www.facebook.com/fstark123"><i class="iconfont icon-tian7_facebook"></i></a></section><p><span>Copyright ©</span><span> Fstark 2021</span><span></span></p></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/post.js"></script></body></html>
