@@ -44,16 +44,16 @@
       
       <categories>
           
-          <category> fuzz </category>
-          
-          <category> winafl </category>
+          <category> 二进制 </category>
           
       </categories>
       
       
         <tags>
             
-            <tag> 二进制 </tag>
+            <tag> fuzz </tag>
+            
+            <tag> winafl </tag>
             
         </tags>
       
