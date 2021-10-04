@@ -1,0 +1,149 @@
+<!DOCTYPE html><html class="appearance-dark" lang="zh-CN"><head><meta charset="UTF-8"><title>Windows GDI+远程代码执行漏洞挖掘与分析（翻译）</title><meta name="description" content="Winter is coming"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><!-- Google Analytics --><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q || []).push(arguments)},i[r].l=1 * new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', '', 'auto');
+ga('send', 'pageview');</script><!-- End Google Analytics -->
+<!-- Baidu Analytics --><!-- End Baidu Analytics --><link rel="icon" href="/source/favicon.png"><link rel="stylesheet" href="/style/common/bulma.css"><link rel="stylesheet" href="/style/base.css"><link rel="stylesheet" href="/style/common/helper.css"><script src="/js/common.js"></script><link rel="stylesheet" href="/style/post.css"><link rel="stylesheet" href="/style/themes/highlight-theme-light.css"><script src="/js/highlight.pack.js"></script><script src="//unpkg.com/valine/dist/Valine.min.js"></script><meta name="generator" content="Hexo 5.3.0"></head><body class="is-flex is-flex-direction-column"><header class="header-widget is-flex-shrink-0 is-hidden-mobile"><div class="container is-fullhd is-flex is-justify-content-space-between is-align-items-center is-full-height"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/">Fstark's blog</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">Windows GDI+远程代码执行漏洞挖掘与分析（翻译）</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">点击返回顶部</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about/">关于</a></h3><h3 class="is-inline-block"><a href="/archives/">归档</a></h3></aside></div></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about/">关于</a></h3><h3 class="is-inline-block"><a href="/archives/">归档</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%83%8C%E6%99%AF%E4%BB%8B%E7%BB%8D"><span class="toc-text">背景介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFWinafl%EF%BC%9F"><span class="toc-text">什么是Winafl？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%94%B6%E9%9B%86%E8%AF%AD%E6%96%99%E5%BA%93"><span class="toc-text">收集语料库</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%80%E5%B0%8F%E5%8C%96%E8%AF%AD%E6%96%99%E5%BA%93"><span class="toc-text">最小化语料库</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Winafl%E6%98%AF%E5%A6%82%E4%BD%95%E5%B7%A5%E4%BD%9C%E7%9A%84%EF%BC%9F"><span class="toc-text">Winafl是如何工作的？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8-WinAFL-%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95"><span class="toc-text">使用 WinAFL 进行模糊测试</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%93%E6%9E%9C"><span class="toc-text">结果</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%A9%E7%94%A8%E8%A1%A5%E4%B8%81%E6%AF%94%E8%BE%83%E8%BF%9B%E4%B8%80%E6%AD%A5%E6%8E%A2%E7%B4%A2%E5%8E%9F%E5%9B%A0"><span class="toc-text">利用补丁比较进一步探索原因</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EMF-%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F"><span class="toc-text">EMF 文件格式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9C%A8-EMF-%E6%96%87%E4%BB%B6%E4%B8%AD%E5%AE%9A%E4%BD%8D%E6%BC%8F%E6%B4%9E%E8%AE%B0%E5%BD%95"><span class="toc-text">在 EMF 文件中定位漏洞记录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E6%80%BB%E7%BB%93"><span class="toc-text">执行流程总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%A6%E6%83%85"><span class="toc-text">详情</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%99%E4%B8%AA%E9%97%AE%E9%A2%98%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%EF%BC%9F"><span class="toc-text">这个问题如何解决？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%93%E8%AE%BA"><span class="toc-text">结论</span></a></li></ol></div><div class="column is-9"><header class="my-4"><a href="/tags/fuzz"><i class="tag post-item-tag">fuzz</i></a><a href="/tags/%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98"><i class="tag post-item-tag">漏洞挖掘</i></a><a href="/tags/%E6%96%B0%E8%B6%8B%E5%8A%BF"><i class="tag post-item-tag">新趋势</i></a><a href="/tags/%E7%BF%BB%E8%AF%91"><i class="tag post-item-tag">翻译</i></a></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">Windows GDI+远程代码执行漏洞挖掘与分析（翻译）</h1><time class="has-text-grey" datetime="2021-07-20T09:45:00.000Z">2021-07-20</time><article class="mt-2 post-content"><p>本文是自己对McAfee安全实验室Hardik Shah发现CVE-2021-1665过程文章的翻译（<a target="_blank" rel="noopener" href="https://www.mcafee.com/blogs/other-blogs/mcafee-labs/analyzing-cve-2021-1665-remote-code-execution-vulnerability-in-windows-gdi/">原文点击这里</a>），Hardik在Windows fuzz方面研究的内容颇多，在Youtube上也有自己的系列视频教授别人如何进行模糊测试，他也曾将浙江大学的MOPT算法移植到winafl上（原本仅适配了afl）以提升挖掘的效率，通过他分享的这篇文章可以学习一些漏洞挖掘流程和利用补丁对比回溯漏洞成因的思路。</p>
+ <a id="more"></a>
+
+<h3 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a>背景介绍</h3><p>Microsoft Windows 的图形设备接口简称 GDI+，允许各种应用层的程序调用打印机或视频显示器的图形功能。Windows 应用程序并不直接访问设备驱动程序等图形硬件，而是通过与 GDI 接口来与设备驱动程序交互。这样，就存在了一个 Windows 应用程序的抽象层和一组可供所有用户调用的通用 API。</p>
+<p>因为 GDI+ 很复杂，在网上GDI+ 也有各种漏洞的已知历史。McAfee 持续的对各种开源和闭源软件进行模糊测试，其中就包括 了Windows GDI+。在过去几年中，McAfee向 微软也报告了各种 Windows 组件（包括 GDI+）中的问题，并收到了相应的 CVE编号。</p>
+<p>在这篇文章中，详细介绍了 CVE-2021-1665：GDI+ 远程代码执行漏洞的发现过程与漏洞分析，这是使用 WinAFL 发现的漏洞之一。该漏洞已在 2021 年 1 月在 Microsoft 公布的补丁中解决。</p>
+<h3 id="什么是Winafl？"><a href="#什么是Winafl？" class="headerlink" title="什么是Winafl？"></a>什么是Winafl？</h3><p>WinAFL 是流行的 Linux模糊器 AFL 的 Windows  版本，是由 Google Project Zero 的 Ivan Fratric 发布并维护的。WinAFL 通过 DynamoRIO 进行二进制动态插桩与覆盖率反馈，想要针对应用程序进行模糊测试需要一个名为 Harness 的程序（部分文章中称其为Fuzz Driver），Harness 只不过是一个简单的程序，它可以调用我们想要 fuzz 的 API函数。</p>
+<p>以下是我们所使用的Harness小程序，用于模糊测试 GDI+ 图像和 GetThumbnailImage API函数。</p>
+<p><img src="https://i.loli.net/2021/10/04/t8LNrWHkwGMbQBR.png" alt="image-20211004160401285"></p>
+<p>如您所见，这段代码只是从提供的输入文件中创建一个新的图像对象，然后调用另一个函数来生成缩略图。这是一个极好的攻击媒介，如果使用缩略图，可能会影响各种 Windows 应用程序。此外，这个过程需要很少的用户交互，因此使用 GDI+ 并调用 GetThumbnailImage API 的软件容易受到攻击。</p>
+<h3 id="收集语料库"><a href="#收集语料库" class="headerlink" title="收集语料库"></a>收集语料库</h3><p>一个好的语料库能够为模糊测试提供坚实的基础。您可以使用 Google 或 Github 来广泛的收集语料信息，并在针对不同漏洞发布的各种公共 EMP 文件中获得额外的测试语料库。本文更改了 Microsoft 站点上提供的示例代码来自主的生成一些测试文件，比如以下代码生成一个包含 EMFPlusDrawString 和其它记录的 EMF 文件。</p>
+<p><img src="https://i.loli.net/2021/10/04/W63a8sNkqUVcvPS.png" alt="image-20211004160831893"></p>
+<p>该部分内容可以参考微软的官方文档：<a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-emfplus/07bda2af-7a5d-4c0b-b996-30326a41fa57">https</a> : <a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-emfplus/07bda2af-7a5d-4c0b-b996-30326a41fa57">//docs.microsoft.com/en-us/openspecs/windows_protocols/ms-emfplus/07bda2af-7a5d-4c0b-b996-30326a41fa57</a></p>
+<h3 id="最小化语料库"><a href="#最小化语料库" class="headerlink" title="最小化语料库"></a>最小化语料库</h3><p>收集初始语料库文件后，应将其最小化。为此，您可以使用名为 winafl-cmin.py 的实用程序，命令如下所示：</p>
+<pre><code class="shell">winafl-cmin.py -D D:\\\\work\\\\winafl\\\\DynamoRIO\\\\bin32 -t 10000 -i inCorpus -o minCorpus -covtype edge -coverage_module gdiplus.dll -target_module gdiplus_hardik.exe -target_method fuzzMe -nargs 2 — gdiplus_hardik.exe @@</code></pre>
+<h3 id="Winafl是如何工作的？"><a href="#Winafl是如何工作的？" class="headerlink" title="Winafl是如何工作的？"></a>Winafl是如何工作的？</h3><p>WinAFL 使用了内存模糊测试的概念，我们需要为 WinAFL 提供一个函数名称，Winafl将在函数开始时保存程序状态，并从语料库中获取一个输入文件对其进行变异操作，并将其提供给该函数。</p>
+<p>Winafl将监视任何新出现的代码路径或崩溃。如果它找到一个新的代码路径，它会将该输入文件视为一个有趣的测试用例，并将其添加到队列中以进行进一步的修改（变异）；如果发现任何崩溃，它会将崩溃文件保存在 crashes 文件夹中。</p>
+<p>下图显示了模糊测试流程：</p>
+<p><img src="https://i.loli.net/2021/10/04/N5iKQbrmWfAXdn7.png" alt="image-20211004161529149"></p>
+<h3 id="使用-WinAFL-进行模糊测试"><a href="#使用-WinAFL-进行模糊测试" class="headerlink" title="使用 WinAFL 进行模糊测试"></a>使用 WinAFL 进行模糊测试</h3><p>编译Harness程序、收集语料库并最小化后，您可以运行以下命令使用WinAFL进行漏洞挖掘了！</p>
+<pre><code class="shell">afl-fuzz.exe -i minCorpus -o out -D D:\\work\\winafl\\DynamoRIO\\bin32 -t 20000 —coverage_module gdiplus.dll -fuzz_iterations 5000 -target_module gdiplus_hardik.exe -target_offset 0x16e0 -nargs 2 — gdiplus_hardik.exe @@</code></pre>
+<h3 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h3><p>在经过一段时间的模糊测试后，发现了不少的Crash，经过复现发现在“ <strong>gdiplus!BuiltLine::GetBaselineOffset</strong> ”中发现了一个问题，它在调用的堆栈中如下所示：</p>
+<p><img src="https://i.loli.net/2021/10/04/aovZ4khwP9XVD71.png" alt="image-20211004161915453"></p>
+<p>如上图所示，程序在尝试读取 edx+8 指向的内存地址处的数据时崩溃。可以看到 ebx、ecx 和 edx 包含 c0c0c0c0，这也就是说为二进制启用了页堆（Page Heap），我们还可以看到 c0c0c0c0 作为参数传递给“ <strong>gdiplus!FullTextImager::RenderLine</strong> ”函数。</p>
+<h3 id="利用补丁比较进一步探索原因"><a href="#利用补丁比较进一步探索原因" class="headerlink" title="利用补丁比较进一步探索原因"></a>利用补丁比较进一步探索原因</h3><p>为了找出根本原因，您可以使用 IDA BinDiff 插件来识别补丁文件中的更改。如果幸运的话，只需查看更改的代码，就可以轻松找到根本原因。因此，我们可以生成 gdiplus.dll 打补丁和未打补丁版本的两种 IDB 文件，然后运行 IDA <strong>BinDiff</strong>插件来查看它们有哪些不同。</p>
+<p>我们可以看到在补丁文件中添加了一个新函数，这似乎是<strong>BuiltLine</strong> 对象的析构函数：</p>
+<p><img src="https://i.loli.net/2021/10/04/2GDq5A1rScuRhfT.png" alt="image-20211004162536761"></p>
+<p>您可以看到一些函数的相似度分数 &lt; 1，其中之一是<strong>FullTextImager::BuildAllLines</strong>，如下所示：</p>
+<p><img src="https://i.loli.net/2021/10/04/fiejrdQ9zIBpG4T.png" alt="image-20211004162729903"></p>
+<p>为了验证这个函数是否真的被打过补丁，我们可以在windbg中运行我们的测试程序（harness）和POC（crash），并在这个函数上设置一个断点。我们观察到断点被击中时，程序不再崩溃：</p>
+<p><img src="https://i.loli.net/2021/10/04/Xze8fix2JokUMQH.png" alt="image-20211004163003533"></p>
+<p>接下来，我们需要确定此函数中进行了哪些更改以修复此漏洞。我们可以切换函数的流程图对比来进行查找：不幸的是，有如此多的变化，仅通过查看差异无法识别出漏洞位置。</p>
+<p><img src="https://i.loli.net/2021/10/04/WgxV8KXtZ6cyYwb.png" alt="image-20211004163348840"></p>
+<p>左侧展示了一个未打补丁的 dll，而右侧展示了一个打过补丁的 dll：</p>
+<ul>
+<li>绿色表示补丁和未补丁的相同块。</li>
+<li>黄色表示未补丁和已补丁的 dll 之间发生了一些变化。</li>
+<li>红色表示 dll 中补丁前后出现比较明显的差异。</li>
+</ul>
+<p>如果我们放大黄色块，我们可以看到以下内容：</p>
+<p><img src="https://i.loli.net/2021/10/04/ApfXUBjI1LiNrWu.png" alt="image-20211004163548595"></p>
+<p>我们可以看到一些变化，由于已从补丁后的 DLL 中删除了一些块，因此仅靠补丁差异不足以确定漏洞的根本原因。但是，它确实提供了有关在使用其他调试方法（如 windbg）时在哪里查找内容的宝贵提示。我们可以在上面的 BinDiff 输出中看到一些观察结果：</p>
+<ul>
+<li>在未打补丁的 DLL 中，如果我们仔细检查，我们可以看到调用了“ <strong>GetuntrimmedCharacterCount</strong> ”函数，随后又调用了另一个函数“ <strong>SetSpan::SpanVector</strong> ”</li>
+<li>在修补后的 DLL 中，我们可以看到调用了“ <strong>GetuntrimmedCharacterCount</strong> ”，其中检查了存储在<strong>EAX</strong>寄存器中的返回值。如果是零，则控制跳转到另一个位置的（BuiltLine 对象的析构函数），这是新添加的代码：</li>
+</ul>
+<p><img src="https://i.loli.net/2021/10/04/seTEkPtgbMIxjNV.png" alt="image-20211004163934672"></p>
+<p>所以我们可以假设这是修复漏洞的地方。现在我们需要弄清楚以下几点：</p>
+<ol>
+<li>为什么我们的程序会因提供的 POC 文件而崩溃？</li>
+<li>文件中的哪个字段导致此崩溃？</li>
+<li>该字段的值是什么？</li>
+<li>导致此崩溃的程序条件是什么？</li>
+<li>漏洞是如何解决的？</li>
+</ol>
+<h3 id="EMF-文件格式"><a href="#EMF-文件格式" class="headerlink" title="EMF 文件格式"></a>EMF 文件格式</h3><p>EMF 也称为增强型元文件格式，用于独立存储图形图像设备。EMF 文件由各种长度可变的记录组成。它可以包含各种图形对象的定义、绘图命令和其他图形属性。</p>
+<p><img src="https://i.loli.net/2021/10/04/aAoMLUg1uX67IDV.png" alt="image-20211004164324662"></p>
+<p>通常，一个 EMF 文件包含以下记录：</p>
+<ol>
+<li>EMF 标头 - 包含有关 EMF 结构的信息。</li>
+<li>EMF 记录 - 这可以是各种长度可变的记录，其中包含有关图形细节、绘图顺序等的信息。</li>
+<li>EMFEOF 记录 - EMF 文件中的最后一条记录。</li>
+<li>可以在位于以下 URL 的 Microsoft 站点上找到 EMF 文件格式的详细规范：</li>
+</ol>
+<p><a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-emf/91c257d7-c39d-4a36-9b1f-63e3f73d30ca">https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-emf/91c257d7-c39d-4a36-9b1f-63e3f73d30ca</a></p>
+<h3 id="在-EMF-文件中定位漏洞记录"><a href="#在-EMF-文件中定位漏洞记录" class="headerlink" title="在 EMF 文件中定位漏洞记录"></a>在 EMF 文件中定位漏洞记录</h3><p>通常，EMF 中的大多数问题都是由于格式错误或损坏的记录造成的。我们需要找出导致这次崩溃的记录类型。为此，如果我们查看调用堆栈，我们可以看到以下内容：</p>
+<p><img src="https://i.loli.net/2021/10/04/7XypxJuEdO63mtT.png" alt="image-20211004164439912"></p>
+<p>我们可以注意到对函数“ <strong>gdiplus!GdipPlayMetafileRecordCallback</strong> ”的调用</p>
+<p><img src="https://i.loli.net/2021/10/04/7NJDIvkbPB1dyQF.png" alt="image-20211004164502396"></p>
+<p>通过在该函数上设置断点并检查参数，我们可以看到以下内容：</p>
+<p><img src="https://i.loli.net/2021/10/04/ub9ls1xMdRFSvga.png" alt="image-20211004164540535"></p>
+<p>我们可以看到<strong>EDX</strong>包含一些内存地址，我们可以看到给这个函数的参数是：00x00401c、0x00000000 和 0x00000044。</p>
+<p>除此之外，在检查<strong>EDX</strong>指向的位置时，我们可以看到以下内容：</p>
+<p><img src="https://i.loli.net/2021/10/04/i1rlbE39dj7sP5e.png" alt="image-20211004164613679"></p>
+<p>如果我们检查我们的 POC EMF 文件，我们将看到该数据属于文件中的偏移量 0x15c。</p>
+<p><img src="https://i.loli.net/2021/10/04/Q2G1o6heHYzVCS9.png" alt="image-20211004164635282"></p>
+<p>通过EMF规范，手动解析记录，我们可以很容易地看出这是一个“ <strong>EmfPlusDrawString”</strong>记录，该记录的格式如下。</p>
+<p><img src="https://i.loli.net/2021/10/04/G1Wiz2qaZCJdO9p.png" alt="image-20211004164743038"></p>
+<p>在我们的例子中：</p>
+<p>Record Type = 0x401c EmfPlusDrawString record</p>
+<p>Flags = 0x0000</p>
+<p>Size = 0x50</p>
+<p>Data size = 0x44</p>
+<p>Brushid = 0x02</p>
+<p>Format id = 0x01</p>
+<p><strong>Length = 0x14</strong></p>
+<p>Layoutrect = 00 00 00 00 00 00 00 00 FC FF C7 42 00 00 80 FF</p>
+<p>String data =</p>
+<p><img src="https://i.loli.net/2021/10/04/rc5jnUVMQBySmpd.png" alt="image-20211004164856788"></p>
+<p>现在我们似乎已经找到了导致崩溃的记录，接下来就是找出程序崩溃的原因。如果我们调试和检查代码，我们可以看到控制到达了一个函数“ <strong>gdiplus!FullTextImager::BuildAllLines</strong> ”。当我们反编译这段代码时，我们可以看到如下内容：</p>
+<p><img src="https://i.loli.net/2021/10/04/8zPiV7MfsHXInLx.png" alt="image-20211004165020772"></p>
+<p>下图显示了函数调用的层次结构。</p>
+<p><img src="https://i.loli.net/2021/10/04/NQ4eqHXGVtB3f6U.png" alt="image-20211004165049682"></p>
+<h3 id="执行流程总结"><a href="#执行流程总结" class="headerlink" title="执行流程总结"></a>执行流程总结</h3><ol>
+<li>在“ <strong>Builtline::BuildAllLines”</strong>函数内部，有一个while循环，程序在其中分配了0x60字节的内存。然后它调用“ <strong>Builtline::BuiltLine”</strong></li>
+<li>该<strong>“Builtline :: BuiltLine”</strong>函数将数据迁移到新分配的内存，然后将其称之为“ <strong>BuiltLine :: GetUntrimmedCharacterCount</strong> ”。</li>
+<li>“ <strong>BuiltLine::GetUntrimmedCharacterCount</strong> ”的返回值被添加到循环计数器中，即<strong>ECX</strong>。这个过程会一直重复，直到循环计数器（<strong>ECX</strong>）&lt; 字符串长度（<strong>EAX</strong>），这里是0x14。</li>
+<li>循环从 0 开始，所以它应该在<strong>0x13 处</strong>终止，或者应该在“ <strong>GetUntrimmedCharacterCount”</strong>的返回值为0时终止。</li>
+<li>但是在易受攻击的<strong>DLL 中</strong>，由于循环计数器增加的方式，程序不会终止。这里，“ <strong>BuiltLine::GetUntrimmedCharacterCount”</strong>返回0，它被添加到循环计数器（<strong>ECX</strong>）并且不会增加ECX值。它分配 0x60 字节的内存并创建另一行破坏数据导致程序崩溃。循环执行了<strong>21</strong>次而不是<strong>20</strong>次<strong>。</strong></li>
+</ol>
+<h3 id="详情"><a href="#详情" class="headerlink" title="详情"></a>详情</h3><ol>
+<li>在“ <strong>Builtline::BuildAllLines”</strong>内部将分配0x60或96字节的内存，在调试器中如下所示：</li>
+</ol>
+<p><img src="https://i.loli.net/2021/10/04/QDkz2Z7d8Y5r4j3.png" alt="image-20211004165336100"></p>
+<ol start="2">
+<li>然后调用“ <strong>BuiltLine::BuiltLine</strong> ”函数并将数据移动到新分配的内存中：</li>
+</ol>
+<p><img src="https://i.loli.net/2021/10/04/it8eDdGVu3YHLxK.png" alt="image-20211004165406705"></p>
+<ol start="3">
+<li>这发生在 while 循环中，并且有一个对“ <strong>BuiltLine::GetUntrimmedCharacterCount</strong> ”的函数调用。</li>
+<li>“ <strong>BuiltLine::GetUntrimmedCharacterCount</strong> ”的返回值存储在0x12ff2ec位置。该值将为 1，如下所示：</li>
+</ol>
+<p><img src="https://i.loli.net/2021/10/04/FVC7tUlj4mzZa3J.png" alt="image-20211004165449904"></p>
+<ol start="5">
+<li>此值被添加到 ECX：</li>
+</ol>
+<p><img src="https://i.loli.net/2021/10/04/MDbkYARcNSJBzKg.png" alt="image-20211004165532361"></p>
+<ol start="6">
+<li>然后检查确定是否<strong>ecx&lt; eax</strong>。如果为真，它将继续循环，否则将跳转到另一个位置：</li>
+</ol>
+<p><img src="https://i.loli.net/2021/10/04/1a8wgIG7Vubh9YO.png" alt="image-20211004165606361"></p>
+<p>7、现在在易受攻击的版本中，如果“ <strong>BuiltLine::GetUntrimmedCharacterCount</strong> ”的返回值为0，则循环不存在，这意味着将 0 添加到 ECX 并且 ECX 值不增加。所以需要运行20次的循环一共执行了21次，这就是根本原因。</p>
+<p>同样经过一些调试，我们可以弄清楚为什么<strong>EAX</strong>包含 14。它是从 POC 文件中的偏移量0x174 处读取的：</p>
+<p><img src="https://i.loli.net/2021/10/04/z3e9itI7fWAxl5d.png" alt="image-20211004165850321"></p>
+<p>如果我们还记得，这是<strong>EmfPlusDrawString</strong>记录，<strong>0x14</strong>是我们之前提到的长度。</p>
+<p>稍后，程序使用“ <strong>FullTextImager::Render</strong> ”函数破坏 EAX 的值，因为它读取未使用的内存：</p>
+<p><img src="https://i.loli.net/2021/10/04/gBk2fq9MHDUh6Cr.png" alt="image-20211004165920282"></p>
+<p>这将作为参数传递给“ <strong>FullTextImager::RenderLine</strong> ”函数：</p>
+<p><img src="https://i.loli.net/2021/10/04/oxqYBwbzaHWQlLi.png" alt="image-20211004165943368"></p>
+<p>稍后，程序将在尝试访问此位置时崩溃。</p>
+<p><img src="https://i.loli.net/2021/10/04/DEPMIvpiBAHw34q.png" alt="image-20211004170004122"></p>
+<p>我们的程序在处理EMF 文件中的<strong>EmfPlusDrawString</strong>记录时崩溃，同时访问了无效的内存位置和处理字符串数据字段。总结来说，程序没有验证“ <strong>gdiplus!BuiltLine::GetUntrimmedCharacterCount</strong> ”函数的返回值，这导致采用不同的程序路径破坏寄存器和各种内存值，最终导致崩溃。</p>
+<h3 id="这个问题如何解决？"><a href="#这个问题如何解决？" class="headerlink" title="这个问题如何解决？"></a>这个问题如何解决？</h3><p>正如我们通过查看上面的补丁差异发现的那样，添加了一个检查来确定“ <strong>gdiplus!BuiltLine::GetUntrimmedCharacterCount</strong> ”函数的返回值。</p>
+<p><img src="https://i.loli.net/2021/10/04/9k8DrjW2RqsZwNF.png" alt="image-20211004170125822"></p>
+<p>如果返回的值为 0，则对包含计数器的xor 的<strong>EBX</strong>进行编程，并跳转到为内置对象调用析构函数的位置：</p>
+<p><img src="https://i.loli.net/2021/10/04/IgdAEm2UyZN8R15.png" alt="image-20211004170143828"></p>
+<p>这是防止问题的析构函数：</p>
+<p><img src="https://i.loli.net/2021/10/04/wQydAr5IF1xRStO.png" alt="image-20211004170202997"></p>
+<h3 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h3><p>GDI+ 是一个非常常用的 Windows 组件，此类漏洞可能会影响全球数十亿个系统。我们建议您对自己电脑上的应用定时更新，并使您的 Windows 部署保持最新。</p>
+<p>McAfee 不断对各种开源和闭源库进行模糊测试，并通过与供应商合作负责任地披露这些问题，为他们提供适当的时间来解决问题并根据需要发布更新。</p>
+<p>感谢 Microsoft 解决此问题并发布更新。</p>
+</article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><em></em><a class="button is-default" href="/2021/06/02/%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95%E4%B9%8BWinAFL%E6%80%BB%E7%BB%93/" title="模糊测试之WinAFL总结"><span class="has-text-weight-semibold">下一页: 模糊测试之WinAFL总结</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container" id="vcomments" data-comment_valine_id="gFcW43aIrI0SECFbJUKuX8Kd-gzGzoHsz" data-comment_valine_key="wRmrKhtHo1BipWydKE2EVHq6"></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><a title="twitter" target="_blank" rel="noopener nofollow" href="//twitter.com/FstarkFZY"><i class="iconfont icon-twitter"></i></a><!-- Github--><a title="github" target="_blank" rel="noopener nofollow" href="//github.com/F-ZhaoYang"><i class="iconfont icon-github"></i></a><!-- Ins--><a title="instagram" target="_blank" rel="noopener nofollow" href="//www.instagram.com//"><i class="iconfont icon-ins"></i></a><!-- RSS--><!-- 知乎--><!-- 领英--><!-- 脸书--><a title="facebook" target="_blank" rel="noopener nofollow" href="//www.facebook.com/fstark123"><i class="iconfont icon-tian7_facebook"></i></a></section><p><span>Copyright ©</span><span> Fstark 2021</span><span></span></p></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/post.js"></script></body></html>
